@@ -1,10 +1,10 @@
-# Gnosis Safe Apps
+# Safe Apps
 
-[![Logo](https://raw.githubusercontent.com/gnosis/safe-react-apps/main/assets/logo.png)](https://gnosis-safe.io/)
+[![Logo](https://raw.githubusercontent.com/safe-global/safe-react-apps/main/assets/logo.png)](https://gnosis-safe.io/)
 
-![license](https://img.shields.io/github/license/gnosis/safe-react-apps)
-![build](https://img.shields.io/github/workflow/status/gnosis/safe-react-apps/Deploy%20safe%20apps/main)
-![tests](https://img.shields.io/github/workflow/status/gnosis/safe-react-apps/Test/main?label=tests)
+![license](https://img.shields.io/github/license/safe-global/safe-react-apps)
+![build](https://img.shields.io/github/workflow/status/safe-global/safe-react-apps/Deploy%20safe%20apps/main)
+![tests](https://img.shields.io/github/workflow/status/safe-global/safe-react-apps/Test/main?label=tests)
 
 This project contains apps developed by Gnosis to be consumed by Gnosis Safe.
 
@@ -61,9 +61,9 @@ yarn workspace tx-builder contract:read-method --network <network> --address <ad
 
 In `./apps` you can find one folder per each integration app Gnosis develops.
 
-Also, each app must expose a `manifest.json` in order to be accepted by Gnosis Safe, you can find it in their `./public` folder. Besides the `manifest.json` file we also include the app Icon.
+Also, each app must expose a `manifest.json` in order to be accepted by Safe, you can find it in their `./public` folder. Besides the `manifest.json` file we also include the app Icon.
 
-This will allow the Gnosis Safe to consume these resources like so: `https://apps.gnosis-safe.io/tx-builder/manifest.json`
+This will allow the Safe to consume these resources like so: `https://apps.gnosis-safe.io/tx-builder/manifest.json`
 
 ## How to Develop a third-party App
 
@@ -85,29 +85,40 @@ headers: {
 
 These apps are deployed in the following environments.
 
-- When the code is merged into `development`: https://safe-apps.dev.gnosisdev.com
+- When the code is merged into `development`: https://safe-apps.dev.5afe.dev
 
-  [Compound](https://safe-apps.dev.gnosisdev.com/compound)
-  | [Drain Account](https://safe-apps.dev.gnosisdev.com/drain-safe)
-  | [Ramp Network](https://safe-apps.dev.gnosisdev.com/ramp-network)
-  | [Transaction Builder](https://safe-apps.dev.gnosisdev.com/tx-builder)
-  | [WalletConnect](https://safe-apps.dev.gnosisdev.com/wallet-connect)
+  [Drain Account](https://safe-apps.dev.5afe.dev/drain-safe)
+  | [Ramp Network](https://safe-apps.dev.5afe.dev/ramp-network)
+  | [Transaction Builder](https://safe-apps.dev.5afe.dev/tx-builder)
+  | [WalletConnect](https://safe-apps.dev.5afe.dev/wallet-connect)
 
-- When the code is merged into `main`: https://safe-apps.staging.gnosisdev.com
+- When the code is merged into `main`: https://safe-apps.staging.5afe.dev
 
-  [Compound](https://safe-apps.staging.gnosisdev.com/compound)
-  | [Drain Account](https://safe-apps.staging.gnosisdev.com/drain-safe)
-  | [Ramp Network](https://safe-apps.staging.gnosisdev.com/ramp-network)
-  | [Transaction Builder](https://safe-apps.staging.gnosisdev.com/tx-builder)
-  | [WalletConnect](https://safe-apps.staging.gnosisdev.com/wallet-connect)
+  [Drain Account](https://safe-apps.staging.5afe.dev/drain-safe)
+  | [Ramp Network](https://safe-apps.staging.5afe.dev/ramp-network)
+  | [Transaction Builder](https://safe-apps.staging.5afe.dev/tx-builder)
+  | [WalletConnect](https://safe-apps.staging.5afe.dev/wallet-connect)
 
 - When the code is released: https://apps.gnosis-safe.io
 
-  [Compound](https://apps.gnosis-safe.io/compound)
-  | [Drain Account](https://apps.gnosis-safe.io/drain-safe)
+  [Drain Account](https://apps.gnosis-safe.io/drain-safe)
   | [Ramp Network](https://apps.gnosis-safe.io/ramp-network)
   | [Transaction Builder](https://apps.gnosis-safe.io/tx-builder)
   | [WalletConnect](https://apps.gnosis-safe.io/wallet-connect)
+
+## Run e2e tests
+
+This repo provides e2e tests using Cypress. Ideally to be used on CI can also be handy to check locally that everything works as expected.
+To run them it will be necessary to provide the following ENV parameters, that can be filled in a `.env` file at the root of the project
+
+Example:
+```
+CYPRESS_BASE_URL=https://gnosis-safe.io/app
+CYPRESS_NETWORK_PREFIX=rin
+CYPRESS_TESTING_SAFE_ADDRESS=0x0000000000000000000000000000000000000000
+CYPRESS_CONFIG_SERVICE_BASE_URL=https://safe-client.gnosis.io
+```
+Make sure to enter the desired values, for example a Safe address that you own
 
 ## License
 
