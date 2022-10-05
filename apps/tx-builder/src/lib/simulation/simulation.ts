@@ -37,6 +37,12 @@ const NON_SUPPORTED_CHAINS = [
   '9001',
   // Evmos Testnet
   '9000',
+  // Moonbeam Mainnet
+  '1284',
+  // Moonriver Mainnet
+  '1285',
+  // Moonbase Testnet
+  '1287',
 ]
 
 const isSimulationSupported = (chainId: string) => !NON_SUPPORTED_CHAINS.includes(chainId)
