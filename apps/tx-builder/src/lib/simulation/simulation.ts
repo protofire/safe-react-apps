@@ -25,6 +25,18 @@ const NON_SUPPORTED_CHAINS = [
   '84531',
   // Aurora
   '1313161554',
+  // Astar
+  '529',
+  // Velas
+  '106',
+  // Cronos Mainnet
+  '25',
+  // Cronos Testnet
+  '338',
+  // Evmos Mainnet
+  '9001',
+  // Evmos Testnet
+  '9000',
 ]
 
 const isSimulationSupported = (chainId: string) => !NON_SUPPORTED_CHAINS.includes(chainId)
