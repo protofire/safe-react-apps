@@ -129,5 +129,4 @@ Latest code version from deprecated apps can be found in the following links:
 - [Compound](https://github.com/safe-global/safe-react-apps/releases/tag/compound-1.1.3)
 
 ## License
-
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
