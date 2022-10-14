@@ -124,5 +124,4 @@ CYPRESS_CONFIG_SERVICE_BASE_URL=https://safe-client.gnosis.io
 Make sure to enter the desired values, for example a Safe address that you own
 
 ## License
-
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
