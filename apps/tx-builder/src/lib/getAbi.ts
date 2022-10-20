@@ -88,7 +88,11 @@ const getAbi = async (address: string, chainInfo: ChainInfo): Promise<any> => {
     try {
       return await getAbiFromGateway(address, chainInfo.chainId)
     } catch {
-      return await getAbiFromBlockscout(address, chainInfo.chainId)
+      try {
+        return await getAbiFromBlockscout(address, chainInfo.chainId)
+      } catch {
+        return null
+      }
     }
   }
 }
