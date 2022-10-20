@@ -4,6 +4,7 @@ import { ChainInfo } from '@gnosis.pm/safe-apps-sdk'
 enum PROVIDER {
   SOURCIFY = 1,
   GATEWAY = 2,
+  BLOCKSCOUT = 3,
 }
 
 type SourcifyResponse = {
@@ -21,6 +22,8 @@ const getProviderURL = (chain: string, address: string, urlProvider: PROVIDER): 
       return `https://sourcify.dev/server/files/${chain}/${address}`
     case PROVIDER.GATEWAY:
       return `https://safe-client.gnosis.io/v1/chains/${chain}/contracts/${address}`
+    case PROVIDER.BLOCKSCOUT:
+      return `https://blockscout.com/${chain}/api?module=contract&action=getabi&address=${address}`
     default:
       throw new Error('The Provider is not supported')
   }
@@ -57,6 +60,27 @@ const getAbiFromGateway = async (address: string, chainName: string): Promise<an
   throw new Error('Contract found but could not found ABI using the Gateway')
 }
 
+const getAbiFromBlockscout = async (address: string, chainId: string): Promise<any> => {
+  let chainName = ''
+  if (chainId === '592') {
+    chainName = 'astar'
+  } else {
+    throw new Error('Unsupported chain')
+  }
+
+  const { data } = await axios.get(getProviderURL(chainName, address, PROVIDER.BLOCKSCOUT), {
+    timeout: DEFAULT_TIMEOUT,
+  })
+  // We need to check if the abi is present in the response because it's possible
+  // That the transaction service just stores the contract and returns 200 without querying for the abi
+  // (or querying for the abi failed)
+  if (data && data.message === 'OK' && data.result) {
+    return JSON.parse(data.result)
+  }
+
+  throw new Error('Contract found but could not found ABI using Blockscout')
+}
+
 const getAbi = async (address: string, chainInfo: ChainInfo): Promise<any> => {
   try {
     return await getAbiFromSourcify(address, chainInfo.chainId)
@@ -64,7 +88,7 @@ const getAbi = async (address: string, chainInfo: ChainInfo): Promise<any> => {
     try {
       return await getAbiFromGateway(address, chainInfo.chainId)
     } catch {
-      return null
+      return await getAbiFromBlockscout(address, chainInfo.chainId)
     }
   }
 }
