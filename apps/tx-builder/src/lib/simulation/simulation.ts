@@ -30,7 +30,7 @@ const NON_SUPPORTED_CHAINS = [
   // Aurora
   '1313161554',
   // Astar
-  '529',
+  '592',
   // Velas
   '106',
   // Cronos Mainnet
@@ -49,7 +49,11 @@ const NON_SUPPORTED_CHAINS = [
   '1287',
 ]
 
-const isSimulationSupported = (chainId: string) => !NON_SUPPORTED_CHAINS.includes(chainId)
+const isSimulationSupported = (chainId: string) => {
+  console.log('isSimulationSupported', !NON_SUPPORTED_CHAINS.includes(String(chainId)))
+  return !NON_SUPPORTED_CHAINS.includes(String(chainId))
+  
+}
 
 const getSimulation = async (tx: TenderlySimulatePayload): Promise<TenderlySimulation> => {
   const response = await axios.post<TenderlySimulation>(TENDERLY_SIMULATE_ENDPOINT_URL, tx)
