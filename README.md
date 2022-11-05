@@ -95,7 +95,7 @@ In `./apps` you can find one folder per each integration app Gnosis develops.
 
 Also, each app must expose a `manifest.json` in order to be accepted by Safe, you can find it in their `./public` folder. Besides the `manifest.json` file we also include the app Icon.
 
-This will allow the Safe to consume these resources like so: `https://apps.gnosis-safe.protofire.io//tx-builder/manifest.json`
+This will allow the Safe to consume these resources like so: `https://apps.gnosis-safe.protofire.io/tx-builder/manifest.json`
 
 ## How to Develop a third-party App
 
@@ -127,11 +127,11 @@ These apps are deployed in the following environments.
 
 - When the code is released into `protofire-prd`: https://apps.gnosis-safe.protofire.io/
 
-  [Compound](https://apps.gnosis-safe.protofire.io//compound)
-  | [Drain Account](https://apps.gnosis-safe.protofire.io//drain-safe)
-  | [Ramp Network](https://apps.gnosis-safe.protofire.io//ramp-network)
-  | [Transaction Builder](https://apps.gnosis-safe.protofire.io//tx-builder)
-  | [WalletConnect](https://apps.gnosis-safe.protofire.io//wallet-connect)
+  [Compound](https://apps.gnosis-safe.protofire.io/compound)
+  | [Drain Account](https://apps.gnosis-safe.protofire.io/drain-safe)
+  | [Ramp Network](https://apps.gnosis-safe.protofire.io/ramp-network)
+  | [Transaction Builder](https://apps.gnosis-safe.protofire.io/tx-builder)
+  | [WalletConnect](https://apps.gnosis-safe.protofire.io/wallet-connect)
 
 ## Run e2e tests
 
