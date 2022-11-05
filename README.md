@@ -1,12 +1,44 @@
 # Safe Apps
 
-[![Logo](https://raw.githubusercontent.com/safe-global/safe-react-apps/main/assets/logo.svg)](https://safe.global/)
+[![Logo](/assets/logo.png)](https://protofire.io/)
 
 ![license](https://img.shields.io/github/license/safe-global/safe-react-apps)
-![build](https://img.shields.io/github/actions/workflow/status/safe-global/safe-react-apps/deployment.yml?branch=main)
-![tests](https://img.shields.io/github/actions/workflow/status/safe-global/safe-react-apps/safe-apps-e2e.yml?branch=main)
+![build](https://img.shields.io/github/workflow/status/safe-global/safe-react-apps/Deploy%20safe%20apps/main)
+![tests](https://img.shields.io/github/workflow/status/safe-global/safe-react-apps/Test/main?label=tests)
 
-This project contains apps developed by Gnosis to be consumed by the Safe.
+This project its a mono-repo of safe apps. Initially forked from safe-global/safe-react-apps.
+Links to source: [Staging](https://github.com/protofire/safe-react-apps/tree/protofire-stg/apps/) and [Production](https://github.com/protofire/safe-react-apps/tree/protofire/apps/)
+
+## List of safe apps supported by Protofire
+
+We currently support only those EVM chain-agnostic dapps we see can bring tangible value to the projects we maintain and their users.
+
+### [Transaction Builder](https://github.com/protofire/safe-react-apps/tree/protofire-stg/apps/tx-builder)
+
+The Transaction Builder allows users to compose lists of transactions, execute them in a single batch to save gas, and export the list as a template for later re-use.
+The tool guarantees the atomicity of the execution; If any transaction fails, every transaction on the list will revert.
+Use case: Payroll, list of custom transactions, document complex Defi workflows, create templates for recurrent workflows
+
+### CSV Airdrop App
+
+Send arbitrarily many distinct tokens, to arbitrarily many distinct accounts with various different values from a CSV file in a single transaction.
+Use case: Payroll, easier than Transaction Builder for spreadsheet users.
+
+### [Drain Account](https://github.com/protofire/safe-react-apps/tree/protofire-stg/apps/drain-safe)
+
+Drain Account safe app provides a quick and easy way to drain every asset associated with the account on a given network.
+Useful to drain funds from compromised safes.
+Use case: emergency use in case of compromised security of a safe and its assets
+
+### [WalletConnect](https://github.com/protofire/safe-react-apps/tree/protofire-stg/apps/wallet-connect)
+
+Wallet Connect safe apps allows safe users to connect a Safe with dApps supporting wallet connect's protocol.
+Once a WC safe app is open, the user can open a dapp on a different tab/browser/device and connect to it by pasting the connection URL or scanning the dapp's QR code.
+Use cases: connect safe to other dApps
+
+
+----------------
+
 
 ## Install
 
@@ -62,7 +94,7 @@ In `./apps` you can find one folder per each integration app Gnosis develops.
 
 Also, each app must expose a `manifest.json` in order to be accepted by the Safe, you can find it in their `./public` folder. Besides the `manifest.json` file we also include the app Icon.
 
-This will allow the Safe to consume these resources like so: `https://apps-portal.safe.global/tx-builder/manifest.json`
+This will allow the Safe to consume these resources like so: `https://apps.gnosis-safe.protofire.io//tx-builder/manifest.json`
 
 ## How to Develop a third-party App
 
