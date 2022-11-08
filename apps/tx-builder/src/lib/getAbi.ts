@@ -82,19 +82,17 @@ const getAbiFromBlockscout = async (address: string, chainId: string): Promise<a
 }
 
 const getAbi = async (address: string, chainInfo: ChainInfo): Promise<any> => {
+  let abi
   try {
-    return await getAbiFromSourcify(address, chainInfo.chainId)
+    abi = await Promise.any([
+      getAbiFromSourcify(address, chainInfo.chainId),
+      getAbiFromGateway(address, chainInfo.chainId),
+      getAbiFromBlockscout(address, chainInfo.chainId),
+    ])
   } catch {
-    try {
-      return await getAbiFromGateway(address, chainInfo.chainId)
-    } catch {
-      try {
-        return await getAbiFromBlockscout(address, chainInfo.chainId)
-      } catch {
-        return null
-      }
-    }
+    abi = null
   }
+  return abi
 }
 
 export default getAbi
