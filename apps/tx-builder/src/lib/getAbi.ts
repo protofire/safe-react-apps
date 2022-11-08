@@ -17,6 +17,7 @@ const METADATA_FILE = 'metadata.json'
 const DEFAULT_TIMEOUT = 10000
 
 const getProviderURL = (chain: string, address: string, urlProvider: PROVIDER): string => {
+  console.log(`getProviderURL chain: ${chain},  address: ${address}`)
   switch (urlProvider) {
     case PROVIDER.SOURCIFY:
       return `https://sourcify.dev/server/files/${chain}/${address}`
@@ -104,7 +105,7 @@ const getGatewayProvider = (chain: string, address: string): string => {
       url = `https://gateway.velasafe.com/v1/chains/${chain}/contracts/${address}`
       break
     default:
-      url = `https://safe-client.gnosis.io/v1/chains/${chain}/contracts/${address}`
+      throw new Error('unsupported chain')
   }
   return url
 }
@@ -142,7 +143,7 @@ const getAbiFromGateway = async (address: string, chainName: string): Promise<an
 
 const getAbiFromBlockscout = async (address: string, chainId: string): Promise<any> => {
   let chainName = ''
-  if (chainId === '592') {
+  if (chainId === SUPPORTED_CHAINS.ASTAR) {
     chainName = 'astar'
   } else {
     throw new Error('Unsupported chain')
