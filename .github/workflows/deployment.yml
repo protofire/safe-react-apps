@@ -42,22 +42,25 @@ jobs:
         env:
           PR_NUMBER: ${{ github.event.number }}
           REVIEW_BUCKET_NAME: ${{ secrets.AWS_REVIEW_BUCKET_NAME }}
-          REACT_APP_RPC_TOKEN: ${{ secrets.REACT_APP_RPC_TOKEN }}
           REACT_APP_TENDERLY_ORG_NAME: ${{ secrets.REACT_APP_TENDERLY_ORG_NAME }}
           REACT_APP_TENDERLY_SIMULATE_ENDPOINT_URL: ${{ secrets.REACT_APP_TENDERLY_SIMULATE_ENDPOINT_URL }}
           REACT_APP_TENDERLY_PROJECT_NAME: ${{ secrets.REACT_APP_TENDERLY_PROJECT_NAME }}
+          REACT_APP_MMI_BACKEND_BASE_URL: ${{ secrets.MMI_BACKEND_BASE_URL }}
+          REACT_APP_MMI_ENVIRONMENT: ${{ secrets.MMI_ENVIRONMENT }}
+          REACT_APP_WALLETCONNECT_PROJECT_ID: ${{ secrets.REACT_APP_WALLETCONNECT_PROJECT_ID_DEVSTAGING }}
 
       - name: 'PRaul: Comment PR with app URLs'
         if: success() && github.event.number
         uses: mshick/add-pr-comment@v1
         with:
           message: |
-            * [Compound app](${{ env.REVIEW_FEATURE_URL }}/compound/)
-            * [WalletConnect app](${{ env.REVIEW_FEATURE_URL }}/wallet-connect/)
-            * [Tx Builder App](${{ env.REVIEW_FEATURE_URL }}/tx-builder/)
             * [Drain Account App](${{ env.REVIEW_FEATURE_URL }}/drain-safe/)
             * [RAMP Network App](${{ env.REVIEW_FEATURE_URL }}/ramp-network/)
+            * [Sign-In With Ethereum Delegate Manager App](${{ env.REVIEW_FEATURE_URL }}/siwe-delegate-manager/)
             * [Safe Claiming App](${{ env.REVIEW_FEATURE_URL }}/safe-claiming-app/)
+            * [Tx Builder App](${{ env.REVIEW_FEATURE_URL }}/tx-builder/)
+            * [WalletConnect app](${{ env.REVIEW_FEATURE_URL }}/wallet-connect/)
+            * [MMI App](${{ env.REVIEW_FEATURE_URL }}/mmi/)
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: 'github-actions[bot]'
         env:
@@ -87,10 +90,12 @@ jobs:
           npx nx affected --target=test --parallel
           npx nx affected --target=build --parallel
         env:
-          REACT_APP_RPC_TOKEN: ${{ secrets.REACT_APP_RPC_TOKEN }}
           REACT_APP_TENDERLY_ORG_NAME: ${{ secrets.REACT_APP_TENDERLY_ORG_NAME }}
           REACT_APP_TENDERLY_SIMULATE_ENDPOINT_URL: ${{ secrets.REACT_APP_TENDERLY_SIMULATE_ENDPOINT_URL }}
           REACT_APP_TENDERLY_PROJECT_NAME: ${{ secrets.REACT_APP_TENDERLY_PROJECT_NAME }}
+          REACT_APP_MMI_BACKEND_BASE_URL: ${{ secrets.MMI_BACKEND_BASE_URL }}
+          REACT_APP_MMI_ENVIRONMENT: ${{ secrets.MMI_ENVIRONMENT }}
+          REACT_APP_WALLETCONNECT_PROJECT_ID: ${{ secrets.REACT_APP_WALLETCONNECT_PROJECT_ID_DEVSTAGING }}
 
       # Script to deploy to the dev environment
       - name: 'Deploy to S3: Develop'
@@ -130,7 +135,9 @@ jobs:
           prod-deployment-hook-token: ${{ secrets.PROD_DEPLOYMENT_HOOK_TOKEN }}
           prod-deployment-hook-url: ${{ secrets.PROD_DEPLOYMENT_HOOK_URL }}
           bucket-name: ${{ secrets.STAGING_BUCKET_NAME }}/releases
-          react-app-rpc-token: ${{ secrets.REACT_APP_RPC_TOKEN }}
           react-app-tenderly-org-name: ${{ secrets.REACT_APP_TENDERLY_ORG_NAME }}
           react-app-tenderly-project-name: ${{ secrets.REACT_APP_TENDERLY_PROJECT_NAME }}
           react-app-tenderly-simulate-endpoint-url: ${{ secrets.REACT_APP_TENDERLY_SIMULATE_ENDPOINT_URL }}
+          react-app-mmi-backend-base-url: ${{ secrets.MMI_BACKEND_BASE_URL }}
+          react-app-mmi-environment: ${{ secrets.MMI_ENVIRONMENT }}
+          react-app-walletconnect-project-id: ${{ secrets.REACT_APP_WALLETCONNECT_PROJECT_ID }}

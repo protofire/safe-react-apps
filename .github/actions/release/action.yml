@@ -27,6 +27,12 @@ inputs:
   react-app-tenderly-simulate-endpoint-url:
     description: Tenderly simulation endpoint
     required: true
+  react-app-mmi-backend-base-url:
+    description: MMI backend base URL
+    required: true
+  react-app-mmi-environment:
+    description: MMI environment
+    required: true
 
 runs:
   using: composite
@@ -51,10 +57,12 @@ runs:
         PROD_DEPLOYMENT_HOOK_URL: ${{ inputs.prod-deployment-hook-url }}
         BUCKET_NAME: ${{ inputs.bucket-name }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
-        REACT_APP_RPC_TOKEN: ${{ inputs.react-app-rpc-token }}
         REACT_APP_TENDERLY_ORG_NAME: ${{ inputs.react-app-tenderly-org-name }}
         REACT_APP_TENDERLY_PROJECT_NAME: ${{ inputs.react-app-tenderly-project-name }}
         REACT_APP_TENDERLY_SIMULATE_ENDPOINT_URL: ${{ inputs.react-app-tenderly-simulate-endpoint-url }}
+        REACT_APP_MMI_BACKEND_BASE_URL: ${{ inputs.react-app-mmi-backend-base-url }}
+        REACT_APP_MMI_ENVIRONMENT: ${{ inputs.react-app-mmi-environment }}
+        REACT_APP_WALLETCONNECT_PROJECT_ID: ${{ inputs.react-app-walletconnect-project-id }}
 
     - name: Push changes
       uses: ad-m/github-push-action@8407731efefc0d8f72af254c74276b7a90be36e1
