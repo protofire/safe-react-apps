@@ -1,31 +1,31 @@
-import { useSafeAppsSDK } from "@gnosis.pm/safe-apps-react-sdk"
 import { BigNumber } from "ethers"
 import { useEffect, useState } from "react"
-import { VestingClaim } from "src/types/vestings"
-import { getWeb3Provider } from "src/utils/getWeb3Provider"
 import { calculateVestedAmount } from "src/utils/vesting"
+import { Vesting } from "./useSafeTokenAllocation"
 
-export const useAmounts = (
-  vestingClaim: VestingClaim | null
-): [string, string] => {
+export const useAmounts = (vestingClaim: Vesting | null): [string, string] => {
   const [claimableAmount, setClaimableAmount] = useState("0")
   const [amountInVesting, setAmountInVesting] = useState("0")
-  const { safe, sdk } = useSafeAppsSDK()
 
   useEffect(() => {
-    const refreshAmount = async () => {
+    const refreshAmount = () => {
       try {
-        const web3Provider = getWeb3Provider(safe, sdk)
-
-        // get timestamp from latest block
-        const latestBlock = await web3Provider.getBlock("latest")
-        const blockTimestamp = latestBlock.timestamp
+        if (!vestingClaim) {
+          return
+        }
         const totalAmount = vestingClaim ? vestingClaim.amount : "0"
-        const vestedAmount = vestingClaim
-          ? calculateVestedAmount(vestingClaim, blockTimestamp)
+        let vestedAmount = vestingClaim
+          ? calculateVestedAmount(vestingClaim)
           : "0"
+        const amountClaimed = vestingClaim?.amountClaimed || "0"
+
+        // If a user just claimed it can happen, that the amountClaimed is > vestedAmount for ~30s
+        if (BigNumber.from(vestedAmount).lt(amountClaimed)) {
+          vestedAmount = amountClaimed
+        }
+
         const newClaimableAmount = BigNumber.from(vestedAmount)
-          .sub(BigNumber.from(vestingClaim?.amountClaimed || "0"))
+          .sub(BigNumber.from(amountClaimed))
           .toString()
 
         const newAmountInVesting = BigNumber.from(totalAmount)
@@ -48,7 +48,7 @@ export const useAmounts = (
     const refreshAmountInterval = window.setInterval(refreshAmount, 10000)
 
     return () => window.clearInterval(refreshAmountInterval)
-  }, [safe, sdk, vestingClaim])
+  }, [vestingClaim])
 
   return [claimableAmount, amountInVesting]
 }

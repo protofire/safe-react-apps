@@ -22,7 +22,7 @@ const getProviderURL = (chain: string, address: string, urlProvider: PROVIDER): 
     case PROVIDER.SOURCIFY:
       return `https://sourcify.dev/server/files/${chain}/${address}`
     case PROVIDER.GATEWAY:
-      return getGatewayProvider(chain, address)
+      return `${getGatewayBaseUrl(chain)}/v1/chains/${chain}/contracts/${address}`
     case PROVIDER.BLOCKSCOUT:
       return `https://blockscout.com/${chain}/api?module=contract&action=getabi&address=${address}`
     default:
@@ -30,84 +30,80 @@ const getProviderURL = (chain: string, address: string, urlProvider: PROVIDER): 
   }
 }
 
-const SUPPORTED_CHAINS = {
-  ACALA: '787',
-  KARURA: '686',
-  MANDALA: '595',
-  ASTAR: '592',
-  BOBABEAM: '1294',
-  CRONOS: '25',
-  CRONOS_TESTNET: '338',
-  HARMONY: '1666600000',
-  EVMOS: '9001',
-  EVMOS_TESTNET: '9000',
-  MOONBEAM: '1284',
-  MOONRIVER: '1285',
-  MOONBASE: '1287',
-  TELOS: '40',
-  TELOS_TESTNET: '41',
-  VELAS: '106',
-  VELAS_TESTNET: '111',
+enum SUPPORTED_CHAINS {
+  ACALA = '787',
+  KARURA = '686',
+  MANDALA = '595',
+  ASTAR = '592',
+  SHIDEN = '336',
+  SHIBUYA = '81',
+  BOBABEAM = '1294',
+  CRONOS = '25',
+  CRONOS_TESTNET = '338',
+  EVMOS = '9001',
+  EVMOS_TESTNET = '9000',
+  HARMONY = '1666600000',
+  HARMONY_TESTNET = '1666700000',
+  MOONBEAM = '1284',
+  MOONRIVER = '1285',
+  MOONBASE = '1287',
+  TELOS = '40',
+  TELOS_TESTNET = '41',
+  THUNDER_CORE = '108',
+  VELAS = '106',
+  VELAS_TESTNET = '111',
 }
 
-const getGatewayProvider = (chain: string, address: string): string => {
-  let url: string
+const getGatewayBaseUrl = (chain: string) => {
+  const isProdEnv = process.env?.REACT_APP_IS_PRODUCTION === 'true'
+
   switch (chain) {
     case SUPPORTED_CHAINS.ACALA:
-      url = `https://gateway.safe.acala.network/v1/chains/${chain}/contracts/${address}`
-      break
     case SUPPORTED_CHAINS.KARURA:
-      url = `https://gateway.safe.acala.network/v1/chains/${chain}/contracts/${address}`
-      break
     case SUPPORTED_CHAINS.MANDALA:
-      url = `https://gateway.safe.acala.network/v1/chains/${chain}/contracts/${address}`
-      break
+      return isProdEnv
+        ? `https://gateway.safe.acala.network/`
+        : `https://gateway.staging.safe.acala.network/`
     case SUPPORTED_CHAINS.ASTAR:
-      url = `https://gateway.safe.astar.network/v1/chains/${chain}/contracts/${address}`
-      break
+    case SUPPORTED_CHAINS.SHIDEN:
+    case SUPPORTED_CHAINS.SHIBUYA:
+      return isProdEnv
+        ? `https://gateway.safe.astar.network/`
+        : `https://gateway.staging-safe.astar.network/`
     case SUPPORTED_CHAINS.BOBABEAM:
-      url = `https://gateway.multisig.bobabeam.boba.network/v1/chains/${chain}/contracts/${address}`
-      break
+      return isProdEnv
+        ? `https://gateway.multisig.bobabeam.boba.network/`
+        : `https://gateway.staging.multisig.bobabeam.boba.network/`
     case SUPPORTED_CHAINS.CRONOS:
-      url = `https://gateway.cronos-safe.org/v1/chains/${chain}/contracts/${address}`
-      break
     case SUPPORTED_CHAINS.CRONOS_TESTNET:
-      url = `https://gateway.cronos-safe.org/v1/chains/${chain}/contracts/${address}`
-      break
+      return isProdEnv
+        ? `https://gateway.cronos-safe.org/`
+        : `https://gateway-cronos-safe.crolabs-int.co/`
     case SUPPORTED_CHAINS.EVMOS:
-      url = `https://gateway.safe.evmos.org/v1/chains/${chain}/contracts/${address}`
-      break
     case SUPPORTED_CHAINS.EVMOS_TESTNET:
-      url = `https://gateway.safe.evmos.org/v1/chains/${chain}/contracts/${address}`
-      break
+      return isProdEnv ? `https://gateway.safe.evmos.org/` : `https://gateway.safe.evmos.dev/`
     case SUPPORTED_CHAINS.HARMONY:
-      url = `https://gateway.staging-safe.harmony.one/v1/chains/${chain}/contracts/${address}`
-      break
+    case SUPPORTED_CHAINS.HARMONY_TESTNET:
+      return isProdEnv
+        ? `https://gateway.multisig.harmony.one/`
+        : `https://gateway.staging-safe.harmony.one/`
     case SUPPORTED_CHAINS.MOONBEAM:
-      url = `https://gateway.multisig.moonbeam.network/v1/chains/${chain}/contracts/${address}`
-      break
     case SUPPORTED_CHAINS.MOONRIVER:
-      url = `https://gateway.multisig.moonbeam.network/v1/chains/${chain}/contracts/${address}`
-      break
     case SUPPORTED_CHAINS.MOONBASE:
-      url = `https://gateway.multisig.moonbeam.network/v1/chains/${chain}/contracts/${address}`
-      break
+      return isProdEnv
+        ? `https://gateway.multisig.moonbeam.network/`
+        : `https://gateway.staging.multisig.moonbeam.network/`
     case SUPPORTED_CHAINS.TELOS:
-      url = `https://gateway.safe.telos.net/v1/chains/${chain}/contracts/${address}`
-      break
     case SUPPORTED_CHAINS.TELOS_TESTNET:
-      url = `https://gateway.safe.telos.net/v1/chains/${chain}/contracts/${address}`
-      break
+      return `https://gateway.safe.telos.net/`
+    case SUPPORTED_CHAINS.THUNDER_CORE:
+      return isProdEnv ? `` : `https://gateway.staging.safe.thundercore.com/`
     case SUPPORTED_CHAINS.VELAS:
-      url = `https://gateway.velasafe.com/v1/chains/${chain}/contracts/${address}`
-      break
     case SUPPORTED_CHAINS.VELAS_TESTNET:
-      url = `https://gateway.velasafe.com/v1/chains/${chain}/contracts/${address}`
-      break
+      return isProdEnv ? `https://gateway.velasafe.com/` : `https://gateway.staging.velasafe.com/`
     default:
-      throw new Error('unsupported chain')
+      throw new Error('UNSUPPORTED_CHAIN')
   }
-  return url
 }
 
 const getAbiFromSourcify = async (address: string, chainId: string): Promise<any> => {
@@ -142,14 +138,11 @@ const getAbiFromGateway = async (address: string, chainName: string): Promise<an
 }
 
 const getAbiFromBlockscout = async (address: string, chainId: string): Promise<any> => {
-  let chainName = ''
-  if (chainId === SUPPORTED_CHAINS.ASTAR) {
-    chainName = 'astar'
-  } else {
+  if (chainId !== SUPPORTED_CHAINS.ASTAR) {
     throw new Error('Unsupported chain')
   }
 
-  const { data } = await axios.get(getProviderURL(chainName, address, PROVIDER.BLOCKSCOUT), {
+  const { data } = await axios.get(getProviderURL(chainId, address, PROVIDER.BLOCKSCOUT), {
     timeout: DEFAULT_TIMEOUT,
   })
   // We need to check if the abi is present in the response because it's possible

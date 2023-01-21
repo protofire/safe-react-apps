@@ -66,7 +66,7 @@ const SafeNavigation = ({ handleNext, handleBack }: Props) => {
               process
               <ExternalLink style={{ marginLeft: "4px" }} />
             </Link>{" "}
-            and post an SIP.
+            and post an SEP.
           </Typography>
         </Box>
         <Box display="inline-flex" alignItems="flex-start" gap={2}>
@@ -94,6 +94,7 @@ const SafeNavigation = ({ handleNext, handleBack }: Props) => {
           elevation={0}
           sx={{
             backgroundColor: ({ palette }) => palette.safeGreen.light,
+            border: ({ palette }) => `1px solid ${palette.primary.main}`,
             borderRadius: "8px",
             padding: 3,
             minWidth: "220px",

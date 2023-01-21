@@ -2,6 +2,63 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.9.0](https://github.com/safe-global/safe-react-apps/compare/wallet-connect-1.8.2...wallet-connect-1.9.0) (2023-01-12)
+
+
+### Features
+
+* **wallet-connect:** Wallet-connect v2 implementation ([#563](https://github.com/safe-global/safe-react-apps/issues/563)) ([789c535](https://github.com/safe-global/safe-react-apps/commit/789c5356873e0d53b5972a8ea840f76acfa886f3))
+
+
+
+## [1.8.2](https://github.com/safe-global/safe-react-apps/compare/wallet-connect-1.8.1...wallet-connect-1.8.2) (2022-12-14)
+
+
+
+## [1.8.1](https://github.com/safe-global/safe-react-apps/compare/wallet-connect-1.8.0...wallet-connect-1.8.1) (2022-12-02)
+
+
+### Bug Fixes
+
+* **wallet-connect:** fixed open safe app redirection ([#604](https://github.com/safe-global/safe-react-apps/issues/604)) ([b04fc33](https://github.com/safe-global/safe-react-apps/commit/b04fc336a0d64100f7236188961d039b6aca81f6))
+
+
+
+## [1.8.1](https://github.com/safe-global/safe-react-apps/compare/wallet-connect-1.8.0...wallet-connect-1.8.1) (2022-12-01)
+
+
+
+# [1.8.0](https://github.com/safe-global/safe-react-apps/compare/wallet-connect-1.7.2...wallet-connect-1.8.0) (2022-11-18)
+
+
+### Features
+
+* **siwe-delegate-manager:** Sign-In With Ethereum Delegate Manager Safe App ([#499](https://github.com/safe-global/safe-react-apps/issues/499)) ([34c36c5](https://github.com/safe-global/safe-react-apps/commit/34c36c580300672c6366ad2d534de0a3b1534058))
+
+
+
+## [1.7.2](https://github.com/safe-global/safe-react-apps/compare/wallet-connect-1.7.1...wallet-connect-1.7.2) (2022-11-03)
+
+
+
+## [1.7.1](https://github.com/safe-global/safe-react-apps/compare/wallet-connect-1.7.0...wallet-connect-1.7.1) (2022-10-11)
+
+
+### Bug Fixes
+
+* **wallet-connect:** accept string as an argument for signing typed data ([2ab365b](https://github.com/safe-global/safe-react-apps/commit/2ab365b26ab2f5f0f6c56bffcd476951da350a5e))
+
+
+
+# [1.7.0](https://github.com/safe-global/safe-react-apps/compare/wallet-connect-1.6.1...wallet-connect-1.7.0) (2022-10-05)
+
+
+### Features
+
+* **wallet-connect:** switch to the safe-apps-provider under the hood ([352f6b9](https://github.com/safe-global/safe-react-apps/commit/352f6b96e08c46b2bb7a87aaa7451bfa1315fa4a)), closes [#377](https://github.com/safe-global/safe-react-apps/issues/377)
+
+
+
 ## [1.6.1](https://github.com/safe-global/safe-react-apps/compare/wallet-connect-1.6.0...wallet-connect-1.6.1) (2022-09-22)
 
 
