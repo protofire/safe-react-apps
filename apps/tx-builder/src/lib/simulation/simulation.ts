@@ -3,6 +3,7 @@ import Web3 from 'web3'
 import { BaseTransaction } from '@gnosis.pm/safe-apps-sdk'
 import { TenderlySimulatePayload, TenderlySimulation, StateObject } from './types'
 import { encodeMultiSendCall, getMultiSendCallOnlyAddress } from './multisend'
+import { SUPPORTED_CHAINS } from '../getAbi'
 
 type OptionalExceptFor<T, TRequired extends keyof T = keyof T> = Partial<
   Pick<T, Exclude<keyof T, TRequired>>
@@ -21,30 +22,30 @@ const NON_SUPPORTED_CHAINS = [
   '73799',
   // Aurora
   '1313161554',
-  // Astar
-  '592',
-  // Velas
-  '106',
-  // Cronos Mainnet
-  '25',
-  // Cronos Testnet
-  '338',
-  // Evmos Mainnet
-  '9001',
-  // Evmos Testnet
-  '9000',
-  // Moonbeam Mainnet
-  '1284',
-  // Moonriver Mainnet
-  '1285',
-  // Moonbase Testnet
-  '1287',
+  SUPPORTED_CHAINS.ASTAR,
+  SUPPORTED_CHAINS.SHIDEN,
+  SUPPORTED_CHAINS.SHIBUYA,
+  SUPPORTED_CHAINS.BOBABEAM,
+  SUPPORTED_CHAINS.CRONOS_TESTNET,
+  SUPPORTED_CHAINS.EVMOS,
+  SUPPORTED_CHAINS.EVMOS_TESTNET,
+  SUPPORTED_CHAINS.HARMONY,
+  SUPPORTED_CHAINS.HARMONY_TESTNET,
+  SUPPORTED_CHAINS.MOONBASE,
+  SUPPORTED_CHAINS.TELOS,
+  SUPPORTED_CHAINS.TELOS_TESTNET,
+  SUPPORTED_CHAINS.THUNDER_CORE,
+  SUPPORTED_CHAINS.VELAS,
+  SUPPORTED_CHAINS.VELAS_TESTNET,
 ]
 
 const isSimulationSupported = (chainId: string) => {
-  console.log('isSimulationSupported', !NON_SUPPORTED_CHAINS.includes(String(chainId)))
-  return !NON_SUPPORTED_CHAINS.includes(String(chainId))
-  
+  return (
+    Boolean(TENDERLY_SIMULATE_ENDPOINT_URL) &&
+    Boolean(TENDERLY_PROJECT_NAME) &&
+    Boolean(TENDERLY_ORG_NAME) &&
+    !NON_SUPPORTED_CHAINS.includes(chainId)
+  )
 }
 
 const getSimulation = async (tx: TenderlySimulatePayload): Promise<TenderlySimulation> => {

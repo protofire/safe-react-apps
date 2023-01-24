@@ -30,7 +30,7 @@ const getProviderURL = (chain: string, address: string, urlProvider: PROVIDER): 
   }
 }
 
-enum SUPPORTED_CHAINS {
+export enum SUPPORTED_CHAINS {
   ACALA = '787',
   KARURA = '686',
   MANDALA = '595',
