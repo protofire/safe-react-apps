@@ -62,45 +62,45 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.KARURA:
     case SUPPORTED_CHAINS.MANDALA:
       return isProdEnv
-        ? `https://gateway.safe.acala.network/`
-        : `https://gateway.staging.safe.acala.network/`
+        ? `https://gateway.safe.acala.network`
+        : `https://gateway.staging.safe.acala.network`
     case SUPPORTED_CHAINS.ASTAR:
     case SUPPORTED_CHAINS.SHIDEN:
     case SUPPORTED_CHAINS.SHIBUYA:
       return isProdEnv
-        ? `https://gateway.safe.astar.network/`
-        : `https://gateway.staging-safe.astar.network/`
+        ? `https://gateway.safe.astar.network`
+        : `https://gateway.staging-safe.astar.network`
     case SUPPORTED_CHAINS.BOBABEAM:
       return isProdEnv
-        ? `https://gateway.multisig.bobabeam.boba.network/`
-        : `https://gateway.staging.multisig.bobabeam.boba.network/`
+        ? `https://gateway.multisig.bobabeam.boba.network`
+        : `https://gateway.staging.multisig.bobabeam.boba.network`
     case SUPPORTED_CHAINS.CRONOS:
     case SUPPORTED_CHAINS.CRONOS_TESTNET:
       return isProdEnv
-        ? `https://gateway.cronos-safe.org/`
-        : `https://gateway-cronos-safe.crolabs-int.co/`
+        ? `https://gateway.cronos-safe.org`
+        : `https://gateway-cronos-safe.crolabs-int.co`
     case SUPPORTED_CHAINS.EVMOS:
     case SUPPORTED_CHAINS.EVMOS_TESTNET:
-      return isProdEnv ? `https://gateway.safe.evmos.org/` : `https://gateway.safe.evmos.dev/`
+      return isProdEnv ? `https://gateway.safe.evmos.org` : `https://gateway.safe.evmos.dev`
     case SUPPORTED_CHAINS.HARMONY:
     case SUPPORTED_CHAINS.HARMONY_TESTNET:
       return isProdEnv
-        ? `https://gateway.multisig.harmony.one/`
-        : `https://gateway.staging-safe.harmony.one/`
+        ? `https://gateway.multisig.harmony.one`
+        : `https://gateway.staging-safe.harmony.one`
     case SUPPORTED_CHAINS.MOONBEAM:
     case SUPPORTED_CHAINS.MOONRIVER:
     case SUPPORTED_CHAINS.MOONBASE:
       return isProdEnv
-        ? `https://gateway.multisig.moonbeam.network/`
-        : `https://gateway.staging.multisig.moonbeam.network/`
+        ? `https://gateway.multisig.moonbeam.network`
+        : `https://gateway.staging.multisig.moonbeam.network`
     case SUPPORTED_CHAINS.TELOS:
     case SUPPORTED_CHAINS.TELOS_TESTNET:
-      return `https://gateway.safe.telos.net/`
+      return `https://gateway.safe.telos.net`
     case SUPPORTED_CHAINS.THUNDER_CORE:
-      return isProdEnv ? `` : `https://gateway.staging.safe.thundercore.com/`
+      return isProdEnv ? `` : `https://gateway.staging.safe.thundercore.com`
     case SUPPORTED_CHAINS.VELAS:
     case SUPPORTED_CHAINS.VELAS_TESTNET:
-      return isProdEnv ? `https://gateway.velasafe.com/` : `https://gateway.staging.velasafe.com/`
+      return isProdEnv ? `https://gateway.velasafe.com` : `https://gateway.staging.velasafe.com`
     default:
       throw new Error('UNSUPPORTED_CHAIN')
   }
