@@ -1,8 +1,12 @@
-import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk'
-import { getSafeApps, SafeAppData, SafeAppsResponse } from '@gnosis.pm/safe-react-gateway-sdk'
 import { useCallback, useEffect, useState } from 'react'
+import {
+  getSafeApps,
+  SafeAppData,
+  SafeAppsResponse,
+  setBaseUrl,
+} from '@safe-global/safe-gateway-typescript-sdk'
+import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk'
 
-// const BASE_URL = 'https://safe-client.gnosis.io'
 enum SUPPORTED_CHAINS {
   ACALA = '787',
   KARURA = '686',
@@ -95,7 +99,8 @@ export function useApps(): UseAppsResponse {
       try {
         const chainInfo = await sdk.safe.getChainInfo()
         const environmentInfo = await sdk.safe.getEnvironmentInfo()
-        const appsList = await getSafeApps(getGatewayBaseUrl(chainInfo.chainId), chainInfo.chainId)
+        setBaseUrl(getGatewayBaseUrl(chainInfo.chainId))
+        const appsList = await getSafeApps(chainInfo.chainId)
 
         setOrigin(environmentInfo.origin)
         setSafeAppsList(appsList)

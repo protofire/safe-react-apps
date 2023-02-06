@@ -1,9 +1,8 @@
 import axios from 'axios'
 import Web3 from 'web3'
-import { BaseTransaction } from '@gnosis.pm/safe-apps-sdk'
+import { BaseTransaction } from '@safe-global/safe-apps-sdk'
 import { TenderlySimulatePayload, TenderlySimulation, StateObject } from './types'
 import { encodeMultiSendCall, getMultiSendCallOnlyAddress } from './multisend'
-import { SUPPORTED_CHAINS } from '../getAbi'
 
 type OptionalExceptFor<T, TRequired extends keyof T = keyof T> = Partial<
   Pick<T, Exclude<keyof T, TRequired>>
@@ -15,11 +14,15 @@ const TENDERLY_SIMULATE_ENDPOINT_URL = process.env.REACT_APP_TENDERLY_SIMULATE_E
 const TENDERLY_PROJECT_NAME = process.env.REACT_APP_TENDERLY_PROJECT_NAME || ''
 const TENDERLY_ORG_NAME = process.env.REACT_APP_TENDERLY_ORG_NAME || ''
 
-const TENDERLY_SUPPOERTED_CHAINS: string[] = [
-  SUPPORTED_CHAINS.MOONBEAM,
-  SUPPORTED_CHAINS.MOONRIVER,
-  SUPPORTED_CHAINS.CRONOS,
-  SUPPORTED_CHAINS.CRONOS_TESTNET,
+const NON_SUPPORTED_CHAINS = [
+  // Energy web chain
+  '246',
+  // Celo
+  '42220',
+  // Volta
+  '73799',
+  // Aurora
+  '1313161554',
 ]
 
 const isSimulationSupported = (chainId: string) => {
@@ -28,7 +31,7 @@ const isSimulationSupported = (chainId: string) => {
     Boolean(TENDERLY_ORG_NAME) &&
     Boolean(TENDERLY_PROJECT_NAME)
 
-  const isNetworkSupported = TENDERLY_SUPPOERTED_CHAINS.includes(chainId)
+  const isNetworkSupported = !NON_SUPPORTED_CHAINS.includes(chainId)
 
   return isSimulationEnvSet && isNetworkSupported
 }

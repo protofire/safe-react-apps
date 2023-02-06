@@ -3,10 +3,10 @@
 [![Logo](/assets/logo.png)](https://protofire.io/)
 
 ![license](https://img.shields.io/github/license/safe-global/safe-react-apps)
-![build](https://img.shields.io/github/workflow/status/safe-global/safe-react-apps/Deploy%20safe%20apps/main)
-![tests](https://img.shields.io/github/workflow/status/safe-global/safe-react-apps/Test/main?label=tests)
+![build](https://img.shields.io/github/actions/workflow/status/safe-global/safe-react-apps/deployment.yml?branch=main)
+![tests](https://img.shields.io/github/actions/workflow/status/safe-global/safe-react-apps/safe-apps-e2e.yml?branch=main)
 
-This project its a mono-repo of safe apps. Initially forked from safe-global/safe-react-apps.
+This project is a mono-repo of safe apps. Initially forked from safe-global/safe-react-apps.
 Links to source: [Staging](https://github.com/protofire/safe-react-apps/tree/protofire-stg/apps/) and [Production](https://github.com/protofire/safe-react-apps/tree/protofire/apps/)
 
 ## List of safe apps supported by Protofire
@@ -18,11 +18,6 @@ We currently support only those EVM chain-agnostic dapps we see can bring tangib
 The Transaction Builder allows users to compose lists of transactions, execute them in a single batch to save gas, and export the list as a template for later re-use.
 The tool guarantees the atomicity of the execution; If any transaction fails, every transaction on the list will revert.
 Use case: Payroll, list of custom transactions, document complex Defi workflows, create templates for recurrent workflows
-
-### CSV Airdrop App
-
-Send arbitrarily many distinct tokens, to arbitrarily many distinct accounts with various different values from a CSV file in a single transaction.
-Use case: Payroll, easier than Transaction Builder for spreadsheet users.
 
 ### [Drain Account](https://github.com/protofire/safe-react-apps/tree/protofire-stg/apps/drain-safe)
 
@@ -74,7 +69,7 @@ yarn start:wallet-connect
 
 ## Contracts
 
-This project contains some test contracts to check all solidity types in the tx-builder Safe App.
+This project contains some test contracts to check all solidity types in the `tx-builder` Safe App.
 
 You can deploy your own tests contracts using the following command:
 
@@ -138,7 +133,7 @@ To run them it will be necessary to provide the following ENV parameters, that c
 Example:
 
 ```
-CYPRESS_BASE_URL=https://gnosis-safe.io/app
+CYPRESS_WEB_BASE_URL=https://app.safe.global
 CYPRESS_CHAIN_ID=1
 CYPRESS_NETWORK_PREFIX=rin
 CYPRESS_TESTING_SAFE_ADDRESS=0x0000000000000000000000000000000000000000
@@ -154,4 +149,5 @@ Latest code version from deprecated apps can be found in the following links:
 - [Compound](https://github.com/safe-global/safe-react-apps/releases/tag/compound-1.1.3)
 
 ## License
+
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details

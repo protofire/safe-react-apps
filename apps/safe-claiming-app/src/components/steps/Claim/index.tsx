@@ -16,7 +16,7 @@ import { ReactComponent as SafeIcon } from "src/assets/images/safe-token.svg"
 import { SelectedDelegate } from "src/components/steps/Claim/SelectedDelegate"
 import { maxDecimals, minMaxValue, mustBeFloat } from "src/utils/validation"
 
-import { useSafeAppsSDK } from "@gnosis.pm/safe-apps-react-sdk"
+import { useSafeAppsSDK } from "@safe-global/safe-apps-react-sdk"
 import { BigNumber, ethers } from "ethers"
 import { useAmounts } from "src/hooks/useAmounts"
 import { InfoOutlined } from "@mui/icons-material"
@@ -236,7 +236,7 @@ const Claim = ({ handleBack, state, handleUpdateState, handleNext }: Props) => {
                   variant="contained"
                   size="large"
                   disableElevation
-                  sx={{ width: 1, paddingX: 0 }}
+                  sx={{ width: 1, paddingX: 0, height: "47px" }}
                   disabled={buttonDisabled}
                   onClick={claimTokens}
                 >

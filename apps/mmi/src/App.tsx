@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ethers } from 'ethers'
-import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk'
+import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk'
 import { hashMessage } from 'ethers/lib/utils'
 import { Grid, Container, Button, Typography, Card, styled } from '@mui/material'
 import AppBar from './components/AppBar'
@@ -112,7 +112,7 @@ function App() {
             <StyledCard>
               <StyledContainer container alignItems="center" justifyContent="center" spacing={3}>
                 <Grid item>
-                  <StyledLogo src="./mmi.svg" alt="safe-app-logo" />
+                  <StyledLogo src={`${process.env.PUBLIC_URL}/mmi.svg`} alt="safe-app-logo" />
                 </Grid>
                 <Grid
                   container
@@ -180,7 +180,7 @@ function App() {
 
 const StyledMainContainer = styled(Container)`
   && {
-    height: 100vh;
+    height: 100%;
     max-width: 100%;
     display: flex;
     justify-content: center;

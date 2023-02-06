@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
@@ -45,8 +45,8 @@ jobs:
           REACT_APP_TENDERLY_ORG_NAME: ${{ secrets.REACT_APP_TENDERLY_ORG_NAME }}
           REACT_APP_TENDERLY_SIMULATE_ENDPOINT_URL: ${{ secrets.REACT_APP_TENDERLY_SIMULATE_ENDPOINT_URL }}
           REACT_APP_TENDERLY_PROJECT_NAME: ${{ secrets.REACT_APP_TENDERLY_PROJECT_NAME }}
-          REACT_APP_MMI_BACKEND_BASE_URL: ${{ secrets.MMI_STAGING_BACKEND_BASE_URL }}
-          REACT_APP_MMI_ENVIRONMENT: ${{ secrets.MMI_STAGING_ENVIRONMENT }}
+          REACT_APP_MMI_BACKEND_BASE_URL: ${{ secrets.MMI_BACKEND_BASE_URL }}
+          REACT_APP_MMI_ENVIRONMENT: ${{ secrets.MMI_ENVIRONMENT }}
           REACT_APP_WALLETCONNECT_PROJECT_ID: ${{ secrets.REACT_APP_WALLETCONNECT_PROJECT_ID_DEVSTAGING }}
 
       - name: 'PRaul: Comment PR with app URLs'
@@ -72,7 +72,7 @@ jobs:
     if: github.event_name != 'pull_request' && github.event_name != 'workflow_dispatch'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -117,7 +117,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           ref: main
