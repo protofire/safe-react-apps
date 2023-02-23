@@ -126,7 +126,7 @@ const Dashboard = (): ReactElement => {
           <AddressInput
             id="address"
             name="address"
-            label="Enter Address or ENS Name"
+            label="Enter Address"
             hiddenLabel={false}
             address={abiAddress}
             fullWidth
