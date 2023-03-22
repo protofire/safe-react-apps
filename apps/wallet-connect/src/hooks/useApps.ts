@@ -22,12 +22,16 @@ enum SUPPORTED_CHAINS {
   EVMOS_TESTNET = '9000',
   HARMONY = '1666600000',
   HARMONY_TESTNET = '1666700000',
+  IOTEX = '4689',
+  IOTEX_TESTNET = '4690',
   MOONBEAM = '1284',
   MOONRIVER = '1285',
   MOONBASE = '1287',
+  OASIS_SAPPHIRE = '23294',
   TELOS = '40',
   TELOS_TESTNET = '41',
   THUNDER_CORE = '108',
+  THUNDER_CORE_TESTNET = '18',
   VELAS = '106',
   VELAS_TESTNET = '111',
 }
@@ -65,17 +69,25 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.multisig.harmony.one`
         : `https://gateway.staging-safe.harmony.one`
+    case SUPPORTED_CHAINS.IOTEX:
+    case SUPPORTED_CHAINS.IOTEX_TESTNET:
+      return isProdEnv ? `https://gateway.safe.iotex.io` : `https://gateway.staging.safe.iotex.io`
     case SUPPORTED_CHAINS.MOONBEAM:
     case SUPPORTED_CHAINS.MOONRIVER:
     case SUPPORTED_CHAINS.MOONBASE:
       return isProdEnv
         ? `https://gateway.multisig.moonbeam.network`
         : `https://gateway.staging.multisig.moonbeam.network`
+    case SUPPORTED_CHAINS.OASIS_SAPPHIRE:
+      return isProdEnv ? `https://gateway.safe.oasis.io` : `https://gateway.safe.stg.oasis.io`
     case SUPPORTED_CHAINS.TELOS:
     case SUPPORTED_CHAINS.TELOS_TESTNET:
       return `https://gateway.safe.telos.net`
     case SUPPORTED_CHAINS.THUNDER_CORE:
-      return isProdEnv ? `` : `https://gateway.staging.safe.thundercore.com`
+    case SUPPORTED_CHAINS.THUNDER_CORE_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.thundercore.com`
+        : `https://gateway.staging.safe.thundercore.com`
     case SUPPORTED_CHAINS.VELAS:
     case SUPPORTED_CHAINS.VELAS_TESTNET:
       return isProdEnv ? `https://gateway.velasafe.com` : `https://gateway.staging.velasafe.com`
