@@ -140,7 +140,7 @@ const getGatewayBaseUrl = (chain: string) => {
         : `https://gateway.staging-zksafe.protofire.io`
     default:
       throw new Error(
-        `There is no gateway for ${chain}, therefore we cannot get the list of safe apps.`,
+        `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the list of safe apps.`,
       )
   }
 }
@@ -168,7 +168,11 @@ export function useApps(): UseAppsResponse {
         setSafeAppsList(appsList)
         setNetworkPrefix(chainInfo.shortName)
       } catch (error) {
-        console.error('Unable to get chain info:', error)
+        if (error instanceof Error && error.message.includes('[getGatewayBaseUrl]')) {
+          console.warn(error)
+        } else {
+          console.error('Unable to get chain info:', error)
+        }
       }
     })()
   }, [sdk])

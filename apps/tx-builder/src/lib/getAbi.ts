@@ -161,7 +161,7 @@ const getGatewayBaseUrl = (chain: string) => {
         : `https://gateway.staging-zksafe.protofire.io`
     default:
       throw new Error(
-        `There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
+        `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
       )
   }
 }
