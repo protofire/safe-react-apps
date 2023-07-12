@@ -17,7 +17,6 @@ const METADATA_FILE = 'metadata.json'
 const DEFAULT_TIMEOUT = 10000
 
 const getProviderURL = (chain: string, address: string, urlProvider: PROVIDER): string => {
-  console.log(`getProviderURL chain: ${chain},  address: ${address}`)
   switch (urlProvider) {
     case PROVIDER.SOURCIFY:
       return `https://sourcify.dev/server/files/${chain}/${address}`
@@ -38,6 +37,7 @@ export enum SUPPORTED_CHAINS {
   SHIDEN = '336',
   SHIBUYA = '81',
   BOBABEAM = '1294',
+  CASCADIA_TESTNET = '6102',
   CRONOS = '25',
   CRONOS_TESTNET = '338',
   EVMOS = '9001',
@@ -46,16 +46,30 @@ export enum SUPPORTED_CHAINS {
   HARMONY_TESTNET = '1666700000',
   IOTEX = '4689',
   IOTEX_TESTNET = '4690',
+  LINEA = '59144',
+  LINEA_TESTNET = '59140',
+  MANTLE = '5000',
+  MANTLE_TESTNET = '5001',
   MOONBEAM = '1284',
   MOONRIVER = '1285',
   MOONBASE = '1287',
+  NEON_EVM = '245022934',
+  NEON_EVM_DEVNET = '245022926',
+  NEON_EVM_TESTNET = '245022940',
   OASIS_SAPPHIRE = '23294',
+  OASIS_SAPPHIRE_TESTNET = '23295',
+  RSK = '30',
+  RSK_TESTNET = '31',
   TELOS = '40',
   TELOS_TESTNET = '41',
+  TENET = '155',
+  TENET_TESTNET = '1559',
   THUNDER_CORE = '108',
   THUNDER_CORE_TESTNET = '18',
   VELAS = '106',
   VELAS_TESTNET = '111',
+  ZKSYNC_ERA = '324',
+  ZKSYNC_ERA_TESTNET = '280',
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -78,6 +92,10 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.multisig.bobabeam.boba.network`
         : `https://gateway.staging.multisig.bobabeam.boba.network`
+    case SUPPORTED_CHAINS.CASCADIA_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.cascadia.foundation`
+        : `https://gateway.staging.safe.cascadia.foundation`
     case SUPPORTED_CHAINS.CRONOS:
     case SUPPORTED_CHAINS.CRONOS_TESTNET:
       return isProdEnv
@@ -94,17 +112,40 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.IOTEX:
     case SUPPORTED_CHAINS.IOTEX_TESTNET:
       return isProdEnv ? `https://gateway.safe.iotex.io` : `https://gateway.staging.safe.iotex.io`
+    case SUPPORTED_CHAINS.LINEA:
+    case SUPPORTED_CHAINS.LINEA_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.linea.build`
+        : `https://gateway.staging.safe.linea.build`
+    case SUPPORTED_CHAINS.MANTLE:
+    case SUPPORTED_CHAINS.MANTLE_TESTNET:
+      return isProdEnv
+        ? `https://gateway.multisig.mantle.xyz`
+        : `https://gateway.staging.multisig.mantle.xyz`
     case SUPPORTED_CHAINS.MOONBEAM:
     case SUPPORTED_CHAINS.MOONRIVER:
     case SUPPORTED_CHAINS.MOONBASE:
       return isProdEnv
         ? `https://gateway.multisig.moonbeam.network`
         : `https://gateway.staging.multisig.moonbeam.network`
+    case SUPPORTED_CHAINS.NEON_EVM:
+    case SUPPORTED_CHAINS.NEON_EVM_DEVNET:
+    case SUPPORTED_CHAINS.NEON_EVM_TESTNET:
+      return `https://gateway.neonevm.safe.protofire.io`
     case SUPPORTED_CHAINS.OASIS_SAPPHIRE:
+    case SUPPORTED_CHAINS.OASIS_SAPPHIRE_TESTNET:
       return isProdEnv ? `https://gateway.safe.oasis.io` : `https://gateway.safe.stg.oasis.io`
+    case SUPPORTED_CHAINS.RSK:
+    case SUPPORTED_CHAINS.RSK_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.rootstock.io`
+        : `https://gateway.staging.safe.rootstock.io`
     case SUPPORTED_CHAINS.TELOS:
     case SUPPORTED_CHAINS.TELOS_TESTNET:
       return `https://gateway.safe.telos.net`
+    case SUPPORTED_CHAINS.TENET:
+    case SUPPORTED_CHAINS.TENET_TESTNET:
+      return isProdEnv ? `https://gateway.safe.tenet.org` : `https://gateway.staging.safe.tenet.org`
     case SUPPORTED_CHAINS.THUNDER_CORE:
     case SUPPORTED_CHAINS.THUNDER_CORE_TESTNET:
       return isProdEnv
@@ -113,8 +154,15 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.VELAS:
     case SUPPORTED_CHAINS.VELAS_TESTNET:
       return isProdEnv ? `https://gateway.velasafe.com` : `https://gateway.staging.velasafe.com`
+    case SUPPORTED_CHAINS.ZKSYNC_ERA:
+    case SUPPORTED_CHAINS.ZKSYNC_ERA_TESTNET:
+      return isProdEnv
+        ? `https://gateway.zksafe.protofire.io`
+        : `https://gateway.staging-zksafe.protofire.io`
     default:
-      throw new Error('UNSUPPORTED_CHAIN')
+      throw new Error(
+        `There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
+      )
   }
 }
 
@@ -134,8 +182,8 @@ const getAbiFromSourcify = async (address: string, chainId: string): Promise<any
   throw new Error('Contract found but could not found abi using Sourcify')
 }
 
-const getAbiFromGateway = async (address: string, chainName: string): Promise<any> => {
-  const { data } = await axios.get(getProviderURL(chainName, address, PROVIDER.GATEWAY), {
+const getAbiFromGateway = async (address: string, chainId: string): Promise<any> => {
+  const { data } = await axios.get(getProviderURL(chainId, address, PROVIDER.GATEWAY), {
     timeout: DEFAULT_TIMEOUT,
   })
 
@@ -150,10 +198,6 @@ const getAbiFromGateway = async (address: string, chainName: string): Promise<an
 }
 
 const getAbiFromBlockscout = async (address: string, chainId: string): Promise<any> => {
-  if (chainId !== SUPPORTED_CHAINS.ASTAR) {
-    throw new Error('Unsupported chain')
-  }
-
   const { data } = await axios.get(getProviderURL(chainId, address, PROVIDER.BLOCKSCOUT), {
     timeout: DEFAULT_TIMEOUT,
   })
