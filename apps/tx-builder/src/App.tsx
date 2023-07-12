@@ -14,7 +14,7 @@ import {
   SAVE_BATCH_PATH,
   TRANSACTION_LIBRARY_PATH,
 } from './routes/routes'
-import Banner from './components/Banner'
+// import Banner from './components/Banner'
 
 const App = () => {
   return (
@@ -43,7 +43,7 @@ const App = () => {
       </Routes>
 
       {/* Banner */}
-      <Banner />
+      {/* <Banner /> */}
     </>
   )
 }
