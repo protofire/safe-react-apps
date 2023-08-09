@@ -5,6 +5,7 @@ enum PROVIDER {
   SOURCIFY = 1,
   GATEWAY = 2,
   BLOCKSCOUT = 3,
+  SCANAPI = 4,
 }
 
 type SourcifyResponse = {
@@ -24,6 +25,8 @@ const getProviderURL = (chain: string, address: string, urlProvider: PROVIDER): 
       return `${getGatewayBaseUrl(chain)}/v1/chains/${chain}/contracts/${address}`
     case PROVIDER.BLOCKSCOUT:
       return `https://blockscout.com/${chain}/api?module=contract&action=getabi&address=${address}`
+    case PROVIDER.SCANAPI:
+      return `${getScanAPIBaseURL(chain)}/api?module=contract&action=getabi&address=${address}`
     default:
       throw new Error('The Provider is not supported')
   }
@@ -166,6 +169,19 @@ const getGatewayBaseUrl = (chain: string) => {
   }
 }
 
+const getScanAPIBaseURL = (chain: string) => {
+  switch (chain) {
+    case SUPPORTED_CHAINS.CASCADIA_TESTNET:
+      return 'https://explorer.cascadia.foundation'
+    case SUPPORTED_CHAINS.LINEA:
+      return 'https://api.lineascan.build'
+    case SUPPORTED_CHAINS.LINEA_TESTNET:
+      return 'https://api-testnet.lineascan.build'
+    default:
+      return
+  }
+}
+
 const getAbiFromSourcify = async (address: string, chainId: string): Promise<any> => {
   const { data } = await axios.get<SourcifyResponse[]>(
     getProviderURL(chainId, address, PROVIDER.SOURCIFY),
@@ -211,6 +227,20 @@ const getAbiFromBlockscout = async (address: string, chainId: string): Promise<a
   throw new Error('Contract found but could not found ABI using Blockscout')
 }
 
+const getABIFromScanAPI = async (address: string, chainId: string): Promise<any> => {
+  const { data } = await axios.get(getProviderURL(chainId, address, PROVIDER.SCANAPI), {
+    timeout: DEFAULT_TIMEOUT,
+  })
+  // We need to check if the abi is present in the response because it's possible
+  // That the transaction service just stores the contract and returns 200 without querying for the abi
+  // (or querying for the abi failed)
+  if (data && data.message === 'OK' && data.result) {
+    return JSON.parse(data.result)
+  }
+
+  throw new Error('Contract found but ABI is missing when using API service')
+}
+
 const getAbi = async (address: string, chainInfo: ChainInfo): Promise<any> => {
   let abi
   try {
@@ -218,6 +248,7 @@ const getAbi = async (address: string, chainInfo: ChainInfo): Promise<any> => {
       getAbiFromSourcify(address, chainInfo.chainId),
       getAbiFromGateway(address, chainInfo.chainId),
       getAbiFromBlockscout(address, chainInfo.chainId),
+      getABIFromScanAPI(address, chainInfo.chainId),
     ])
   } catch {
     abi = null
