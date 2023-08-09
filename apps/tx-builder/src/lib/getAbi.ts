@@ -171,6 +171,8 @@ const getGatewayBaseUrl = (chain: string) => {
 
 const getScanAPIBaseURL = (chain: string) => {
   switch (chain) {
+    case SUPPORTED_CHAINS.CASCADIA_TESTNET:
+      return 'https://explorer.cascadia.foundation'
     case SUPPORTED_CHAINS.LINEA:
       return 'https://api.lineascan.build'
     case SUPPORTED_CHAINS.LINEA_TESTNET:
