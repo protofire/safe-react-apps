@@ -176,9 +176,7 @@ const getScanAPIBaseURL = (chain: string) => {
     case SUPPORTED_CHAINS.LINEA_TESTNET:
       return 'https://api-testnet.lineascan.build'
     default:
-      throw new Error(
-        `[getScanAPIBaseURL]: There is no scan API for ${chain}, therefore we cannot get the contract abi from it.`,
-      )
+      return
   }
 }
 
