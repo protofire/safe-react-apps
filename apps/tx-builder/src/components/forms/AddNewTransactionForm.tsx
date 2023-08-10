@@ -1,5 +1,6 @@
 import { Title, Button } from '@gnosis.pm/safe-react-components'
 import styled from 'styled-components'
+import { toChecksumAddress } from 'web3-utils'
 
 import { ContractInterface } from '../../typings/models'
 import { isValidAddress } from '../../utils'
@@ -23,7 +24,7 @@ const AddNewTransactionForm = ({
   showHexEncodedData,
 }: AddNewTransactionFormProps) => {
   const initialFormValues = {
-    [TO_ADDRESS_FIELD_NAME]: isValidAddress(to) ? to : '',
+    [TO_ADDRESS_FIELD_NAME]: isValidAddress(to) ? toChecksumAddress(to) : '',
     [CONTRACT_METHOD_INDEX_FIELD_NAME]: '0',
   }
 

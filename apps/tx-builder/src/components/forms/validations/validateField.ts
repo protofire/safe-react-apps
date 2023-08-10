@@ -1,5 +1,5 @@
 import { Validate, ValidateResult } from 'react-hook-form'
-import { toWei } from 'web3-utils'
+import { toChecksumAddress, toWei } from 'web3-utils'
 import {
   NATIVE_AMOUNT_FIELD_TYPE,
   CUSTOM_TRANSACTION_DATA_FIELD_TYPE,
@@ -30,7 +30,7 @@ const validateField = (
       ...extraValidations, // extra validations
     ].reduce<ValidateResult>(
       (error, validation) => {
-        return error || validation(value, fieldType)
+        return error || validation(isAddressFieldType(fieldType) ? toChecksumAddress(value) : value, fieldType)
       },
       undefined, // initially no error is present
     )
