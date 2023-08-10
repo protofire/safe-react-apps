@@ -6,6 +6,7 @@ import InputAdornment from '@material-ui/core/InputAdornment'
 import Grid from '@material-ui/core/Grid'
 import CheckCircle from '@material-ui/icons/CheckCircle'
 import detectProxyTarget from 'evm-proxy-detection'
+import { toChecksumAddress } from 'web3-utils'
 
 import { evalTemplate, FETCH_STATUS, isValidAddress } from '../utils'
 import AddNewTransactionForm from '../components/forms/AddNewTransactionForm'
@@ -59,7 +60,8 @@ const Dashboard = (): ReactElement => {
   // 4. If the user chooses to use the implementation address, we set the ABI address to the
   //    implementation address, otherwise we keep the original address.
   const handleAbiAddressInput = useCallback(
-    async (input: string) => {
+    async (_input: string) => {
+      const input = toChecksumAddress(_input)
       // For some reason the onchange handler is fired many times
       // Even if the value hasn't changed, we have to check if we already tried to fetch the ABI
       const alreadyExecuted = input.toLowerCase() === abiAddress.toLowerCase()

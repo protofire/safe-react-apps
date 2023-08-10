@@ -1,7 +1,8 @@
-import { AbiItem, toBN, isAddress, fromWei } from 'web3-utils'
+import { AbiItem, toBN, fromWei, toChecksumAddress } from 'web3-utils'
 import abiCoder, { AbiCoder } from 'web3-eth-abi'
 import { ContractInput, ContractMethod, ProposedTransaction } from './typings/models'
 import {
+  isAddressFieldType,
   isArrayFieldType,
   isArrayOfStringsFieldType,
   isBooleanFieldType,
@@ -145,6 +146,10 @@ const parseArrayOfValues = (values: string, fieldType: string): any => {
 export const parseInputValue = (fieldType: string, value: string): any => {
   const trimmedValue = typeof value === 'string' ? value.trim() : value
 
+  if (isAddressFieldType(fieldType)) {
+    return toChecksumAddress(trimmedValue)
+  }
+
   if (isBooleanFieldType(fieldType)) {
     return parseBooleanValue(trimmedValue)
   }
@@ -200,7 +205,8 @@ export const isValidAddress = (address: string | null) => {
   if (!address) {
     return false
   }
-  return isAddress(address)
+  // return isAddress(address)
+  return /^(0x)?[0-9a-fA-F]{40}$/.test(address)
 }
 
 const NON_VALID_CONTRACT_METHODS = ['receive', 'fallback']
