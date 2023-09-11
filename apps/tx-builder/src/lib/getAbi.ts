@@ -26,7 +26,8 @@ const getProviderURL = (chain: string, address: string, urlProvider: PROVIDER): 
     case PROVIDER.BLOCKSCOUT:
       return `https://blockscout.com/${chain}/api?module=contract&action=getabi&address=${address}`
     case PROVIDER.SCANAPI:
-      return `${getScanAPIBaseURL(chain)}/api?module=contract&action=getabi&address=${address}`
+      const scanAPI = getScanAPIBaseURL(chain)
+      return `${scanAPI?.link}/api?module=contract&action=getabi&address=${address}&apiKey=${scanAPI?.apiKey}`
     default:
       throw new Error('The Provider is not supported')
   }
@@ -169,14 +170,17 @@ const getGatewayBaseUrl = (chain: string) => {
   }
 }
 
-const getScanAPIBaseURL = (chain: string) => {
+const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: string } => {
   switch (chain) {
     case SUPPORTED_CHAINS.CASCADIA_TESTNET:
-      return 'https://explorer.cascadia.foundation'
+      return { link: 'https://explorer.cascadia.foundation' }
     case SUPPORTED_CHAINS.LINEA:
-      return 'https://api.lineascan.build'
+      return { link: 'https://api.lineascan.build', apiKey: process.env.REACT_APP_LINEASCAN_KEY }
     case SUPPORTED_CHAINS.LINEA_TESTNET:
-      return 'https://api-testnet.lineascan.build'
+      return {
+        link: 'https://api-testnet.lineascan.build',
+        apiKey: process.env.REACT_APP_LINEASCAN_KEY,
+      }
     default:
       return
   }
