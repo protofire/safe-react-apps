@@ -7,7 +7,8 @@ import { isEthersError } from '../../../typings/errors'
 
 const basicSolidityValidation = (value: string, fieldType: string): ValidateResult => {
   const isSolidityFieldType = !NON_SOLIDITY_TYPES.includes(fieldType)
-  if (isSolidityFieldType) {
+  // NOTE: skip validation from web3-eth-abi library, since it has issues with encoding `tuple(...)[]`
+  if (isSolidityFieldType && !(fieldType.startsWith('tuple(') && fieldType.endsWith(')[]'))) {
     try {
       const cleanValue = parseInputValue(fieldType, value)
       const abi = abiCoder as unknown // a bug in the web3-eth-abi types
