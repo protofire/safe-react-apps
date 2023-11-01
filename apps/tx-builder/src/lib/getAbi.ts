@@ -40,6 +40,7 @@ export enum SUPPORTED_CHAINS {
   ASTAR = '592',
   SHIDEN = '336',
   SHIBUYA = '81',
+  ZKATANA_TESTNET = '1261120',
   BOBABEAM = '1294',
   CASCADIA_TESTNET = '6102',
   CRONOS = '25',
@@ -48,6 +49,7 @@ export enum SUPPORTED_CHAINS {
   EVMOS_TESTNET = '9000',
   HARMONY = '1666600000',
   HARMONY_TESTNET = '1666700000',
+  HOLESKY = '17000',
   IOTEX = '4689',
   IOTEX_TESTNET = '4690',
   LINEA = '59144',
@@ -64,6 +66,9 @@ export enum SUPPORTED_CHAINS {
   OASIS_SAPPHIRE_TESTNET = '23295',
   RSK = '30',
   RSK_TESTNET = '31',
+  SCROLL = '534352',
+  SCROLL_ALPHA_TESTNET = '534353',
+  SCROLL_SEPOLIA_TESTNET = '534351',
   TELOS = '40',
   TELOS_TESTNET = '41',
   TENET = '155',
@@ -72,6 +77,7 @@ export enum SUPPORTED_CHAINS {
   THUNDER_CORE_TESTNET = '18',
   VELAS = '106',
   VELAS_TESTNET = '111',
+  ZETACHAIN_TESTNET = '7001',
   ZKSYNC_ERA = '324',
   ZKSYNC_ERA_TESTNET = '280',
 }
@@ -89,6 +95,7 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.ASTAR:
     case SUPPORTED_CHAINS.SHIDEN:
     case SUPPORTED_CHAINS.SHIBUYA:
+    case SUPPORTED_CHAINS.ZKATANA_TESTNET:
       return isProdEnv
         ? `https://gateway.safe.astar.network`
         : `https://gateway.staging-safe.astar.network`
@@ -97,9 +104,7 @@ const getGatewayBaseUrl = (chain: string) => {
         ? `https://gateway.multisig.bobabeam.boba.network`
         : `https://gateway.staging.multisig.bobabeam.boba.network`
     case SUPPORTED_CHAINS.CASCADIA_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.cascadia.foundation`
-        : `https://gateway.staging.safe.cascadia.foundation`
+      return `https://gateway.safe.cascadia.foundation`
     case SUPPORTED_CHAINS.CRONOS:
     case SUPPORTED_CHAINS.CRONOS_TESTNET:
       return isProdEnv
@@ -113,6 +118,10 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.multisig.harmony.one`
         : `https://gateway.staging-safe.harmony.one`
+    case SUPPORTED_CHAINS.HOLESKY:
+      return isProdEnv
+        ? `https://gateway.holesky-safe.protofire.io`
+        : `https://gateway.stg.holesky-safe.protofire.io`
     case SUPPORTED_CHAINS.IOTEX:
     case SUPPORTED_CHAINS.IOTEX_TESTNET:
       return isProdEnv ? `https://gateway.safe.iotex.io` : `https://gateway.staging.safe.iotex.io`
@@ -135,7 +144,9 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.NEON_EVM:
     case SUPPORTED_CHAINS.NEON_EVM_DEVNET:
     case SUPPORTED_CHAINS.NEON_EVM_TESTNET:
-      return `https://gateway.neonevm.safe.protofire.io`
+      return isProdEnv
+        ? `https://gateway.safe.neonevm.org`
+        : `https://gateway.staging.safe.neonevm.org`
     case SUPPORTED_CHAINS.OASIS_SAPPHIRE:
     case SUPPORTED_CHAINS.OASIS_SAPPHIRE_TESTNET:
       return isProdEnv ? `https://gateway.safe.oasis.io` : `https://gateway.safe.stg.oasis.io`
@@ -144,6 +155,12 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.rootstock.io`
         : `https://gateway.staging.safe.rootstock.io`
+    case SUPPORTED_CHAINS.SCROLL:
+    case SUPPORTED_CHAINS.SCROLL_ALPHA_TESTNET:
+    case SUPPORTED_CHAINS.SCROLL_SEPOLIA_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.scroll.xyz `
+        : `https://gateway.staging.safe.scroll.xyz`
     case SUPPORTED_CHAINS.TELOS:
     case SUPPORTED_CHAINS.TELOS_TESTNET:
       return `https://gateway.safe.telos.net`
@@ -158,6 +175,10 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.VELAS:
     case SUPPORTED_CHAINS.VELAS_TESTNET:
       return isProdEnv ? `https://gateway.velasafe.com` : `https://gateway.staging.velasafe.com`
+    case SUPPORTED_CHAINS.ZETACHAIN_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.zetachain.com`
+        : `https://gateway.staging.safe.zetachain.com`
     case SUPPORTED_CHAINS.ZKSYNC_ERA:
     case SUPPORTED_CHAINS.ZKSYNC_ERA_TESTNET:
       return isProdEnv
