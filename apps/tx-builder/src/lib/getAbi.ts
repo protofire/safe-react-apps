@@ -54,6 +54,7 @@ export enum SUPPORTED_CHAINS {
   IOTEX_TESTNET = '4690',
   LINEA = '59144',
   LINEA_TESTNET = '59140',
+  MANTA_PACIFIC_MAINNET = '169',
   MANTLE = '5000',
   MANTLE_TESTNET = '5001',
   MOONBEAM = '1284',
@@ -130,6 +131,10 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.linea.build`
         : `https://gateway.staging.safe.linea.build`
+    case SUPPORTED_CHAINS.MANTA_PACIFIC_MAINNET:
+      return isProdEnv
+        ? `https://gateway.safe.manta.network`
+        : `https://gateway.staging.safe.manta.network`
     case SUPPORTED_CHAINS.MANTLE:
     case SUPPORTED_CHAINS.MANTLE_TESTNET:
       return isProdEnv
