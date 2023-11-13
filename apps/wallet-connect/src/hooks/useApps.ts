@@ -108,7 +108,7 @@ const getGatewayBaseUrl = (chain: string) => {
         : `https://gateway.staging.safe.linea.build`
     case SUPPORTED_CHAINS.MANTA_PACIFIC_MAINNET:
       return isProdEnv
-        ? `https://gateway.staging.safe.manta.network`
+        ? `https://gateway.safe.manta.network`
         : `https://gateway.staging.safe.manta.network`
     case SUPPORTED_CHAINS.MANTLE:
     case SUPPORTED_CHAINS.MANTLE_TESTNET:
