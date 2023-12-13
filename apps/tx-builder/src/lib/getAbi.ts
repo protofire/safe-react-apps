@@ -207,6 +207,11 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
         link: 'https://api-testnet.lineascan.build',
         apiKey: process.env.REACT_APP_LINEASCAN_KEY,
       }
+    case SUPPORTED_CHAINS.HOLESKY:
+      return {
+        link: 'https://api-holesky.etherscan.io',
+        apiKey: process.env.REACT_APP_ETHERSCAN_KEY,
+      }
     default:
       return
   }
