@@ -218,17 +218,17 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
     case SUPPORTED_CHAINS.MOONBEAM:
       return {
         link: 'https://api-moonbeam.moonscan.io',
-        apiKey: process.env.REACT_APP_MOONBEAM_KEY,
+        apiKey: process.env.REACT_APP_MOONSCAN_KEY,
       }
     case SUPPORTED_CHAINS.MOONBASE:
       return {
         link: 'https://api-moonbase.moonscan.io',
-        apiKey: process.env.REACT_APP_MOONBEAM_KEY,
+        apiKey: process.env.REACT_APP_MOONSCAN_KEY,
       }
     case SUPPORTED_CHAINS.MOONRIVER:
       return {
         link: 'https://api-moonriver.moonriver.io',
-        apiKey: process.env.REACT_APP_MOONBEAM_KEY,
+        apiKey: process.env.REACT_APP_MOONSCAN_KEY,
       }
     default:
       return
