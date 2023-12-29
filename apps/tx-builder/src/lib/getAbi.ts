@@ -201,7 +201,10 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
     case SUPPORTED_CHAINS.CASCADIA_TESTNET:
       return { link: 'https://explorer.cascadia.foundation' }
     case SUPPORTED_CHAINS.LINEA:
-      return { link: 'https://api.lineascan.build', apiKey: process.env.REACT_APP_LINEASCAN_KEY }
+      return {
+        link: 'https://api.lineascan.build',
+        apiKey: process.env.REACT_APP_LINEASCAN_KEY,
+      }
     case SUPPORTED_CHAINS.LINEA_TESTNET:
       return {
         link: 'https://api-testnet.lineascan.build',
@@ -211,6 +214,21 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       return {
         link: 'https://api-holesky.etherscan.io',
         apiKey: process.env.REACT_APP_ETHERSCAN_KEY,
+      }
+    case SUPPORTED_CHAINS.MOONBEAM:
+      return {
+        link: 'https://api-moonbeam.moonscan.io',
+        apiKey: process.env.REACT_APP_MOONBEAM_KEY,
+      }
+    case SUPPORTED_CHAINS.MOONBASE:
+      return {
+        link: 'https://api-moonbase.moonscan.io',
+        apiKey: process.env.REACT_APP_MOONBEAM_KEY,
+      }
+    case SUPPORTED_CHAINS.MOONRIVER:
+      return {
+        link: 'https://api-moonriver.moonriver.io',
+        apiKey: process.env.REACT_APP_MOONBEAM_KEY,
       }
     default:
       return
