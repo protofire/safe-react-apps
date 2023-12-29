@@ -227,7 +227,7 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       }
     case SUPPORTED_CHAINS.MOONRIVER:
       return {
-        link: 'https://api-moonriver.moonriver.io',
+        link: 'https://api-moonriver.moonscan.io',
         apiKey: process.env.REACT_APP_MOONSCAN_KEY,
       }
     default:
