@@ -28,6 +28,7 @@ export enum SUPPORTED_CHAINS {
   IOTEX = '4689',
   IOTEX_TESTNET = '4690',
   LINEA = '59144',
+  LINEA_SEPOLIA = '59141',
   LINEA_TESTNET = '59140',
   MANTA_PACIFIC_MAINNET = '169',
   MANTLE = '5000',
@@ -102,6 +103,7 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.IOTEX_TESTNET:
       return isProdEnv ? `https://gateway.safe.iotex.io` : `https://gateway.staging.safe.iotex.io`
     case SUPPORTED_CHAINS.LINEA:
+    case SUPPORTED_CHAINS.LINEA_SEPOLIA:
     case SUPPORTED_CHAINS.LINEA_TESTNET:
       return isProdEnv
         ? `https://gateway.safe.linea.build`
