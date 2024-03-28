@@ -82,6 +82,8 @@ export enum SUPPORTED_CHAINS {
   VELAS = '106',
   VELAS_TESTNET = '111',
   ZETACHAIN_TESTNET = '7001',
+  ZKLINK_NOVA = '810180',
+  ZKLINK_NOVA_GOERLI = '810182',
   ZKSYNC_ERA = '324',
   ZKSYNC_ERA_TESTNET = '280',
 }
@@ -248,6 +250,14 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
     case SUPPORTED_CHAINS.IMMUTABLE_TESTNET:
       return {
         link: 'https://explorer.testnet.immutable.com',
+      }
+    case SUPPORTED_CHAINS.ZKLINK_NOVA_GOERLI:
+      return {
+        link: 'https://goerli.explorer-api.zklink.io',
+      }
+    case SUPPORTED_CHAINS.ZKLINK_NOVA:
+      return {
+        link: 'https://explorer-api.zklink.io',
       }
     default:
       return
