@@ -50,6 +50,8 @@ export enum SUPPORTED_CHAINS {
   HARMONY = '1666600000',
   HARMONY_TESTNET = '1666700000',
   HOLESKY = '17000',
+  IMMUTABLE = '13371',
+  IMMUTABLE_TESTNET = '13473',
   IOTEX = '4689',
   IOTEX_TESTNET = '4690',
   LINEA = '59144',
@@ -238,6 +240,14 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       return {
         link: 'https://api-moonriver.moonscan.io',
         apiKey: TEMP_MOONRIVER_KEY,
+      }
+    case SUPPORTED_CHAINS.IMMUTABLE:
+      return {
+        link: 'https://explorer.immutable.com',
+      }
+    case SUPPORTED_CHAINS.IMMUTABLE_TESTNET:
+      return {
+        link: 'https://explorer.testnet.immutable.com',
       }
     default:
       return
