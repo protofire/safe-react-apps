@@ -41,6 +41,7 @@ export enum SUPPORTED_CHAINS {
   NEON_EVM_TESTNET = '245022940',
   OASIS_SAPPHIRE = '23294',
   OASIS_SAPPHIRE_TESTNET = '23295',
+  REYA = '1729',
   RSK = '30',
   RSK_TESTNET = '31',
   SCROLL = '534352',
@@ -132,6 +133,10 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.OASIS_SAPPHIRE:
     case SUPPORTED_CHAINS.OASIS_SAPPHIRE_TESTNET:
       return isProdEnv ? `https://gateway.safe.oasis.io` : `https://gateway.safe.stg.oasis.io`
+    case SUPPORTED_CHAINS.REYA:
+      return isProdEnv
+        ? `https://gateway.safe.reya.network`
+        : `https://gateway.staging.safe.reya.network`
     case SUPPORTED_CHAINS.RSK:
     case SUPPORTED_CHAINS.RSK_TESTNET:
       return isProdEnv
