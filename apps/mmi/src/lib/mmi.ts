@@ -23,7 +23,7 @@ export const authenticate = async (refreshToken: string) => {
         apiUrl: `${process.env.REACT_APP_MMI_BACKEND_BASE_URL}/api`,
         feature: 'custodian',
         service: 'JSONRPC',
-        environment: /*process.env.REACT_APP_MMI_ENVIRONMENT*/ 'safe-prod', //TODO: remove temp string
+        environment: /*process.env.REACT_APP_MMI_ENVIRONMENT*/ 'safe-linea', //TODO: remove temp string
         labels: [
           {
             key: 'token',
