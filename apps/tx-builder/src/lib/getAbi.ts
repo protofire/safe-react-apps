@@ -35,6 +35,8 @@ const getProviderURL = (chain: string, address: string, urlProvider: PROVIDER): 
 
 export enum SUPPORTED_CHAINS {
   ACALA = '787',
+  BLAST = '81457',
+  BLAST_TESTNET = '168587773',
   BOB = '60808',
   BOB_TESTNET = '111',
   KARURA = '686',
@@ -114,6 +116,9 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.astar.network`
         : `https://gateway.staging-safe.astar.network`
+    case SUPPORTED_CHAINS.BLAST:
+    case SUPPORTED_CHAINS.BLAST_TESTNET:
+      return isProdEnv ? `https://gateway.blast-safe.io` : `https://gateway.blast-safe.io`
     case SUPPORTED_CHAINS.BOB:
     case SUPPORTED_CHAINS.BOB_TESTNET:
       return isProdEnv ? `https://gateway.safe.gobob.xyz` : `https://gateway.staging.safe.gobob.xyz`
@@ -236,6 +241,10 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
   switch (chain) {
     case SUPPORTED_CHAINS.CASCADIA_TESTNET:
       return { link: 'https://explorer.cascadia.foundation' }
+    case SUPPORTED_CHAINS.BLAST:
+      return { link: 'https://api.blastscan.io' }
+    case SUPPORTED_CHAINS.BLAST_TESTNET:
+      return { link: 'https://api-sepolia.blastscan.io' }
     case SUPPORTED_CHAINS.LINEA:
       return {
         link: 'https://api.lineascan.build',
