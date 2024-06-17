@@ -79,6 +79,8 @@ export enum SUPPORTED_CHAINS {
   SCROLL_SEPOLIA_TESTNET = '534351',
   SEI = '1329',
   SEI_DEVNET = '713715',
+  TANGIBLE_REAL = '111188',
+  TANGIBLE_UNREAL = '18233',
   TELOS = '40',
   TELOS_TESTNET = '41',
   TENET = '155',
@@ -194,6 +196,9 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.sei-safe.protofire.io`
         : `https://gateway.staging.sei-safe.protofire.io`
+    case SUPPORTED_CHAINS.TANGIBLE_REAL:
+    case SUPPORTED_CHAINS.TANGIBLE_UNREAL:
+      return isProdEnv ? `https://gateway.safe.re.al` : `https://gateway.staging.safe.re.al`
     case SUPPORTED_CHAINS.TELOS:
     case SUPPORTED_CHAINS.TELOS_TESTNET:
       return `https://gateway.safe.telos.net`
