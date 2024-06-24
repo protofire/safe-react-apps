@@ -97,6 +97,7 @@ export enum SUPPORTED_CHAINS {
   ZKLINK_NOVA_GOERLI = '810182',
   ZKSYNC_ERA = '324',
   ZKSYNC_ERA_TESTNET = '280',
+  CROSS_FI_TESTNET = '4157',
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -228,6 +229,8 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.zksafe.protofire.io`
         : `https://gateway.staging-zksafe.protofire.io`
+    case SUPPORTED_CHAINS.CROSS_FI_TESTNET:
+      return isProdEnv ? 'https://gateway.safe.crossfi.org' : 'https://gateway.staging.safe.crossfi.org'
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
