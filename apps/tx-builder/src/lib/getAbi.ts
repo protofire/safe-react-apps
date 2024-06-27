@@ -244,7 +244,7 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.XAI_TESTNET:
       return isProdEnv
         ? `https://gateway.safe-xai.protofire.io`
-        : `https://gateway.staging-zksafe.protofire.io`
+        : `https://gateway.staging-safe-xai.protofire.io`
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
