@@ -102,6 +102,8 @@ export enum SUPPORTED_CHAINS {
   CROSS_FI_TESTNET = '4157',
   WEMIX = '1111',
   WEMIX_TESTNET = '1112',
+  XAI = '660279',
+  XAI_TESTNET = '37714555429',
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -237,10 +239,17 @@ const getGatewayBaseUrl = (chain: string) => {
         ? `https://gateway.zksafe.protofire.io`
         : `https://gateway.staging-zksafe.protofire.io`
     case SUPPORTED_CHAINS.CROSS_FI_TESTNET:
-      return isProdEnv ? 'https://gateway.safe.crossfi.org' : 'https://gateway.staging.safe.crossfi.org'
+      return isProdEnv
+        ? 'https://gateway.safe.crossfi.org'
+        : 'https://gateway.staging.safe.crossfi.org'
     case SUPPORTED_CHAINS.WEMIX:
     case SUPPORTED_CHAINS.WEMIX_TESTNET:
       return isProdEnv ? 'https://gateway.safe.wemix.com' : 'https://gateway.staging.safe.wemix.com'
+    case SUPPORTED_CHAINS.XAI:
+    case SUPPORTED_CHAINS.XAI_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe-xai.protofire.io`
+        : `https://gateway.staging-zksafe.protofire.io`
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
