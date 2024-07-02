@@ -251,7 +251,7 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe-xai.protofire.io`
         : `https://gateway.staging-safe-xai.protofire.io`
-    case SUPPORTED_CHAINS.XAI_TESTNET:
+    case SUPPORTED_CHAINS.MORPH_HOLESKY:
       return isProdEnv
         ? `https://gateway.safe.morphl2.io`
         : `https://gateway.stg.safe.morphl2.io`
