@@ -102,6 +102,7 @@ export enum SUPPORTED_CHAINS {
   WEMIX_TESTNET = '1112',
   XAI = '660279',
   XAI_TESTNET = '37714555429',
+  MORPH_HOLESKY = '2810'
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -245,6 +246,10 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe-xai.protofire.io`
         : `https://gateway.staging-safe-xai.protofire.io`
+    case SUPPORTED_CHAINS.XAI_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.morphl2.io`
+        : `https://gateway.stg.safe.morphl2.io`
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
