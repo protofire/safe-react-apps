@@ -24,7 +24,8 @@ const getProviderURL = (chain: string, address: string, urlProvider: PROVIDER): 
     case PROVIDER.GATEWAY:
       return `${getGatewayBaseUrl(chain)}/v1/chains/${chain}/contracts/${address}`
     case PROVIDER.BLOCKSCOUT:
-      return `https://blockscout.com/${chain}/api?module=contract&action=getabi&address=${address}`
+      const baseApi = getBlockscoutBaseURL(chain)
+      return `${baseApi}/api?module=contract&action=getabi&address=${address}`
     case PROVIDER.SCANAPI:
       const scanAPI = getScanAPIBaseURL(chain)
       return `${scanAPI?.link}/api?module=contract&action=getabi&address=${address}&apiKey=${scanAPI?.apiKey}`
@@ -325,6 +326,15 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       }
     default:
       return
+  }
+}
+
+const getBlockscoutBaseURL = (chain: string): string => {
+  switch (chain) {
+    case SUPPORTED_CHAINS.TANGIBLE_REAL:
+      return 'https://unreal.blockscout.com'
+    default:
+      return `https://blockscout.com/${chain}`
   }
 }
 
