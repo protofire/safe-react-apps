@@ -332,7 +332,7 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
 const getBlockscoutBaseURL = (chain: string): string => {
   switch (chain) {
     case SUPPORTED_CHAINS.TANGIBLE_REAL:
-      return 'https://explorer.re.al/'
+      return 'https://explorer.re.al'
     case SUPPORTED_CHAINS.TANGIBLE_UNREAL:
       return 'https://unreal.blockscout.com'
     default:
