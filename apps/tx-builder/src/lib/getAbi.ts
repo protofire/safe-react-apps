@@ -84,6 +84,8 @@ export enum SUPPORTED_CHAINS {
   SEI_DEVNET = '713715',
   TANGIBLE_REAL = '111188',
   TANGIBLE_UNREAL = '18233',
+  TAIKO = '167000',
+  TAIKO_HEKLA = '167009',
   TELOS = '40',
   TELOS_TESTNET = '41',
   TENET = '155',
@@ -256,6 +258,9 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.morphl2.io`
         : `https://gateway.stg.safe.morphl2.io`
+    case SUPPORTED_CHAINS.TAIKO:
+    case SUPPORTED_CHAINS.TAIKO_HEKLA:
+      return isProdEnv ? 'https://gateway.safe.taiko.xyz' : 'https://gateway.staging.safe.taiko.xyz'
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
