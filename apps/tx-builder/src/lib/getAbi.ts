@@ -107,7 +107,8 @@ export enum SUPPORTED_CHAINS {
   WEMIX_TESTNET = '1112',
   XAI = '660279',
   XAI_TESTNET = '37714555429',
-  MORPH_HOLESKY = '2810'
+  MORPH_HOLESKY = '2810',
+  MINT = '185',
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -340,6 +341,8 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://explorer.re.al'
     case SUPPORTED_CHAINS.TANGIBLE_UNREAL:
       return 'https://unreal.blockscout.com'
+    case SUPPORTED_CHAINS.MINT:
+      return 'https://explorer.mintchain.io'    
     default:
       return `https://blockscout.com/${chain}`
   }
