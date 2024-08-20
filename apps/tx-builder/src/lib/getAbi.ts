@@ -85,6 +85,10 @@ export enum SUPPORTED_CHAINS {
   TANGIBLE_REAL = '111188',
   TANGIBLE_UNREAL = '18233',
   TAIKO = '167000',
+  BOBA = '288',
+  BOBA_BNB = '56288',
+  BOBA_BNB_TESTNET = '9728',
+  BOBA_TESTNET = '28882',
   TAIKO_HEKLA = '167009',
   TELOS = '40',
   TELOS_TESTNET = '41',
@@ -343,6 +347,12 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://unreal.blockscout.com'
     case SUPPORTED_CHAINS.MINT:
       return 'https://explorer.mintchain.io'    
+    case SUPPORTED_CHAINS.BOBA:
+    case SUPPORTED_CHAINS.BOBA_BNB:
+      return 'https://bobascan.com'
+    case SUPPORTED_CHAINS.BOBA_BNB_TESTNET:
+    case SUPPORTED_CHAINS.BOBA_TESTNET:
+      return 'https://testnet.bobascan.com'
     default:
       return `https://blockscout.com/${chain}`
   }
