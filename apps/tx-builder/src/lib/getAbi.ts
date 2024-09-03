@@ -54,6 +54,7 @@ export enum SUPPORTED_CHAINS {
   EVMOS_TESTNET = '9000',
   HARMONY = '1666600000',
   HARMONY_TESTNET = '1666700000',
+  FLOW_TESTNET = '545',
   HOLESKY = '17000',
   IMMUTABLE = '13371',
   IMMUTABLE_TESTNET = '13473',
@@ -353,6 +354,8 @@ const getBlockscoutBaseURL = (chain: string): string => {
     case SUPPORTED_CHAINS.BOBA_BNB_TESTNET:
     case SUPPORTED_CHAINS.BOBA_TESTNET:
       return 'https://testnet.bobascan.com'
+    case SUPPORTED_CHAINS.FLOW_TESTNET:
+      return 'https://evm-testnet.flowscan.io'
     default:
       return `https://blockscout.com/${chain}`
   }
