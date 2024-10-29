@@ -86,6 +86,7 @@ export enum SUPPORTED_CHAINS {
   TANGIBLE_REAL = '111188',
   TANGIBLE_UNREAL = '18233',
   TAIKO = '167000',
+  KAKAROT = '920637907288165',
   BOBA = '288',
   BOBA_BNB = '56288',
   BOBA_BNB_TESTNET = '9728',
@@ -145,6 +146,8 @@ const getGatewayBaseUrl = (chain: string) => {
         : `https://gateway.staging.multisig.bobabeam.boba.network`
     case SUPPORTED_CHAINS.CASCADIA_TESTNET:
       return `https://gateway.safe.cascadia.foundation`
+    case SUPPORTED_CHAINS.KAKAROT:
+      return `https://gateway.staging.safe.kakarot.org`
     case SUPPORTED_CHAINS.CRONOS:
     case SUPPORTED_CHAINS.CRONOS_TESTNET:
       return isProdEnv
@@ -280,6 +283,8 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
   switch (chain) {
     case SUPPORTED_CHAINS.CASCADIA_TESTNET:
       return { link: 'https://explorer.cascadia.foundation' }
+    case SUPPORTED_CHAINS.KAKAROT:
+      return { link: 'https://api.sepolia.kakarotscan.org' }
     case SUPPORTED_CHAINS.BLAST:
       return { link: 'https://api.blastscan.io' }
     case SUPPORTED_CHAINS.BLAST_TESTNET:
@@ -347,7 +352,7 @@ const getBlockscoutBaseURL = (chain: string): string => {
     case SUPPORTED_CHAINS.TANGIBLE_UNREAL:
       return 'https://unreal.blockscout.com'
     case SUPPORTED_CHAINS.MINT:
-      return 'https://explorer.mintchain.io'    
+      return 'https://explorer.mintchain.io'
     case SUPPORTED_CHAINS.BOBA:
     case SUPPORTED_CHAINS.BOBA_BNB:
       return 'https://bobascan.com'
