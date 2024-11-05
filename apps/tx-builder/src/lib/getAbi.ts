@@ -83,6 +83,7 @@ export enum SUPPORTED_CHAINS {
   SCROLL_SEPOLIA_TESTNET = '534351',
   SEI = '1329',
   SEI_DEVNET = '713715',
+  STORY = '1516',
   TANGIBLE_REAL = '111188',
   TANGIBLE_UNREAL = '18233',
   TAIKO = '167000',
@@ -146,6 +147,8 @@ const getGatewayBaseUrl = (chain: string) => {
         : `https://gateway.staging.multisig.bobabeam.boba.network`
     case SUPPORTED_CHAINS.CASCADIA_TESTNET:
       return `https://gateway.safe.cascadia.foundation`
+    case SUPPORTED_CHAINS.STORY:
+      return `https://gateway.staging.safe.story.foundation`
     case SUPPORTED_CHAINS.KAKAROT:
       return `https://gateway.staging.safe.kakarot.org`
     case SUPPORTED_CHAINS.CRONOS:
@@ -361,6 +364,8 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://testnet.bobascan.com'
     case SUPPORTED_CHAINS.FLOW_TESTNET:
       return 'https://evm-testnet.flowscan.io'
+    case SUPPORTED_CHAINS.STORY:
+      return 'https://odyssey-testnet-explorer.storyscan.xyz'
     default:
       return `https://blockscout.com/${chain}`
   }
