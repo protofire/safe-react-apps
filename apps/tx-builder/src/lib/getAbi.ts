@@ -56,6 +56,7 @@ export enum SUPPORTED_CHAINS {
   HARMONY_TESTNET = '1666700000',
   FLOW_TESTNET = '545',
   HOLESKY = '17000',
+  FRAXTAL_TESNET = '2522',
   IMMUTABLE = '13371',
   IMMUTABLE_TESTNET = '13473',
   IOTEX = '4689',
@@ -83,9 +84,11 @@ export enum SUPPORTED_CHAINS {
   SCROLL_SEPOLIA_TESTNET = '534351',
   SEI = '1329',
   SEI_DEVNET = '713715',
+  STORY = '1516',
   TANGIBLE_REAL = '111188',
   TANGIBLE_UNREAL = '18233',
   TAIKO = '167000',
+  KAKAROT = '920637907288165',
   BOBA = '288',
   BOBA_BNB = '56288',
   BOBA_BNB_TESTNET = '9728',
@@ -133,6 +136,10 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.astar.network`
         : `https://gateway.staging-safe.astar.network`
+    case SUPPORTED_CHAINS.FRAXTAL_TESNET:
+      return isProdEnv
+        ? `https://gateway.safe.optimism.io`
+        : `https://gateway.staging.safe.optimism.io`
     case SUPPORTED_CHAINS.BLAST:
     case SUPPORTED_CHAINS.BLAST_TESTNET:
       return isProdEnv ? `https://gateway.blast-safe.io` : `https://gateway.blast-safe.io`
@@ -145,6 +152,10 @@ const getGatewayBaseUrl = (chain: string) => {
         : `https://gateway.staging.multisig.bobabeam.boba.network`
     case SUPPORTED_CHAINS.CASCADIA_TESTNET:
       return `https://gateway.safe.cascadia.foundation`
+    case SUPPORTED_CHAINS.STORY:
+      return `https://gateway.staging.safe.story.foundation`
+    case SUPPORTED_CHAINS.KAKAROT:
+      return `https://gateway.staging.safe.kakarot.org`
     case SUPPORTED_CHAINS.CRONOS:
     case SUPPORTED_CHAINS.CRONOS_TESTNET:
       return isProdEnv
@@ -280,6 +291,8 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
   switch (chain) {
     case SUPPORTED_CHAINS.CASCADIA_TESTNET:
       return { link: 'https://explorer.cascadia.foundation' }
+    case SUPPORTED_CHAINS.KAKAROT:
+      return { link: 'https://api.sepolia.kakarotscan.org' }
     case SUPPORTED_CHAINS.BLAST:
       return { link: 'https://api.blastscan.io' }
     case SUPPORTED_CHAINS.BLAST_TESTNET:
@@ -302,6 +315,11 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
     case SUPPORTED_CHAINS.HOLESKY:
       return {
         link: 'https://api-holesky.etherscan.io',
+        apiKey: process.env.REACT_APP_ETHERSCAN_KEY,
+      }
+    case SUPPORTED_CHAINS.FRAXTAL_TESNET:
+      return {
+        link: 'https://holesky.fraxscan.com/',
         apiKey: process.env.REACT_APP_ETHERSCAN_KEY,
       }
     case SUPPORTED_CHAINS.MOONBEAM:
@@ -347,7 +365,7 @@ const getBlockscoutBaseURL = (chain: string): string => {
     case SUPPORTED_CHAINS.TANGIBLE_UNREAL:
       return 'https://unreal.blockscout.com'
     case SUPPORTED_CHAINS.MINT:
-      return 'https://explorer.mintchain.io'    
+      return 'https://explorer.mintchain.io'
     case SUPPORTED_CHAINS.BOBA:
     case SUPPORTED_CHAINS.BOBA_BNB:
       return 'https://bobascan.com'
@@ -356,6 +374,8 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://testnet.bobascan.com'
     case SUPPORTED_CHAINS.FLOW_TESTNET:
       return 'https://evm-testnet.flowscan.io'
+    case SUPPORTED_CHAINS.STORY:
+      return 'https://odyssey-testnet-explorer.storyscan.xyz'
     default:
       return `https://blockscout.com/${chain}`
   }
