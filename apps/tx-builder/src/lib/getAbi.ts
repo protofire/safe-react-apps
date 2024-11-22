@@ -56,6 +56,7 @@ export enum SUPPORTED_CHAINS {
   HARMONY_TESTNET = '1666700000',
   FLOW_TESTNET = '545',
   HOLESKY = '17000',
+  FRAXTAL_TESNET = '2522',
   IMMUTABLE = '13371',
   IMMUTABLE_TESTNET = '13473',
   IOTEX = '4689',
@@ -135,6 +136,10 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.astar.network`
         : `https://gateway.staging-safe.astar.network`
+    case SUPPORTED_CHAINS.FRAXTAL_TESNET:
+      return isProdEnv
+        ? `https://gateway.safe.optimism.io`
+        : `https://gateway.staging.safe.optimism.io`
     case SUPPORTED_CHAINS.BLAST:
     case SUPPORTED_CHAINS.BLAST_TESTNET:
       return isProdEnv ? `https://gateway.blast-safe.io` : `https://gateway.blast-safe.io`
@@ -310,6 +315,11 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
     case SUPPORTED_CHAINS.HOLESKY:
       return {
         link: 'https://api-holesky.etherscan.io',
+        apiKey: process.env.REACT_APP_ETHERSCAN_KEY,
+      }
+    case SUPPORTED_CHAINS.FRAXTAL_TESNET:
+      return {
+        link: 'https://holesky.fraxscan.com/',
         apiKey: process.env.REACT_APP_ETHERSCAN_KEY,
       }
     case SUPPORTED_CHAINS.MOONBEAM:
