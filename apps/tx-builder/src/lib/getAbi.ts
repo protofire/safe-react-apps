@@ -110,6 +110,7 @@ export enum SUPPORTED_CHAINS {
   ZKLINK_NOVA_GOERLI = '810182',
   ZKSYNC_ERA = '324',
   ZKSYNC_ERA_TESTNET = '280',
+  CROSSFI = '4158',
   CROSS_FI_TESTNET = '4157',
   WEMIX = '1111',
   WEMIX_TESTNET = '1112',
@@ -263,6 +264,10 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? 'https://gateway.safe.crossfi.org'
         : 'https://gateway.staging.safe.crossfi.org'
+    case SUPPORTED_CHAINS.CROSSFI:
+      return isProdEnv
+        ? 'https://gateway.staging.safe.crossfi.org'
+        : 'https://gateway.safe.crossfi.org'
     case SUPPORTED_CHAINS.WEMIX:
     case SUPPORTED_CHAINS.WEMIX_TESTNET:
       return isProdEnv ? 'https://gateway.safe.wemix.com' : 'https://gateway.staging.safe.wemix.com'
