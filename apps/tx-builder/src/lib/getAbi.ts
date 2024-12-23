@@ -64,6 +64,8 @@ export enum SUPPORTED_CHAINS {
   KROMA = '255',
   KROMA_SEPOLIA = '2358',
   LINEA = '59144',
+  ABSTRACT = '2741',
+  ABSTRACT_TESTNET = '11124',
   LINEA_SEPOLIA = '59141',
   LINEA_TESTNET = '59140',
   MANTA_PACIFIC_MAINNET = '169',
@@ -209,6 +211,15 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.neonevm.org`
         : `https://gateway.staging.safe.neonevm.org`
+    case SUPPORTED_CHAINS.ABSTRACT:
+      return isProdEnv
+        ? `https://gateway.abs.safe.protofire.io`
+        : `https://gateway.staging.abs.safe.protofire.io`
+    case SUPPORTED_CHAINS.ABSTRACT:
+      return isProdEnv
+        ? `https://gateway.abs.safe.protofire.io`
+        : `https://gateway.staging.abs.safe.protofire.io`
+
     case SUPPORTED_CHAINS.OASIS_SAPPHIRE:
     case SUPPORTED_CHAINS.OASIS_SAPPHIRE_TESTNET:
       return isProdEnv ? `https://gateway.safe.oasis.io` : `https://gateway.safe.stg.oasis.io`
