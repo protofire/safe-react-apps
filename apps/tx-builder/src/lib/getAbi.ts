@@ -120,6 +120,8 @@ export enum SUPPORTED_CHAINS {
   XAI_TESTNET = '37714555429',
   MORPH_HOLESKY = '2810',
   MINT = '185',
+  SHOPHON = '50104',
+  SHOPHON_TESTNET = '531050104',
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -294,6 +296,14 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.TAIKO:
     case SUPPORTED_CHAINS.TAIKO_HEKLA:
       return isProdEnv ? 'https://gateway.safe.taiko.xyz' : 'https://gateway.staging.safe.taiko.xyz'
+    case SUPPORTED_CHAINS.SHOPHON:
+      return isProdEnv
+        ? `https://transaction.safe.sophon.xyz`
+        : `https://transaction.staging.safe.sophon.xyz`
+    case SUPPORTED_CHAINS.SHOPHON_TESTNET:
+      return isProdEnv
+        ? `https://transaction-testnet.safe.sophon.xyz`
+        : `https://transaction-testnet.staging.safe.sophon.xyz`
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
@@ -368,6 +378,16 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
     case SUPPORTED_CHAINS.ZKLINK_NOVA:
       return {
         link: 'https://explorer-api.zklink.io',
+      }
+    case SUPPORTED_CHAINS.SHOPHON:
+      return {
+        link: 'https://api.sophscan.xyz',
+        apiKey: process.env.REACT_APP_SHOPHONSCAN_KEY,
+      }
+    case SUPPORTED_CHAINS.SHOPHON_TESTNET:
+      return {
+        link: 'https://api-sepolia.sophscan.xyz',
+        apiKey: process.env.REACT_APP_SHOPHONSCAN_KEY,
       }
     default:
       return
