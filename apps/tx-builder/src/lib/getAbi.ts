@@ -120,8 +120,8 @@ export enum SUPPORTED_CHAINS {
   XAI_TESTNET = '37714555429',
   MORPH_HOLESKY = '2810',
   MINT = '185',
-  SHOPHON = '50104',
-  SHOPHON_TESTNET = '531050104',
+  SOPHON = '50104',
+  SOPHON_TESTNET = '531050104',
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -296,11 +296,11 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.TAIKO:
     case SUPPORTED_CHAINS.TAIKO_HEKLA:
       return isProdEnv ? 'https://gateway.safe.taiko.xyz' : 'https://gateway.staging.safe.taiko.xyz'
-    case SUPPORTED_CHAINS.SHOPHON:
+    case SUPPORTED_CHAINS.SOPHON:
       return isProdEnv
         ? `https://transaction.safe.sophon.xyz`
         : `https://transaction.staging.safe.sophon.xyz`
-    case SUPPORTED_CHAINS.SHOPHON_TESTNET:
+    case SUPPORTED_CHAINS.SOPHON_TESTNET:
       return isProdEnv
         ? `https://transaction-testnet.safe.sophon.xyz`
         : `https://transaction-testnet.staging.safe.sophon.xyz`
@@ -379,15 +379,15 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       return {
         link: 'https://explorer-api.zklink.io',
       }
-    case SUPPORTED_CHAINS.SHOPHON:
+    case SUPPORTED_CHAINS.SOPHON:
       return {
         link: 'https://api.sophscan.xyz',
-        apiKey: process.env.REACT_APP_SHOPHONSCAN_KEY,
+        apiKey: process.env.REACT_APP_SOPHONSCAN_KEY,
       }
-    case SUPPORTED_CHAINS.SHOPHON_TESTNET:
+    case SUPPORTED_CHAINS.SOPHON_TESTNET:
       return {
         link: 'https://api-sepolia.sophscan.xyz',
-        apiKey: process.env.REACT_APP_SHOPHONSCAN_KEY,
+        apiKey: process.env.REACT_APP_SOPHONSCAN_KEY,
       }
     default:
       return
