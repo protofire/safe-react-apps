@@ -122,6 +122,8 @@ export enum SUPPORTED_CHAINS {
   XAI_TESTNET = '37714555429',
   MORPH_HOLESKY = '2810',
   MINT = '185',
+  VANA = '1480',
+  VANA_MOKSHA_TESTNET = '14800',
   SOPHON = '50104',
   SOPHON_TESTNET = '531050104',
 }
@@ -171,6 +173,14 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.cronos-safe.org`
         : `https://gateway-cronos-safe.crolabs-int.co`
+    case SUPPORTED_CHAINS.VANA:
+      return isProdEnv
+        ? `https://gateway.safe.vana.org`
+        : `https://gateway.staging.safe.vana.org`
+    case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.vana.org`
+        : `https://gateway.staging.safe.vana.org`
     case SUPPORTED_CHAINS.AUTONOMYS_TAURUS_NETWORK:
       return isProdEnv
         ? `https://gateway.safe.autonomys.xyz`
@@ -397,6 +407,14 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       return {
         link: 'https://api-sepolia.sophscan.xyz',
         apiKey: process.env.REACT_APP_SOPHONSCAN_KEY,
+      }
+    case SUPPORTED_CHAINS.VANA:
+      return {
+        link: 'https://islander.vanascan.io/api',
+      }
+    case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
+      return {
+        link: 'https://moksha.vanascan.io/api',
       }
     default:
       return
