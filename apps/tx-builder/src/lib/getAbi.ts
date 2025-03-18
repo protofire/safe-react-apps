@@ -66,6 +66,9 @@ export enum SUPPORTED_CHAINS {
   LINEA = '59144',
   ABSTRACT = '2741',
   ABSTRACT_TESTNET = '11124',
+  AUTONOMYS_TAURUS_NETWORK = '490000',
+  BERACHAIN = '80094',
+  BERACHAIN_CARTIO = '80000',
   LINEA_SEPOLIA = '59141',
   LINEA_TESTNET = '59140',
   MANTA_PACIFIC_MAINNET = '169',
@@ -120,6 +123,8 @@ export enum SUPPORTED_CHAINS {
   XAI_TESTNET = '37714555429',
   MORPH_HOLESKY = '2810',
   MINT = '185',
+  VANA = '1480',
+  VANA_MOKSHA_TESTNET = '14800',
   SOPHON = '50104',
   SOPHON_TESTNET = '531050104',
 }
@@ -151,6 +156,9 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.BOB:
     case SUPPORTED_CHAINS.BOB_TESTNET:
       return isProdEnv ? `https://gateway.safe.gobob.xyz` : `https://gateway.staging.safe.gobob.xyz`
+    case SUPPORTED_CHAINS.BERACHAIN:
+      return isProdEnv ? `https://gateway.bp.w3us.site` : `https://gateway.bp.w3us.site`
+
     case SUPPORTED_CHAINS.BOBABEAM:
       return isProdEnv
         ? `https://gateway.multisig.bobabeam.boba.network`
@@ -166,6 +174,18 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.cronos-safe.org`
         : `https://gateway-cronos-safe.crolabs-int.co`
+    case SUPPORTED_CHAINS.VANA:
+      return isProdEnv
+        ? `https://gateway.safe.vana.org`
+        : `https://gateway.staging.safe.vana.org`
+    case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.vana.org`
+        : `https://gateway.staging.safe.vana.org`
+    case SUPPORTED_CHAINS.AUTONOMYS_TAURUS_NETWORK:
+      return isProdEnv
+        ? `https://gateway.safe.autonomys.xyz`
+        : `https://gateway.staging.safe.autonomys.xyz`
     case SUPPORTED_CHAINS.EVMOS:
     case SUPPORTED_CHAINS.EVMOS_TESTNET:
       return isProdEnv ? `https://gateway.safe.evmos.org` : `https://gateway.safe.evmos.dev`
@@ -388,6 +408,18 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       return {
         link: 'https://api-sepolia.sophscan.xyz',
         apiKey: process.env.REACT_APP_SOPHONSCAN_KEY,
+      }
+    case SUPPORTED_CHAINS.VANA:
+      return {
+        link: 'https://islander.vanascan.io/api',
+      }
+    case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
+      return {
+        link: 'https://moksha.vanascan.io/api',
+      }
+    case SUPPORTED_CHAINS.BERACHAIN_CARTIO:
+      return {
+        link: 'https://berachain.cartio.io',
       }
     default:
       return
