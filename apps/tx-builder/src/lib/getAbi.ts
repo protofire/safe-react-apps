@@ -68,6 +68,7 @@ export enum SUPPORTED_CHAINS {
   ABSTRACT_TESTNET = '11124',
   AUTONOMYS_TAURUS_NETWORK = '490000',
   BERACHAIN = '80094',
+  BERACHAIN_CARTIO = '80000',
   LINEA_SEPOLIA = '59141',
   LINEA_TESTNET = '59140',
   MANTA_PACIFIC_MAINNET = '169',
@@ -415,6 +416,10 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
     case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
       return {
         link: 'https://moksha.vanascan.io/api',
+      }
+    case SUPPORTED_CHAINS.BERACHAIN_CARTIO:
+      return {
+        link: 'https://berachain.cartio.io',
       }
     default:
       return
