@@ -424,6 +424,7 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
     case SUPPORTED_CHAINS.BERACHAIN:
       return {
         link: 'https://beratrail.io',
+        apiKey: process.env.REACT_APP_BERASCAN_KEY,
       }
     default:
       return
