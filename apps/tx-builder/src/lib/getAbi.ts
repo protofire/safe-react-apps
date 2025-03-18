@@ -423,7 +423,7 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       }
     case SUPPORTED_CHAINS.BERACHAIN:
       return {
-        link: 'https://beratrail.io',
+        link: 'https://api.berascan.com',
       }
     default:
       return
