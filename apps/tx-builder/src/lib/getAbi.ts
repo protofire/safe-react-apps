@@ -157,7 +157,7 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.BOB_TESTNET:
       return isProdEnv ? `https://gateway.safe.gobob.xyz` : `https://gateway.staging.safe.gobob.xyz`
     case SUPPORTED_CHAINS.BERACHAIN:
-      return isProdEnv ? `https://gateway.bp.w3us.site` : `https://gateway.bp.w3us.site`
+      return isProdEnv ? `https://gateway.safe.berachain.com` : `https://gateway.staging.safe.berachain.com`
 
     case SUPPORTED_CHAINS.BOBABEAM:
       return isProdEnv
@@ -420,6 +420,10 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
     case SUPPORTED_CHAINS.BERACHAIN_CARTIO:
       return {
         link: 'https://berachain.cartio.io',
+      }
+    case SUPPORTED_CHAINS.BERACHAIN:
+      return {
+        link: 'https://beratrail.io',
       }
     default:
       return
