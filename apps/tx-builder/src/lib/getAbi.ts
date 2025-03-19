@@ -428,11 +428,13 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       }
     case SUPPORTED_CHAINS.ABSTRACT:
       return {
-        link: 'https://block-explorer-api.mainnet.abs.xyz'
+        link: 'https://api.abscan.org',
+        apiKey: process.env.REACT_APP_ABSTRACT_KEY
       }
     case SUPPORTED_CHAINS.ABSTRACT_TESTNET:
       return {
-        link: 'https://block-explorer-api.testnet.abs.xyz'
+        link: 'https://api-testnet.abscan.org',
+        apiKey: process.env.REACT_APP_ABSTRACT_KEY
       }
     default:
       return
