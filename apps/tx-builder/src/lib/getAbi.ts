@@ -426,6 +426,14 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
         link: 'https://api.berascan.com',
         apiKey: process.env.REACT_APP_BERASCAN_KEY,
       }
+    case SUPPORTED_CHAINS.ABSTRACT:
+      return {
+        link: 'https://block-explorer-api.mainnet.abs.xyz'
+      }
+    case SUPPORTED_CHAINS.ABSTRACT_TESTNET:
+      return {
+        link: 'https://block-explorer-api.testnet.abs.xyz'
+      }
     default:
       return
   }
