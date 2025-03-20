@@ -129,6 +129,7 @@ export enum SUPPORTED_CHAINS {
   SOPHON_TESTNET = '531050104',
   NIBIRU = 6900,
   NIBIRU_TESTNET = 6911,
+  HOODIE_TESTNET = 560048,
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -469,6 +470,8 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://evm-testnet.flowscan.io'
     case SUPPORTED_CHAINS.STORY:
       return 'https://odyssey-testnet-explorer.storyscan.xyz'
+    case SUPPORTED_CHAINS.HOODIE_TESTNET:
+      return 'https://hoodi.cloud.blockscout.com'
     default:
       return `https://blockscout.com/${chain}`
   }
