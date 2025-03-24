@@ -127,9 +127,9 @@ export enum SUPPORTED_CHAINS {
   VANA_MOKSHA_TESTNET = '14800',
   SOPHON = '50104',
   SOPHON_TESTNET = '531050104',
-  NIBIRU = 6900,
-  NIBIRU_TESTNET = 6911,
-  HOODIE_TESTNET = 560048,
+  NIBIRU = '6900',
+  NIBIRU_TESTNET = '6911',
+  HOODIE_TESTNET = '560048',
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -160,7 +160,9 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.BOB_TESTNET:
       return isProdEnv ? `https://gateway.safe.gobob.xyz` : `https://gateway.staging.safe.gobob.xyz`
     case SUPPORTED_CHAINS.BERACHAIN:
-      return isProdEnv ? `https://gateway.safe.berachain.com` : `https://gateway.staging.safe.berachain.com`
+      return isProdEnv
+        ? `https://gateway.safe.berachain.com`
+        : `https://gateway.staging.safe.berachain.com`
 
     case SUPPORTED_CHAINS.BOBABEAM:
       return isProdEnv
@@ -178,13 +180,9 @@ const getGatewayBaseUrl = (chain: string) => {
         ? `https://gateway.cronos-safe.org`
         : `https://gateway-cronos-safe.crolabs-int.co`
     case SUPPORTED_CHAINS.VANA:
-      return isProdEnv
-        ? `https://gateway.safe.vana.org`
-        : `https://gateway.staging.safe.vana.org`
+      return isProdEnv ? `https://gateway.safe.vana.org` : `https://gateway.staging.safe.vana.org`
     case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.vana.org`
-        : `https://gateway.staging.safe.vana.org`
+      return isProdEnv ? `https://gateway.safe.vana.org` : `https://gateway.staging.safe.vana.org`
     case SUPPORTED_CHAINS.AUTONOMYS_TAURUS_NETWORK:
       return isProdEnv
         ? `https://gateway.safe.autonomys.xyz`
@@ -313,9 +311,7 @@ const getGatewayBaseUrl = (chain: string) => {
         ? `https://gateway.safe-xai.protofire.io`
         : `https://gateway.staging-safe-xai.protofire.io`
     case SUPPORTED_CHAINS.MORPH_HOLESKY:
-      return isProdEnv
-        ? `https://gateway.safe.morphl2.io`
-        : `https://gateway.stg.safe.morphl2.io`
+      return isProdEnv ? `https://gateway.safe.morphl2.io` : `https://gateway.stg.safe.morphl2.io`
     case SUPPORTED_CHAINS.TAIKO:
     case SUPPORTED_CHAINS.TAIKO_HEKLA:
       return isProdEnv ? 'https://gateway.safe.taiko.xyz' : 'https://gateway.staging.safe.taiko.xyz'
@@ -432,12 +428,12 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
     case SUPPORTED_CHAINS.ABSTRACT:
       return {
         link: 'https://api.abscan.org',
-        apiKey: process.env.REACT_APP_ABSTRACT_KEY
+        apiKey: process.env.REACT_APP_ABSTRACT_KEY,
       }
     case SUPPORTED_CHAINS.ABSTRACT_TESTNET:
       return {
         link: 'https://api-testnet.abscan.org',
-        apiKey: process.env.REACT_APP_ABSTRACT_KEY
+        apiKey: process.env.REACT_APP_ABSTRACT_KEY,
       }
     case SUPPORTED_CHAINS.NIBIRU:
       return {
