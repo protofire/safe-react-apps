@@ -127,6 +127,9 @@ export enum SUPPORTED_CHAINS {
   VANA_MOKSHA_TESTNET = '14800',
   SOPHON = '50104',
   SOPHON_TESTNET = '531050104',
+  NIBIRU = 6900,
+  NIBIRU_TESTNET = 6911,
+  HOODIE_TESTNET = 560048,
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -436,6 +439,14 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
         link: 'https://api-testnet.abscan.org',
         apiKey: process.env.REACT_APP_ABSTRACT_KEY
       }
+    case SUPPORTED_CHAINS.NIBIRU:
+      return {
+        link: 'https://api.routescan.io/v2/network/mainnet/evm/6900/etherscan',
+      }
+    case SUPPORTED_CHAINS.NIBIRU_TESTNET:
+      return {
+        link: 'https://api.routescan.io/v2/network/testnet/evm/6911/etherscan',
+      }
     default:
       return
   }
@@ -459,6 +470,8 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://evm-testnet.flowscan.io'
     case SUPPORTED_CHAINS.STORY:
       return 'https://odyssey-testnet-explorer.storyscan.xyz'
+    case SUPPORTED_CHAINS.HOODIE_TESTNET:
+      return 'https://hoodi.cloud.blockscout.com'
     default:
       return `https://blockscout.com/${chain}`
   }
