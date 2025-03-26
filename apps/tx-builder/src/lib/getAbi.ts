@@ -130,6 +130,7 @@ export enum SUPPORTED_CHAINS {
   NIBIRU = '6900',
   NIBIRU_TESTNET = '6911',
   HOODIE_TESTNET = '560048',
+  EXPCHAIN_TESTNET = '18880'
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -323,6 +324,10 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://transaction-testnet.safe.sophon.xyz`
         : `https://transaction-testnet.staging.safe.sophon.xyz`
+    case SUPPORTED_CHAINS.EXPCHAIN_TESTNET:
+        return isProdEnv
+          ? `https://gateway.staging.polyhedra-safe.protofire.io`
+          : `https://gateway.polyhedra-safe.protofire.io`
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
@@ -468,6 +473,8 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://odyssey-testnet-explorer.storyscan.xyz'
     case SUPPORTED_CHAINS.HOODIE_TESTNET:
       return 'https://hoodi.cloud.blockscout.com'
+    case SUPPORTED_CHAINS.EXPCHAIN_TESTNET:
+      return 'https://blockscout-testnet.expchain.ai'
     default:
       return `https://blockscout.com/${chain}`
   }
