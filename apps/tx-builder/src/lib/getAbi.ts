@@ -464,13 +464,9 @@ const getBlockscoutBaseURL = (chain: string): string => {
     case SUPPORTED_CHAINS.EXPCHAIN_TESTNET:
       return 'https://blockscout-testnet.expchain.ai'
     case SUPPORTED_CHAINS.VANA:
-      return {
-        link: 'https://islander.vanascan.io',
-      }
+      return 'https://islander.vanascan.io'
     case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
-      return {
-        link: 'https://moksha.vanascan.io',
-      }
+      return 'https://moksha.vanascan.io'
     default:
       return `https://blockscout.com/${chain}`
   }
