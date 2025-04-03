@@ -181,9 +181,8 @@ const getGatewayBaseUrl = (chain: string) => {
         ? `https://gateway.cronos-safe.org`
         : `https://gateway-cronos-safe.crolabs-int.co`
     case SUPPORTED_CHAINS.VANA:
-      return isProdEnv ? `https://transaction.safe.vana.org` : `https://transaction.staging.safe.vana.org`
     case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
-      return isProdEnv ? `https://transaction-testnet.safe.vana.org` : `https://transaction-testnet.staging.safe.vana.org/`
+      return isProdEnv ? `https://gateway.safe.vana.org` : `https://gateway.staging.safe.vana.org`
     case SUPPORTED_CHAINS.AUTONOMYS_TAURUS_NETWORK:
       return isProdEnv
         ? `https://gateway.safe.autonomys.xyz`
@@ -317,13 +316,10 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.TAIKO_HEKLA:
       return isProdEnv ? 'https://gateway.safe.taiko.xyz' : 'https://gateway.staging.safe.taiko.xyz'
     case SUPPORTED_CHAINS.SOPHON:
-      return isProdEnv
-        ? `https://transaction.safe.sophon.xyz`
-        : `https://transaction.staging.safe.sophon.xyz`
     case SUPPORTED_CHAINS.SOPHON_TESTNET:
       return isProdEnv
-        ? `https://transaction-testnet.safe.sophon.xyz`
-        : `https://transaction-testnet.staging.safe.sophon.xyz`
+        ? `https://gateway.safe.sophon.xyz`
+        : `https://gateway.staging.safe.sophon.xyz`
     case SUPPORTED_CHAINS.EXPCHAIN_TESTNET:
         return isProdEnv
           ? `https://gateway.staging.polyhedra-safe.protofire.io`
@@ -413,14 +409,6 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
         link: 'https://api-sepolia.sophscan.xyz',
         apiKey: process.env.REACT_APP_SOPHONSCAN_KEY,
       }
-    case SUPPORTED_CHAINS.VANA:
-      return {
-        link: 'https://islander.vanascan.io/api',
-      }
-    case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
-      return {
-        link: 'https://moksha.vanascan.io/api',
-      }
     case SUPPORTED_CHAINS.BERACHAIN_CARTIO:
       return {
         link: 'https://berachain.cartio.io',
@@ -475,6 +463,14 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://hoodi.cloud.blockscout.com'
     case SUPPORTED_CHAINS.EXPCHAIN_TESTNET:
       return 'https://blockscout-testnet.expchain.ai'
+    case SUPPORTED_CHAINS.VANA:
+      return {
+        link: 'https://islander.vanascan.io',
+      }
+    case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
+      return {
+        link: 'https://moksha.vanascan.io',
+      }
     default:
       return `https://blockscout.com/${chain}`
   }
