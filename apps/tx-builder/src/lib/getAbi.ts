@@ -181,9 +181,9 @@ const getGatewayBaseUrl = (chain: string) => {
         ? `https://gateway.cronos-safe.org`
         : `https://gateway-cronos-safe.crolabs-int.co`
     case SUPPORTED_CHAINS.VANA:
-      return isProdEnv ? `https://gateway.safe.vana.org` : `https://gateway.staging.safe.vana.org`
+      return isProdEnv ? `https://transaction.safe.vana.org` : `https://transaction.staging.safe.vana.org`
     case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
-      return isProdEnv ? `https://gateway.safe.vana.org` : `https://gateway.staging.safe.vana.org`
+      return isProdEnv ? `https://transaction-testnet.safe.vana.org` : `https://transaction-testnet.staging.safe.vana.org/`
     case SUPPORTED_CHAINS.AUTONOMYS_TAURUS_NETWORK:
       return isProdEnv
         ? `https://gateway.safe.autonomys.xyz`
