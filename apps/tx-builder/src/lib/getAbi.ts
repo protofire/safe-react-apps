@@ -443,6 +443,11 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       return {
         link: 'https://api.routescan.io/v2/network/testnet/evm/6911/etherscan',
       }
+    case SUPPORTED_CHAINS.HOODIE_TESTNET:
+      return {
+        link: 'https://api-hoodi.etherscan.io',
+        apiKey: process.env.REACT_APP_ETHERSCAN_KEY,
+      }
     default:
       return
   }
