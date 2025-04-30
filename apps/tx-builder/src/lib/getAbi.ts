@@ -56,6 +56,8 @@ export enum SUPPORTED_CHAINS {
   HARMONY_TESTNET = '1666700000',
   ALEPH_ZERO = '41455',
   ALEPH_ZERO_TESTNET = '2039',
+  KAVA = '2222',
+  KAVA_TESTNET = '2221',
   FLOW_TESTNET = '545',
   HOLESKY = '17000',
   FRAXTAL_TESNET = '2522',
@@ -344,6 +346,16 @@ const getGatewayBaseUrl = (chain: string) => {
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
       )
+    case SUPPORTED_CHAINS.KAVA:
+    case SUPPORTED_CHAINS.KAVA_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.kava.io`
+        : `https://gateway.staging.safe.kava.io`
+    case SUPPORTED_CHAINS.SHAPE:
+    case SUPPORTED_CHAINS.SHAPE_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.shape.network`
+        : `https://gateway.staging.safe.shape.network`
   }
 }
 // This is a temporary key which will be removed.
