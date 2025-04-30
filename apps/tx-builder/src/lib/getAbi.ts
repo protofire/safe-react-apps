@@ -54,6 +54,8 @@ export enum SUPPORTED_CHAINS {
   EVMOS_TESTNET = '9000',
   HARMONY = '1666600000',
   HARMONY_TESTNET = '1666700000',
+  ALEPH_ZERO = '41455',
+  ALEPH_ZERO_TESTNET = '2039',
   FLOW_TESTNET = '545',
   HOLESKY = '17000',
   FRAXTAL_TESNET = '2522',
@@ -322,15 +324,20 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.sophon.xyz`
         : `https://gateway.staging.safe.sophon.xyz`
+    case SUPPORTED_CHAINS.ALEPH_ZERO:
+    case SUPPORTED_CHAINS.ALEPH_ZERO_TESTNET:
+      return isProdEnv
+        ? `https://gateway.alephzero-safe.protofire.io`
+        : `https://gateway.staging.alephzero-safe.protofire.io`
     case SUPPORTED_CHAINS.EXPCHAIN_TESTNET:
-        return isProdEnv
-          ? `https://gateway.polyhedra-safe.protofire.io`
-          : `https://gateway.staging.polyhedra-safe.protofire.io`
+      return isProdEnv
+        ? `https://gateway.polyhedra-safe.protofire.io`
+        : `https://gateway.staging.polyhedra-safe.protofire.io`
     case SUPPORTED_CHAINS.ZIRCUIT:
     case SUPPORTED_CHAINS.ZIRCUIT_TESTNET:
-        return isProdEnv
-          ? `https://gateway.safe.zircuit.com`
-          : `https://gateway.staging.safe.zircuit.com`
+      return isProdEnv
+        ? `https://gateway.safe.zircuit.com`
+        : `https://gateway.staging.safe.zircuit.com`
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
@@ -475,6 +482,10 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://hoodi.cloud.blockscout.com'
     case SUPPORTED_CHAINS.EXPCHAIN_TESTNET:
       return 'https://blockscout-testnet.expchain.ai'
+    case SUPPORTED_CHAINS.ALEPH_ZERO:
+      return 'https://evm-explorer.alephzero.org'
+    case SUPPORTED_CHAINS.ALEPH_ZERO_TESTNET:
+      return 'https://aleph-zero.blockscout.com'
     case SUPPORTED_CHAINS.VANA:
       return 'https://vanascan.io'
     case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
