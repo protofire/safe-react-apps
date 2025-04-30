@@ -455,6 +455,14 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
         link: 'https://api-hoodi.etherscan.io',
         apiKey: process.env.REACT_APP_ETHERSCAN_KEY,
       }
+    case SUPPORTED_CHAINS.SEI:
+      return {
+        link: 'https://seitrace.com/arctic-1/api',
+      }
+    case SUPPORTED_CHAINS.SEI_DEVNET:
+      return {
+        link: 'https://seitrace.com/pacific-1/api',
+      }
     default:
       return
   }
