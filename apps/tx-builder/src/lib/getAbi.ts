@@ -125,6 +125,8 @@ export enum SUPPORTED_CHAINS {
   XAI_TESTNET = '37714555429',
   MORPH_HOLESKY = '2810',
   MINT = '185',
+  SHAPE = '11011',
+  SHAPE_TESTNET = '360',
   VANA = '1480',
   VANA_MOKSHA_TESTNET = '14800',
   SOPHON = '50104',
@@ -504,6 +506,10 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://evm-explorer.alephzero.org'
     case SUPPORTED_CHAINS.ALEPH_ZERO_TESTNET:
       return 'https://aleph-zero.blockscout.com'
+    case SUPPORTED_CHAINS.SHAPE:
+      return 'https://shapescan.xyz'
+    case SUPPORTED_CHAINS.SHAPE_TESTNET:
+      return 'https://sepolia.shapescan.xyz'
     case SUPPORTED_CHAINS.VANA:
       return 'https://vanascan.io'
     case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
