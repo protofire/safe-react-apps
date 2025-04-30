@@ -463,6 +463,22 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       return {
         link: 'https://seitrace.com/pacific-1/api',
       }
+    case SUPPORTED_CHAINS.BOBA:
+      return {
+        link: 'https://api.routescan.io/v2/network/mainnet/evm/288/etherscan/api',
+      }
+    case SUPPORTED_CHAINS.BOBA_BNB:
+      return {
+        link: 'https://api.routescan.io/v2/network/mainnet/evm/56288/etherscan/api',
+      }
+    case SUPPORTED_CHAINS.BOBA_BNB_TESTNET:
+      return {
+        link: 'https://api.routescan.io/v2/network/testnet/evm/56288/etherscan/api',
+      }
+    case SUPPORTED_CHAINS.BOBA_TESTNET:
+      return {
+        link: 'https://api.routescan.io/v2/network/testnet/evm/9728/etherscan/api',
+      }
     default:
       return
   }
@@ -476,12 +492,6 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://unreal.blockscout.com'
     case SUPPORTED_CHAINS.MINT:
       return 'https://explorer.mintchain.io'
-    case SUPPORTED_CHAINS.BOBA:
-    case SUPPORTED_CHAINS.BOBA_BNB:
-      return 'https://bobascan.com'
-    case SUPPORTED_CHAINS.BOBA_BNB_TESTNET:
-    case SUPPORTED_CHAINS.BOBA_TESTNET:
-      return 'https://testnet.bobascan.com'
     case SUPPORTED_CHAINS.FLOW_TESTNET:
       return 'https://evm-testnet.flowscan.io'
     case SUPPORTED_CHAINS.STORY:
