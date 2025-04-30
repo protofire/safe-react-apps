@@ -342,10 +342,6 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.zircuit.com`
         : `https://gateway.staging.safe.zircuit.com`
-    default:
-      throw new Error(
-        `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
-      )
     case SUPPORTED_CHAINS.KAVA:
     case SUPPORTED_CHAINS.KAVA_TESTNET:
       return isProdEnv
@@ -356,6 +352,11 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.shape.network`
         : `https://gateway.staging.safe.shape.network`
+    default:
+      throw new Error(
+        `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
+      )
+
   }
 }
 // This is a temporary key which will be removed.
