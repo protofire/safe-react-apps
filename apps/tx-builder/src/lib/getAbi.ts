@@ -93,7 +93,8 @@ export enum SUPPORTED_CHAINS {
   SCROLL_SEPOLIA_TESTNET = '534351',
   SEI = '1329',
   SEI_DEVNET = '713715',
-  STORY = '1516',
+  STORY = '1514',
+  STORY_AENEID = '1315',
   TANGIBLE_REAL = '111188',
   TANGIBLE_UNREAL = '18233',
   TAIKO = '167000',
@@ -180,7 +181,10 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.CASCADIA_TESTNET:
       return `https://gateway.safe.cascadia.foundation`
     case SUPPORTED_CHAINS.STORY:
-      return `https://gateway.staging.safe.story.foundation`
+    case SUPPORTED_CHAINS.STORY_AENEID:
+      return isProdEnv
+        ? `https://gateway.safe.story.foundation`
+        : `https://gateway.staging.safe.story.foundation`
     case SUPPORTED_CHAINS.KAKAROT:
       return `https://gateway.staging.safe.kakarot.org`
     case SUPPORTED_CHAINS.CRONOS:
@@ -510,7 +514,9 @@ const getBlockscoutBaseURL = (chain: string): string => {
     case SUPPORTED_CHAINS.FLOW_TESTNET:
       return 'https://evm-testnet.flowscan.io'
     case SUPPORTED_CHAINS.STORY:
-      return 'https://odyssey-testnet-explorer.storyscan.xyz'
+      return 'https://storyscan.io/'
+    case SUPPORTED_CHAINS.STORY_AENEID:
+      return 'https://aeneid.storyscan.io'
     case SUPPORTED_CHAINS.HOODIE_TESTNET:
       return 'https://hoodi.cloud.blockscout.com'
     case SUPPORTED_CHAINS.EXPCHAIN_TESTNET:
