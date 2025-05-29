@@ -139,7 +139,9 @@ export enum SUPPORTED_CHAINS {
   HOODIE_TESTNET = '560048',
   EXPCHAIN_TESTNET = '18880',
   ZIRCUIT = '48900',
-  ZIRCUIT_TESTNET = '48899'
+  ZIRCUIT_TESTNET = '48899',
+  GAME7 = '2187',
+  GAME7_TESTNET = '13746',
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -348,19 +350,21 @@ const getGatewayBaseUrl = (chain: string) => {
         : `https://gateway.staging.safe.zircuit.com`
     case SUPPORTED_CHAINS.KAVA:
     case SUPPORTED_CHAINS.KAVA_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.kava.io`
-        : `https://gateway.staging.safe.kava.io`
+      return isProdEnv ? `https://gateway.safe.kava.io` : `https://gateway.staging.safe.kava.io`
     case SUPPORTED_CHAINS.SHAPE:
     case SUPPORTED_CHAINS.SHAPE_TESTNET:
       return isProdEnv
         ? `https://gateway.safe.shape.network`
         : `https://gateway.staging.safe.shape.network`
+    case SUPPORTED_CHAINS.GAME7:
+    case SUPPORTED_CHAINS.GAME7_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.game7.io`
+        : `https://gateway.staging.safe.game7.io/api`
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
       )
-
   }
 }
 // This is a temporary key which will be removed.
@@ -532,7 +536,17 @@ const getBlockscoutBaseURL = (chain: string): string => {
     case SUPPORTED_CHAINS.VANA:
       return 'https://vanascan.io'
     case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
-      return 'https://api.moksha.vanascan.io'
+      return 'https://moksha.vanascan.io'
+    case SUPPORTED_CHAINS.ASTAR:
+      return 'https://astar.blockscout.com'
+    case SUPPORTED_CHAINS.SHIDEN:
+      return 'https://shiden.blockscout.com'
+    case SUPPORTED_CHAINS.SHIBUYA:
+      return 'https://shibuya.blockscout.com'
+    case SUPPORTED_CHAINS.GAME7:
+      return 'https://mainnet.game7.io'
+    case SUPPORTED_CHAINS.GAME7_TESTNET:
+      return 'https://testnet.game7.io'
     default:
       return `https://blockscout.com/${chain}`
   }
