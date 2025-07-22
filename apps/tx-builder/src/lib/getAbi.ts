@@ -63,6 +63,7 @@ export enum SUPPORTED_CHAINS {
   FRAXTAL_TESNET = '2522',
   IMMUTABLE = '13371',
   IMMUTABLE_TESTNET = '13473',
+  REYA = '1729',
   IOTEX = '4689',
   IOTEX_TESTNET = '4690',
   KROMA = '255',
@@ -252,10 +253,14 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.abs.safe.protofire.io`
         : `https://gateway.staging.abs.safe.protofire.io`
-    case SUPPORTED_CHAINS.ABSTRACT:
+    case SUPPORTED_CHAINS.ABSTRACT_TESTNET:
       return isProdEnv
         ? `https://gateway.abs.safe.protofire.io`
         : `https://gateway.staging.abs.safe.protofire.io`
+    case SUPPORTED_CHAINS.REYA:
+      return isProdEnv
+        ? `https://gateway.safe.reya.network`
+        : `https://gateway.staging.safe.reya.network`
 
     case SUPPORTED_CHAINS.OASIS_SAPPHIRE:
     case SUPPORTED_CHAINS.OASIS_SAPPHIRE_TESTNET:
@@ -525,6 +530,8 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://explorer.mintchain.io'
     case SUPPORTED_CHAINS.FLOW_TESTNET:
       return 'https://evm-testnet.flowscan.io'
+    case SUPPORTED_CHAINS.REYA:
+      return 'https://explorer.reya.network'
     case SUPPORTED_CHAINS.STORY:
       return 'https://storyscan.io/'
     case SUPPORTED_CHAINS.STORY_AENEID:
