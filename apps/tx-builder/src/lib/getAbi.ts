@@ -486,6 +486,14 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       return {
         link: 'https://seitrace.com/pacific-1/api',
       }
+    case SUPPORTED_CHAINS.OASIS_SAPPHIRE:
+        return {
+        link: 'https://nexus.oasis.io/v1',
+      }
+    case SUPPORTED_CHAINS.OASIS_SAPPHIRE_TESTNET:
+      return {
+        link: 'https://testnet.nexus.oasis.io/v1',
+      }
     case SUPPORTED_CHAINS.BOBA:
       return {
         link: 'https://api.routescan.io/v2/network/mainnet/evm/288/etherscan/api',
