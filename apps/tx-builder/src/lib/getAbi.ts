@@ -93,6 +93,7 @@ export enum SUPPORTED_CHAINS {
   SCROLL_ALPHA_TESTNET = '534353',
   SCROLL_SEPOLIA_TESTNET = '534351',
   SEI = '1329',
+  SEI_TESTNET = '1328',
   SEI_DEVNET = '713715',
   STORY = '1514',
   STORY_AENEID = '1315',
@@ -277,6 +278,7 @@ const getGatewayBaseUrl = (chain: string) => {
         ? `https://gateway.safe.scroll.xyz `
         : `https://gateway.staging.safe.scroll.xyz`
     case SUPPORTED_CHAINS.SEI:
+    case SUPPORTED_CHAINS.SEI_TESTNET:
     case SUPPORTED_CHAINS.SEI_DEVNET:
       return isProdEnv
         ? `https://gateway.sei-safe.protofire.io`
@@ -486,6 +488,10 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
     case SUPPORTED_CHAINS.SEI:
       return {
         link: 'https://seitrace.com/arctic-1/api',
+      }
+    case SUPPORTED_CHAINS.SEI_TESTNET:
+      return {
+        link: 'https://seitrace.com/atlantic-2/api',
       }
     case SUPPORTED_CHAINS.SEI_DEVNET:
       return {
