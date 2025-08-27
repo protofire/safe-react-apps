@@ -252,12 +252,12 @@ const getGatewayBaseUrl = (chain: string) => {
         : `https://gateway.staging.safe.neonevm.org`
     case SUPPORTED_CHAINS.ABSTRACT:
       return isProdEnv
-        ? `https://gateway.abs.safe.protofire.io`
-        : `https://gateway.staging.abs.safe.protofire.io`
+        ? `https://gateway.safe.abs.xyz`
+        : `https://gateway.staging.safe.abs.xyz`
     case SUPPORTED_CHAINS.ABSTRACT_TESTNET:
       return isProdEnv
-        ? `https://gateway.abs.safe.protofire.io`
-        : `https://gateway.staging.abs.safe.protofire.io`
+        ? `https://gateway.safe.abs.xyz`
+        : `https://gateway.staging.safe.abs.xyz`
     case SUPPORTED_CHAINS.REYA:
       return isProdEnv
         ? `https://gateway.safe.reya.network`
