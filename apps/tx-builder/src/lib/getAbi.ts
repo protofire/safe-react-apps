@@ -144,6 +144,7 @@ export enum SUPPORTED_CHAINS {
   ZIRCUIT_TESTNET = '48899',
   GAME7 = '2187',
   GAME7_TESTNET = '13746',
+  PHAROS_TESTNET = '688688'
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -368,6 +369,10 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.game7.io`
         : `https://gateway.staging.safe.game7.io/api`
+    case SUPPORTED_CHAINS.PHAROS_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.pharosnetwork.xyz`
+        : 'https://gateway.staging.safe.pharosnetwork.xyz'
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
@@ -520,6 +525,11 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
     case SUPPORTED_CHAINS.BOBA_TESTNET:
       return {
         link: 'https://api.routescan.io/v2/network/testnet/evm/9728/etherscan/api',
+      }
+    case SUPPORTED_CHAINS.PHAROS_TESTNET:
+      return {
+        link: 'https://api.socialscan.io/pharos-testnet',
+        apiKey: process.env.REACT_APP_PHAROS_KEY
       }
     default:
       return
