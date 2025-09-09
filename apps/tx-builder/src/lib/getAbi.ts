@@ -528,7 +528,7 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       }
     case SUPPORTED_CHAINS.PHAROS_TESTNET:
       return {
-        link: 'https://api.socialscan.io/pharos-testnet',
+        link: 'https://api.socialscan.io/pharos-testnet/v1/developer',
         apiKey: process.env.REACT_APP_PHAROS_KEY
       }
     default:
