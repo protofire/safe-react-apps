@@ -28,7 +28,7 @@ const getProviderURL = (chain: string, address: string, urlProvider: PROVIDER): 
       return `${baseApi}/api?module=contract&action=getabi&address=${address}`
     case PROVIDER.SCANAPI:
       const scanAPI = getScanAPIBaseURL(chain)
-      return `${scanAPI?.link}/api?module=contract&action=getabi&address=${address}&apiKey=${scanAPI?.apiKey}`
+      return `${scanAPI?.link}/api?module=contract&action=getabi&address=${address}&apikey=${scanAPI?.apiKey}`
     default:
       throw new Error('The Provider is not supported')
   }
