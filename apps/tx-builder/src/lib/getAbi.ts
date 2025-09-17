@@ -536,6 +536,10 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
         link: 'https://api.socialscan.io/pharos-testnet/v1/developer',
         apiKey: process.env.REACT_APP_PHAROS_KEY
       }
+    case SUPPORTED_CHAINS.ETHEREAL_TESTNET_0:
+      return {
+        link: 'https://explorer-ethereal-testnet-0.t.conduit.xyz/api',
+      }
     default:
       return
   }
