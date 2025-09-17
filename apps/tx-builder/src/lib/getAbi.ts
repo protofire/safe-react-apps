@@ -144,7 +144,8 @@ export enum SUPPORTED_CHAINS {
   ZIRCUIT_TESTNET = '48899',
   GAME7 = '2187',
   GAME7_TESTNET = '13746',
-  PHAROS_TESTNET = '688688'
+  PHAROS_TESTNET = '688688',
+  ETHEREAL_TESTNET_0 = '13374202'
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -373,6 +374,10 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.pharosnetwork.xyz`
         : 'https://gateway.staging.safe.pharosnetwork.xyz'
+    case SUPPORTED_CHAINS.ETHEREAL_TESTNET_0:
+      return isProdEnv
+        ? 'https://gateway.safe.etherealtest.net'
+        : 'https://gateway.safe.etherealtest.net'
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
@@ -578,6 +583,8 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://mainnet.game7.io'
     case SUPPORTED_CHAINS.GAME7_TESTNET:
       return 'https://testnet.game7.io'
+    case SUPPORTED_CHAINS.ETHEREAL_TESTNET_0:
+      return 'https://explorer.etherealtest.net'
     default:
       return `https://blockscout.com/${chain}`
   }
