@@ -67,6 +67,8 @@ export enum SUPPORTED_CHAINS {
   IOTEX = '4689',
   IOTEX_TESTNET = '4690',
   KROMA = '255',
+  HMNTY = '6985385',
+  HMNTYTEST = '7080969',
   KROMA_SEPOLIA = '2358',
   LINEA = '59144',
   ABSTRACT = '2741',
@@ -240,6 +242,11 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.multisig.mantle.xyz`
         : `https://gateway.staging.multisig.mantle.xyz`
+    case SUPPORTED_CHAINS.HMNTY:
+    case SUPPORTED_CHAINS.HMNTYTEST:
+        return isProdEnv
+        ? `https://gateway.safe.humanity.org`
+        : `https://gateway.staging.safe.humanity.org`
     case SUPPORTED_CHAINS.MOONBEAM:
     case SUPPORTED_CHAINS.MOONRIVER:
     case SUPPORTED_CHAINS.MOONBASE:
@@ -569,6 +576,10 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://evm-explorer.alephzero.org'
     case SUPPORTED_CHAINS.ALEPH_ZERO_TESTNET:
       return 'https://aleph-zero.blockscout.com'
+    case SUPPORTED_CHAINS.HMNTY:
+      return 'https://humanity-mainnet.explorer.alchemy.com'
+    case SUPPORTED_CHAINS.HMNTYTEST:
+      return 'https://humanity-testnet.explorer.alchemy.com'
     case SUPPORTED_CHAINS.SHAPE:
       return 'https://shapescan.xyz'
     case SUPPORTED_CHAINS.SHAPE_TESTNET:
