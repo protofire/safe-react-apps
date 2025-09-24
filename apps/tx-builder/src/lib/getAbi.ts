@@ -147,7 +147,8 @@ export enum SUPPORTED_CHAINS {
   GAME7 = '2187',
   GAME7_TESTNET = '13746',
   PHAROS_TESTNET = '688688',
-  ETHEREAL_TESTNET_0 = '13374202'
+  ETHEREAL_TESTNET_0 = '13374202',
+  STABLE_TESTNET = '2201'
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -385,6 +386,10 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? 'https://gateway.safe.etherealtest.net'
         : 'https://gateway.safe.etherealtest.net'
+    case SUPPORTED_CHAINS.STABLE_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.stable.xyz`
+        : `https://gateway.staging.safe.stable.xyz`
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
