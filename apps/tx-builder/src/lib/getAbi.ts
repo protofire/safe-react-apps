@@ -148,6 +148,7 @@ export enum SUPPORTED_CHAINS {
   GAME7_TESTNET = '13746',
   PHAROS_TESTNET = '688688',
   ETHEREAL_TESTNET_0 = '13374202',
+  ETHEREAL = '5064014',
   STABLE_TESTNET = '2201'
 }
 
@@ -382,6 +383,7 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.pharosnetwork.xyz`
         : 'https://gateway.staging.safe.pharosnetwork.xyz'
+    case SUPPORTED_CHAINS.ETHEREAL:
     case SUPPORTED_CHAINS.ETHEREAL_TESTNET_0:
       return isProdEnv
         ? 'https://gateway.safe.ethereal.trade'
@@ -548,6 +550,7 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
         link: 'https://api.socialscan.io/pharos-testnet/v1/developer',
         apiKey: process.env.REACT_APP_PHAROS_KEY
       }
+    case SUPPORTED_CHAINS.ETHEREAL:
     case SUPPORTED_CHAINS.ETHEREAL_TESTNET_0:
       return {
         link: 'https://explorer-ethereal-testnet-0.t.conduit.xyz/api',
@@ -603,6 +606,7 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://mainnet.game7.io'
     case SUPPORTED_CHAINS.GAME7_TESTNET:
       return 'https://testnet.game7.io'
+    case SUPPORTED_CHAINS.ETHEREAL:
     case SUPPORTED_CHAINS.ETHEREAL_TESTNET_0:
       return 'https://explorer.etherealtest.net'
     default:
