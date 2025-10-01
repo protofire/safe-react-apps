@@ -384,7 +384,7 @@ const getGatewayBaseUrl = (chain: string) => {
         : 'https://gateway.staging.safe.pharosnetwork.xyz'
     case SUPPORTED_CHAINS.ETHEREAL_TESTNET_0:
       return isProdEnv
-        ? 'https://gateway.safe.etherealtest.net'
+        ? 'https://gateway.safe.ethereal.trade'
         : 'https://gateway.safe.etherealtest.net'
     case SUPPORTED_CHAINS.STABLE_TESTNET:
       return isProdEnv
