@@ -28,7 +28,8 @@ const getProviderURL = (chain: string, address: string, urlProvider: PROVIDER): 
       return `${baseApi}/api?module=contract&action=getabi&address=${address}`
     case PROVIDER.SCANAPI:
       const scanAPI = getScanAPIBaseURL(chain)
-      return `${scanAPI?.link}/api?module=contract&action=getabi&address=${address}&apikey=${scanAPI?.apiKey}`
+      /** @notice adding chainid for compatibility with Etherscan V2 API */
+      return `${scanAPI?.link}/api?chainid=${chain}&module=contract&action=getabi&address=${address}&apikey=${scanAPI?.apiKey}`
     default:
       throw new Error('The Provider is not supported')
   }
@@ -75,12 +76,11 @@ export enum SUPPORTED_CHAINS {
   ABSTRACT_TESTNET = '11124',
   AUTONOMYS_TAURUS_NETWORK = '490000',
   BERACHAIN = '80094',
-  BERACHAIN_CARTIO = '80000',
+  BERACHAIN_BEPOLIA = '80069',
   LINEA_SEPOLIA = '59141',
-  LINEA_TESTNET = '59140',
   MANTA_PACIFIC_MAINNET = '169',
   MANTLE = '5000',
-  MANTLE_TESTNET = '5001',
+  MANTLE_SEPOLIA = '5003',
   MOONBEAM = '1284',
   MOONRIVER = '1285',
   MOONBASE = '1287',
@@ -102,12 +102,12 @@ export enum SUPPORTED_CHAINS {
   TANGIBLE_REAL = '111188',
   TANGIBLE_UNREAL = '18233',
   TAIKO = '167000',
+  TAIKO_HOODI = '167012',
   KAKAROT = '920637907288165',
   BOBA = '288',
   BOBA_BNB = '56288',
   BOBA_BNB_TESTNET = '9728',
   BOBA_TESTNET = '28882',
-  TAIKO_HEKLA = '167009',
   TELOS = '40',
   TELOS_TESTNET = '41',
   TENET = '155',
@@ -141,6 +141,7 @@ export enum SUPPORTED_CHAINS {
   NIBIRU = '6900',
   NIBIRU_TESTNET = '6911',
   HOODIE_TESTNET = '560048',
+  SEPOLIA_TESTNET = '11155111',
   EXPCHAIN_TESTNET = '18880',
   ZIRCUIT = '48900',
   ZIRCUIT_TESTNET = '48899',
@@ -149,7 +150,9 @@ export enum SUPPORTED_CHAINS {
   PHAROS_TESTNET = '688688',
   ETHEREAL_TESTNET_0 = '13374202',
   ETHEREAL = '5064014',
-  STABLE_TESTNET = '2201'
+  STABLE_TESTNET = '2201',
+  CHILIZ = '88888',
+  CHILIZ_SPICY = '88882',
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -231,7 +234,6 @@ const getGatewayBaseUrl = (chain: string) => {
         : `https://gateway.staging.safe.kroma.network`
     case SUPPORTED_CHAINS.LINEA:
     case SUPPORTED_CHAINS.LINEA_SEPOLIA:
-    case SUPPORTED_CHAINS.LINEA_TESTNET:
       return isProdEnv
         ? `https://gateway.safe.linea.build`
         : `https://gateway.staging.safe.linea.build`
@@ -240,7 +242,7 @@ const getGatewayBaseUrl = (chain: string) => {
         ? `https://gateway.safe.manta.network`
         : `https://gateway.staging.safe.manta.network`
     case SUPPORTED_CHAINS.MANTLE:
-    case SUPPORTED_CHAINS.MANTLE_TESTNET:
+    case SUPPORTED_CHAINS.MANTLE_SEPOLIA:
       return isProdEnv
         ? `https://gateway.multisig.mantle.xyz`
         : `https://gateway.staging.multisig.mantle.xyz`
@@ -345,7 +347,7 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.MORPH_HOLESKY:
       return isProdEnv ? `https://gateway.safe.morphl2.io` : `https://gateway.stg.safe.morphl2.io`
     case SUPPORTED_CHAINS.TAIKO:
-    case SUPPORTED_CHAINS.TAIKO_HEKLA:
+    case SUPPORTED_CHAINS.TAIKO_HOODI:
       return isProdEnv ? 'https://gateway.safe.taiko.xyz' : 'https://gateway.staging.safe.taiko.xyz'
     case SUPPORTED_CHAINS.SOPHON:
     case SUPPORTED_CHAINS.SOPHON_TESTNET:
@@ -398,58 +400,59 @@ const getGatewayBaseUrl = (chain: string) => {
       )
   }
 }
-// This is a temporary key which will be removed.
-const TEMP_MOONRIVER_KEY = 'G5NZZP3M53IYCRKJT7XJCRNJN6XWT9KM7E'
 
+// TODO: split this function into multiple functions for each explorer api,
+//  because some networks are supported by multiple explorers
 const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: string } => {
   switch (chain) {
-    case SUPPORTED_CHAINS.CASCADIA_TESTNET:
-      return { link: 'https://explorer.cascadia.foundation' }
-    case SUPPORTED_CHAINS.KAKAROT:
-      return { link: 'https://api.sepolia.kakarotscan.org' }
-    case SUPPORTED_CHAINS.BLAST:
-      return { link: 'https://api.blastscan.io' }
-    case SUPPORTED_CHAINS.BLAST_TESTNET:
-      return { link: 'https://api-sepolia.blastscan.io' }
-    case SUPPORTED_CHAINS.LINEA:
-      return {
-        link: 'https://api.lineascan.build',
-        apiKey: process.env.REACT_APP_LINEASCAN_KEY,
-      }
-    case SUPPORTED_CHAINS.LINEA_TESTNET:
-      return {
-        link: 'https://api-testnet.lineascan.build',
-        apiKey: process.env.REACT_APP_LINEASCAN_KEY,
-      }
-    case SUPPORTED_CHAINS.LINEA_SEPOLIA:
-      return {
-        link: 'https://api-sepolia.lineascan.build',
-        apiKey: process.env.REACT_APP_LINEASCAN_KEY,
-      }
+    /**
+     * Networks supported by Etherscan V2 API
+     * @see https://docs.etherscan.io/supported-chains
+     */
+    case SUPPORTED_CHAINS.HOODIE_TESTNET:
+    case SUPPORTED_CHAINS.SEPOLIA_TESTNET:
     case SUPPORTED_CHAINS.HOLESKY:
-      return {
-        link: 'https://api-holesky.etherscan.io',
-        apiKey: process.env.REACT_APP_ETHERSCAN_KEY,
-      }
-    case SUPPORTED_CHAINS.FRAXTAL_TESNET:
-      return {
-        link: 'https://holesky.fraxscan.com/',
-        apiKey: process.env.REACT_APP_ETHERSCAN_KEY,
-      }
+    case SUPPORTED_CHAINS.LINEA:
+    case SUPPORTED_CHAINS.LINEA_SEPOLIA:
     case SUPPORTED_CHAINS.MOONBEAM:
-      return {
-        link: 'https://api-moonbeam.moonscan.io',
-        apiKey: process.env.REACT_APP_MOONSCAN_KEY,
-      }
     case SUPPORTED_CHAINS.MOONBASE:
-      return {
-        link: 'https://api-moonbase.moonscan.io',
-        apiKey: process.env.REACT_APP_MOONSCAN_KEY,
-      }
     case SUPPORTED_CHAINS.MOONRIVER:
+    case SUPPORTED_CHAINS.SOPHON:
+    case SUPPORTED_CHAINS.SOPHON_TESTNET:
+    case SUPPORTED_CHAINS.BERACHAIN:
+    case SUPPORTED_CHAINS.BERACHAIN_BEPOLIA:
+    case SUPPORTED_CHAINS.ABSTRACT:
+    case SUPPORTED_CHAINS.ABSTRACT_TESTNET:
+    case SUPPORTED_CHAINS.BLAST:
+    case SUPPORTED_CHAINS.BLAST_TESTNET:
+    case SUPPORTED_CHAINS.FRAXTAL_TESNET:
+    case SUPPORTED_CHAINS.MANTLE:
+    case SUPPORTED_CHAINS.MANTLE_SEPOLIA:
+    case SUPPORTED_CHAINS.SEI:
+    case SUPPORTED_CHAINS.SEI_TESTNET:
+    case SUPPORTED_CHAINS.TAIKO:
+    case SUPPORTED_CHAINS.TAIKO_HOODI:
       return {
-        link: 'https://api-moonriver.moonscan.io',
-        apiKey: TEMP_MOONRIVER_KEY,
+        link: `https://api.etherscan.io/v2`,
+        apiKey: process.env.REACT_APP_ETHERSCAN_V2_KEY,
+      }
+      /**
+       * Networks supported by Routscan API for free
+       * @see https://routescan.notion.site/freeplanlist?v=20204e30369881ebb7d7000ca9ea73dd
+       */
+    case SUPPORTED_CHAINS.BOBA:
+    case SUPPORTED_CHAINS.BOBA_BNB:
+    case SUPPORTED_CHAINS.CHILIZ:
+    case SUPPORTED_CHAINS.NIBIRU:
+      return {
+        link: `https://api.routescan.io/v2/network/mainnet/evm/${chain}/etherscan`,
+      }
+    case SUPPORTED_CHAINS.CHILIZ_SPICY:
+    case SUPPORTED_CHAINS.BOBA_TESTNET:
+    case SUPPORTED_CHAINS.BOBA_BNB_TESTNET:
+    case SUPPORTED_CHAINS.NIBIRU_TESTNET:
+      return {
+        link: `https://api.routescan.io/v2/network/testnet/evm/${chain}/etherscan`,
       }
     case SUPPORTED_CHAINS.IMMUTABLE:
       return {
@@ -459,67 +462,9 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       return {
         link: 'https://explorer.testnet.immutable.com',
       }
-    case SUPPORTED_CHAINS.ZKLINK_NOVA_GOERLI:
-      return {
-        link: 'https://goerli.explorer-api.zklink.io',
-      }
     case SUPPORTED_CHAINS.ZKLINK_NOVA:
       return {
         link: 'https://explorer-api.zklink.io',
-      }
-    case SUPPORTED_CHAINS.SOPHON:
-      return {
-        link: 'https://api.sophscan.xyz',
-        apiKey: process.env.REACT_APP_SOPHONSCAN_KEY,
-      }
-    case SUPPORTED_CHAINS.SOPHON_TESTNET:
-      return {
-        link: 'https://api-sepolia.sophscan.xyz',
-        apiKey: process.env.REACT_APP_SOPHONSCAN_KEY,
-      }
-    case SUPPORTED_CHAINS.BERACHAIN_CARTIO:
-      return {
-        link: 'https://berachain.cartio.io',
-      }
-    case SUPPORTED_CHAINS.BERACHAIN:
-      return {
-        link: 'https://api.berascan.com',
-        apiKey: process.env.REACT_APP_BERASCAN_KEY,
-      }
-    case SUPPORTED_CHAINS.ABSTRACT:
-      return {
-        link: 'https://api.abscan.org',
-        apiKey: process.env.REACT_APP_ABSTRACT_KEY,
-      }
-    case SUPPORTED_CHAINS.ABSTRACT_TESTNET:
-      return {
-        link: 'https://api-testnet.abscan.org',
-        apiKey: process.env.REACT_APP_ABSTRACT_KEY,
-      }
-    case SUPPORTED_CHAINS.NIBIRU:
-      return {
-        link: 'https://api.routescan.io/v2/network/mainnet/evm/6900/etherscan',
-      }
-    case SUPPORTED_CHAINS.NIBIRU_TESTNET:
-      return {
-        link: 'https://api.routescan.io/v2/network/testnet/evm/6911/etherscan',
-      }
-    case SUPPORTED_CHAINS.HOODIE_TESTNET:
-      return {
-        link: 'https://api-hoodi.etherscan.io',
-        apiKey: process.env.REACT_APP_ETHERSCAN_KEY,
-      }
-    case SUPPORTED_CHAINS.SEI:
-      return {
-        link: 'https://seitrace.com/arctic-1/api',
-      }
-    case SUPPORTED_CHAINS.SEI_TESTNET:
-      return {
-        link: 'https://seitrace.com/atlantic-2/api',
-      }
-    case SUPPORTED_CHAINS.SEI_DEVNET:
-      return {
-        link: 'https://seitrace.com/pacific-1/api',
       }
     case SUPPORTED_CHAINS.OASIS_SAPPHIRE:
         return {
@@ -528,22 +473,6 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
     case SUPPORTED_CHAINS.OASIS_SAPPHIRE_TESTNET:
       return {
         link: 'https://testnet.nexus.oasis.io/v1',
-      }
-    case SUPPORTED_CHAINS.BOBA:
-      return {
-        link: 'https://api.routescan.io/v2/network/mainnet/evm/288/etherscan/api',
-      }
-    case SUPPORTED_CHAINS.BOBA_BNB:
-      return {
-        link: 'https://api.routescan.io/v2/network/mainnet/evm/56288/etherscan/api',
-      }
-    case SUPPORTED_CHAINS.BOBA_BNB_TESTNET:
-      return {
-        link: 'https://api.routescan.io/v2/network/testnet/evm/56288/etherscan/api',
-      }
-    case SUPPORTED_CHAINS.BOBA_TESTNET:
-      return {
-        link: 'https://api.routescan.io/v2/network/testnet/evm/9728/etherscan/api',
       }
     case SUPPORTED_CHAINS.PHAROS_TESTNET:
       return {
