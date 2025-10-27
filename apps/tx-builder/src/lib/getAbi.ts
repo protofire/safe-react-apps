@@ -153,6 +153,8 @@ export enum SUPPORTED_CHAINS {
   STABLE_TESTNET = '2201',
   CHILIZ = '88888',
   CHILIZ_SPICY = '88882',
+  TAC_MAINNET = '239',
+  TAC_SAINT_PETERSBUG_TESTNET = '2391',
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -394,6 +396,11 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.stable.xyz`
         : `https://gateway.staging.safe.stable.xyz`
+    case SUPPORTED_CHAINS.TAC_MAINNET:
+    case SUPPORTED_CHAINS.TAC_SAINT_PETERSBUG_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.tac.build`
+        : `https://gateway.staging.safe.tac.build`
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
@@ -484,6 +491,11 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       return {
         link: 'https://explorer-ethereal-testnet-0.t.conduit.xyz/api',
       }
+    case SUPPORTED_CHAINS.TAC_MAINNET:
+    case SUPPORTED_CHAINS.TAC_SAINT_PETERSBUG_TESTNET:
+      return {
+        link: 'https://explorer.tac.build',
+      }
     default:
       return
   }
@@ -538,6 +550,9 @@ const getBlockscoutBaseURL = (chain: string): string => {
     case SUPPORTED_CHAINS.ETHEREAL:
     case SUPPORTED_CHAINS.ETHEREAL_TESTNET_0:
       return 'https://explorer.etherealtest.net'
+    case SUPPORTED_CHAINS.TAC_MAINNET:
+    case SUPPORTED_CHAINS.TAC_SAINT_PETERSBUG_TESTNET:
+      return 'https://explorer.tac.build'
     default:
       return `https://blockscout.com/${chain}`
   }
