@@ -130,6 +130,7 @@ export enum SUPPORTED_CHAINS {
   WEMIX_TESTNET = '1112',
   XAI = '660279',
   XAI_TESTNET = '37714555429',
+  MORPH = '2818',
   MORPH_HOLESKY = '2810',
   MINT = '185',
   SHAPE = '11011',
@@ -346,6 +347,7 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe-xai.protofire.io`
         : `https://gateway.staging-safe-xai.protofire.io`
+    case SUPPORTED_CHAINS.MORPH:
     case SUPPORTED_CHAINS.MORPH_HOLESKY:
       return isProdEnv ? `https://gateway.safe.morphl2.io` : `https://gateway.stg.safe.morphl2.io`
     case SUPPORTED_CHAINS.TAIKO:
@@ -496,6 +498,14 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       return {
         link: 'https://explorer.tac.build',
       }
+    case SUPPORTED_CHAINS.MORPH:
+      return {
+        link: 'https://explorer-api.morphl2.io/api',
+      }
+    case SUPPORTED_CHAINS.MORPH_HOLESKY:
+      return {
+        link: 'https://explorer-api-holesky.morphl2.io/api',
+      }
     default:
       return
   }
@@ -553,6 +563,10 @@ const getBlockscoutBaseURL = (chain: string): string => {
     case SUPPORTED_CHAINS.TAC_MAINNET:
     case SUPPORTED_CHAINS.TAC_SAINT_PETERSBUG_TESTNET:
       return 'https://explorer.tac.build'
+    case SUPPORTED_CHAINS.MORPH:
+      return 'https://explorer.morphl2.io'
+    case SUPPORTED_CHAINS.MORPH_HOLESKY:
+      return 'https://explorer-holesky.morphl2.io'
     default:
       return `https://blockscout.com/${chain}`
   }
