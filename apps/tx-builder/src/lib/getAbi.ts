@@ -6,6 +6,7 @@ enum PROVIDER {
   GATEWAY = 2,
   BLOCKSCOUT = 3,
   SCANAPI = 4,
+  BLOCKSCOUT_V2 = 5,
 }
 
 type SourcifyResponse = {
@@ -26,6 +27,9 @@ const getProviderURL = (chain: string, address: string, urlProvider: PROVIDER): 
     case PROVIDER.BLOCKSCOUT:
       const baseApi = getBlockscoutBaseURL(chain)
       return `${baseApi}/api?module=contract&action=getabi&address=${address}`
+    case PROVIDER.BLOCKSCOUT_V2:
+      const baseApiV2 = getBlockscoutV2BaseURL(chain)
+      return `${baseApiV2}/api/v2/smart-contracts/${address}`
     case PROVIDER.SCANAPI:
       const scanAPI = getScanAPIBaseURL(chain)
       /** @notice adding chainid for compatibility with Etherscan V2 API */
@@ -131,7 +135,7 @@ export enum SUPPORTED_CHAINS {
   XAI = '660279',
   XAI_TESTNET = '37714555429',
   MORPH = '2818',
-  MORPH_HOLESKY = '2810',
+  MORPH_HOODI = '2910',
   MINT = '185',
   SHAPE = '11011',
   SHAPE_TESTNET = '360',
@@ -251,7 +255,7 @@ const getGatewayBaseUrl = (chain: string) => {
         : `https://gateway.staging.multisig.mantle.xyz`
     case SUPPORTED_CHAINS.HMNTY:
     case SUPPORTED_CHAINS.HMNTYTEST:
-        return isProdEnv
+      return isProdEnv
         ? `https://gateway.safe.humanity.org`
         : `https://gateway.staging.safe.humanity.org`
     case SUPPORTED_CHAINS.MOONBEAM:
@@ -267,13 +271,9 @@ const getGatewayBaseUrl = (chain: string) => {
         ? `https://gateway.safe.neonevm.org`
         : `https://gateway.staging.safe.neonevm.org`
     case SUPPORTED_CHAINS.ABSTRACT:
-      return isProdEnv
-        ? `https://gateway.safe.abs.xyz`
-        : `https://gateway.staging.safe.abs.xyz`
+      return isProdEnv ? `https://gateway.safe.abs.xyz` : `https://gateway.staging.safe.abs.xyz`
     case SUPPORTED_CHAINS.ABSTRACT_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.abs.xyz`
-        : `https://gateway.staging.safe.abs.xyz`
+      return isProdEnv ? `https://gateway.safe.abs.xyz` : `https://gateway.staging.safe.abs.xyz`
     case SUPPORTED_CHAINS.REYA:
       return isProdEnv
         ? `https://gateway.safe.reya.network`
@@ -348,7 +348,7 @@ const getGatewayBaseUrl = (chain: string) => {
         ? `https://gateway.safe-xai.protofire.io`
         : `https://gateway.staging-safe-xai.protofire.io`
     case SUPPORTED_CHAINS.MORPH:
-    case SUPPORTED_CHAINS.MORPH_HOLESKY:
+    case SUPPORTED_CHAINS.MORPH_HOODI:
       return isProdEnv ? `https://gateway.safe.morphl2.io` : `https://gateway.stg.safe.morphl2.io`
     case SUPPORTED_CHAINS.TAIKO:
     case SUPPORTED_CHAINS.TAIKO_HOODI:
@@ -400,9 +400,7 @@ const getGatewayBaseUrl = (chain: string) => {
         : `https://gateway.staging.safe.stable.xyz`
     case SUPPORTED_CHAINS.TAC_MAINNET:
     case SUPPORTED_CHAINS.TAC_SAINT_PETERSBUG_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.tac.build`
-        : `https://gateway.staging.safe.tac.build`
+      return isProdEnv ? `https://gateway.safe.tac.build` : `https://gateway.staging.safe.tac.build`
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
@@ -445,10 +443,10 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
         link: `https://api.etherscan.io/v2`,
         apiKey: process.env.REACT_APP_ETHERSCAN_V2_KEY,
       }
-      /**
-       * Networks supported by Routscan API for free
-       * @see https://routescan.notion.site/freeplanlist?v=20204e30369881ebb7d7000ca9ea73dd
-       */
+    /**
+     * Networks supported by Routscan API for free
+     * @see https://routescan.notion.site/freeplanlist?v=20204e30369881ebb7d7000ca9ea73dd
+     */
     case SUPPORTED_CHAINS.BOBA:
     case SUPPORTED_CHAINS.BOBA_BNB:
     case SUPPORTED_CHAINS.CHILIZ:
@@ -476,7 +474,7 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
         link: 'https://explorer-api.zklink.io',
       }
     case SUPPORTED_CHAINS.OASIS_SAPPHIRE:
-        return {
+      return {
         link: 'https://nexus.oasis.io/v1',
       }
     case SUPPORTED_CHAINS.OASIS_SAPPHIRE_TESTNET:
@@ -486,7 +484,7 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
     case SUPPORTED_CHAINS.PHAROS_TESTNET:
       return {
         link: 'https://api.socialscan.io/pharos-testnet/v1/developer',
-        apiKey: process.env.REACT_APP_PHAROS_KEY
+        apiKey: process.env.REACT_APP_PHAROS_KEY,
       }
     case SUPPORTED_CHAINS.ETHEREAL:
     case SUPPORTED_CHAINS.ETHEREAL_TESTNET_0:
@@ -497,14 +495,6 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
     case SUPPORTED_CHAINS.TAC_SAINT_PETERSBUG_TESTNET:
       return {
         link: 'https://explorer.tac.build',
-      }
-    case SUPPORTED_CHAINS.MORPH:
-      return {
-        link: 'https://explorer-api.morphl2.io/api',
-      }
-    case SUPPORTED_CHAINS.MORPH_HOLESKY:
-      return {
-        link: 'https://explorer-api-holesky.morphl2.io/api',
       }
     default:
       return
@@ -564,9 +554,50 @@ const getBlockscoutBaseURL = (chain: string): string => {
     case SUPPORTED_CHAINS.TAC_SAINT_PETERSBUG_TESTNET:
       return 'https://explorer.tac.build'
     case SUPPORTED_CHAINS.MORPH:
-      return 'https://explorer.morphl2.io'
-    case SUPPORTED_CHAINS.MORPH_HOLESKY:
-      return 'https://explorer-holesky.morphl2.io'
+      return 'https://explorer-api.morphl2.io'
+    case SUPPORTED_CHAINS.MORPH_HOODI:
+      return 'https://explorer-api-hoodi.morphl2.io'
+    default:
+      return `https://blockscout.com/${chain}`
+  }
+}
+
+const getBlockscoutV2BaseURL = (chain: string): string => {
+  switch (chain) {
+    case SUPPORTED_CHAINS.MINT:
+      return 'https://explorer-mint-mainnet-0.t.conduit.xyz'
+    case SUPPORTED_CHAINS.FLOW_TESTNET:
+      return 'https://evm-testnet.flowscan.io'
+    case SUPPORTED_CHAINS.REYA:
+      return 'https://explorer.reya.network'
+    case SUPPORTED_CHAINS.STORY:
+      return 'https://www.storyscan.io'
+    case SUPPORTED_CHAINS.STORY_AENEID:
+      return 'https://aeneid.storyscan.io'
+    case SUPPORTED_CHAINS.HOODIE_TESTNET:
+      return 'https://eth-hoodi.blockscout.com'
+    case SUPPORTED_CHAINS.EXPCHAIN_TESTNET:
+      return 'https://blockscout-testnet.gadsgcxobnadfogadsihg.com'
+    case SUPPORTED_CHAINS.VANA:
+      return 'https://vanascan.io'
+    case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
+      return 'https://moksha.vanascan.io'
+    case SUPPORTED_CHAINS.ASTAR:
+      return 'https://astar.blockscout.com'
+    case SUPPORTED_CHAINS.SHIBUYA:
+      return 'https://shibuya.blockscout.com'
+    case SUPPORTED_CHAINS.ETHEREAL:
+      return 'https://explorer-ethereal-mainnet-0.t.conduit.xyz'
+    case SUPPORTED_CHAINS.ETHEREAL_TESTNET_0:
+      return 'https://explorer-ethereal-testnet-0.t.conduit.xyz'
+    case SUPPORTED_CHAINS.TAC_MAINNET:
+      return 'https://explorer.tac.build'
+    case SUPPORTED_CHAINS.TAC_SAINT_PETERSBUG_TESTNET:
+      return 'https://spb.explorer.tac.build'
+    case SUPPORTED_CHAINS.MORPH:
+      return 'https://explorer-api.morphl2.io'
+    case SUPPORTED_CHAINS.MORPH_HOODI:
+      return 'https://explorer-api-hoodi.morphl2.io'
     default:
       return `https://blockscout.com/${chain}`
   }
@@ -617,6 +648,18 @@ const getAbiFromBlockscout = async (address: string, chainId: string): Promise<a
   throw new Error('Contract found but could not found ABI using Blockscout')
 }
 
+const getAbiFromBlockscoutV2 = async (address: string, chainId: string): Promise<any> => {
+  const { data } = await axios.get(getProviderURL(chainId, address, PROVIDER.BLOCKSCOUT_V2), {
+    timeout: DEFAULT_TIMEOUT,
+  })
+  // Blockscout v2 API returns contract data with ABI in the 'abi' field
+  if (data && data.abi) {
+    return data.abi
+  }
+
+  throw new Error('Contract found but could not found ABI using Blockscout v2')
+}
+
 const getABIFromScanAPI = async (address: string, chainId: string): Promise<any> => {
   const { data } = await axios.get(getProviderURL(chainId, address, PROVIDER.SCANAPI), {
     timeout: DEFAULT_TIMEOUT,
@@ -638,6 +681,7 @@ const getAbi = async (address: string, chainInfo: ChainInfo): Promise<any> => {
       getAbiFromSourcify(address, chainInfo.chainId),
       getAbiFromGateway(address, chainInfo.chainId),
       getAbiFromBlockscout(address, chainInfo.chainId),
+      getAbiFromBlockscoutV2(address, chainInfo.chainId),
       getABIFromScanAPI(address, chainInfo.chainId),
     ])
   } catch {
