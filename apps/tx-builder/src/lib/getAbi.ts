@@ -160,6 +160,10 @@ export enum SUPPORTED_CHAINS {
   CHILIZ_SPICY = '88882',
   TAC_MAINNET = '239',
   TAC_SAINT_PETERSBUG_TESTNET = '2391',
+  CITREA_TESTNET = '5115',
+  ETHERLINK = '42793',
+  ETHERLINK_SHADOWNET_TESTNET = '127823',
+  ETHERLINK_GHOSTNET_TESTNET = '128123',
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -401,6 +405,21 @@ const getGatewayBaseUrl = (chain: string) => {
     case SUPPORTED_CHAINS.TAC_MAINNET:
     case SUPPORTED_CHAINS.TAC_SAINT_PETERSBUG_TESTNET:
       return isProdEnv ? `https://gateway.safe.tac.build` : `https://gateway.staging.safe.tac.build`
+    case SUPPORTED_CHAINS.CITREA_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.citrea.xyz`
+        : `https://gateway.staging.safe.citrea.xyz`
+    case SUPPORTED_CHAINS.ETHERLINK:
+    case SUPPORTED_CHAINS.ETHERLINK_SHADOWNET_TESTNET:
+    case SUPPORTED_CHAINS.ETHERLINK_GHOSTNET_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.etherlink.com`
+        : `https://gateway.staging.safe.etherlink.com`
+    case SUPPORTED_CHAINS.BOBA:
+    case SUPPORTED_CHAINS.BOBA_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.boba.network`
+        : `https://gateway.staging.safe.boba.network`
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
@@ -557,6 +576,18 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://explorer-api.morphl2.io'
     case SUPPORTED_CHAINS.MORPH_HOODI:
       return 'https://explorer-api-hoodi.morphl2.io'
+    case SUPPORTED_CHAINS.CITREA_TESTNET:
+      return 'https://explorer.testnet.citrea.xyz'
+    case SUPPORTED_CHAINS.HARMONY:
+      return 'https://explorer.harmony.one'
+    case SUPPORTED_CHAINS.HARMONY_TESTNET:
+      return 'https://explorer.testnet.harmony.one'
+    case SUPPORTED_CHAINS.ETHERLINK_GHOSTNET_TESTNET:
+      return 'https://testnet.explorer.etherlink.com'
+    case SUPPORTED_CHAINS.ETHERLINK_SHADOWNET_TESTNET:
+      return 'https://shadownet.explorer.etherlink.com'
+    case SUPPORTED_CHAINS.ETHERLINK:
+      return 'https://explorer.etherlink.com'
     default:
       return `https://blockscout.com/${chain}`
   }
@@ -598,6 +629,18 @@ const getBlockscoutV2BaseURL = (chain: string): string => {
       return 'https://explorer-api.morphl2.io'
     case SUPPORTED_CHAINS.MORPH_HOODI:
       return 'https://explorer-api-hoodi.morphl2.io'
+    case SUPPORTED_CHAINS.CITREA_TESTNET:
+      return 'https://explorer.testnet.citrea.xyz'
+    case SUPPORTED_CHAINS.HARMONY:
+      return 'https://explorer.harmony.one'
+    case SUPPORTED_CHAINS.HARMONY_TESTNET:
+      return 'https://explorer.testnet.harmony.one'
+    case SUPPORTED_CHAINS.ETHERLINK_GHOSTNET_TESTNET:
+      return 'https://testnet.explorer.etherlink.com'
+    case SUPPORTED_CHAINS.ETHERLINK_SHADOWNET_TESTNET:
+      return 'https://shadownet.explorer.etherlink.com'
+    case SUPPORTED_CHAINS.ETHERLINK:
+      return 'https://explorer.etherlink.com'
     default:
       return `https://blockscout.com/${chain}`
   }
