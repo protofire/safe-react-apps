@@ -164,6 +164,8 @@ export enum SUPPORTED_CHAINS {
   ETHERLINK = '42793',
   ETHERLINK_SHADOWNET_TESTNET = '127823',
   ETHERLINK_GHOSTNET_TESTNET = '128123',
+  EDU_TESTNET = '656476',
+  EDU_MAINNET = '41923',
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -420,6 +422,11 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.boba.network`
         : `https://gateway.staging.safe.boba.network`
+    case SUPPORTED_CHAINS.EDU_TESTNET:
+    case SUPPORTED_CHAINS.EDU_MAINNET:
+      return isProdEnv
+        ? `https://gateway.safe.educhain.xyz`
+        : `https://gateway.staging.safe.educhain.xyz`
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
@@ -588,6 +595,10 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://shadownet.explorer.etherlink.com'
     case SUPPORTED_CHAINS.ETHERLINK:
       return 'https://explorer.etherlink.com'
+    case SUPPORTED_CHAINS.EDU_TESTNET:
+      return 'https://edu-chain-testnet.blockscout.com'
+    case SUPPORTED_CHAINS.EDU_MAINNET:
+      return 'https://educhain.blockscout.com'
     default:
       return `https://blockscout.com/${chain}`
   }
@@ -641,6 +652,10 @@ const getBlockscoutV2BaseURL = (chain: string): string => {
       return 'https://shadownet.explorer.etherlink.com'
     case SUPPORTED_CHAINS.ETHERLINK:
       return 'https://explorer.etherlink.com'
+    case SUPPORTED_CHAINS.EDU_TESTNET:
+      return 'https://edu-chain-testnet.blockscout.com'
+    case SUPPORTED_CHAINS.EDU_MAINNET:
+      return 'https://educhain.blockscout.com'
     default:
       return `https://blockscout.com/${chain}`
   }
