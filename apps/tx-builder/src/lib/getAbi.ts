@@ -656,6 +656,10 @@ const getBlockscoutV2BaseURL = (chain: string): string => {
       return 'https://edu-chain-testnet.blockscout.com'
     case SUPPORTED_CHAINS.EDU_MAINNET:
       return 'https://educhain.blockscout.com'
+    case SUPPORTED_CHAINS.RSK:
+      return 'https://rootstock.blockscout.com'
+    case SUPPORTED_CHAINS.RSK_TESTNET:
+      return 'https://rootstock-testnet.blockscout.com'
     default:
       return `https://blockscout.com/${chain}`
   }
