@@ -153,6 +153,7 @@ export enum SUPPORTED_CHAINS {
   GAME7 = '2187',
   GAME7_TESTNET = '13746',
   PHAROS_TESTNET = '688688',
+  PHAROS_ATLANTIC_TESTNET = '688689',
   ETHEREAL_TESTNET_0 = '13374202',
   ETHEREAL = '5064014',
   STABLE_TESTNET = '2201',
@@ -392,6 +393,7 @@ const getGatewayBaseUrl = (chain: string) => {
         ? `https://gateway.safe.game7.io`
         : `https://gateway.staging.safe.game7.io/api`
     case SUPPORTED_CHAINS.PHAROS_TESTNET:
+    case SUPPORTED_CHAINS.PHAROS_ATLANTIC_TESTNET:
       return isProdEnv
         ? `https://gateway.safe.pharosnetwork.xyz`
         : 'https://gateway.staging.safe.pharosnetwork.xyz'
@@ -511,6 +513,11 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
       return {
         link: 'https://api.socialscan.io/pharos-testnet/v1/developer',
         apiKey: process.env.REACT_APP_PHAROS_KEY,
+      }
+    case SUPPORTED_CHAINS.PHAROS_ATLANTIC_TESTNET:
+      return {
+        link: 'https://api.socialscan.io/pharos-atlantic-testnet/v1/developer',
+        apiKey: process.env.REACT_APP_PHAROS_ATLANTIC_KEY,
       }
     case SUPPORTED_CHAINS.ETHEREAL:
     case SUPPORTED_CHAINS.ETHEREAL_TESTNET_0:
