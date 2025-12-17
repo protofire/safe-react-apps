@@ -167,6 +167,7 @@ export enum SUPPORTED_CHAINS {
   ETHERLINK_GHOSTNET_TESTNET = '128123',
   EDU_TESTNET = '656476',
   EDU_MAINNET = '41923',
+  DOGEOS_CHIKYU_TESTNET = '6281971',
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -606,6 +607,8 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://edu-chain-testnet.blockscout.com'
     case SUPPORTED_CHAINS.EDU_MAINNET:
       return 'https://educhain.blockscout.com'
+    case SUPPORTED_CHAINS.DOGEOS_CHIKYU_TESTNET:
+      return 'https://blockscout.testnet.dogeos.com'
     default:
       return `https://blockscout.com/${chain}`
   }
@@ -667,6 +670,8 @@ const getBlockscoutV2BaseURL = (chain: string): string => {
       return 'https://rootstock.blockscout.com'
     case SUPPORTED_CHAINS.RSK_TESTNET:
       return 'https://rootstock-testnet.blockscout.com'
+    case SUPPORTED_CHAINS.DOGEOS_CHIKYU_TESTNET:
+      return 'https://blockscout.testnet.dogeos.com'
     default:
       return `https://blockscout.com/${chain}`
   }
