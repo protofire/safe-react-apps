@@ -153,6 +153,7 @@ export enum SUPPORTED_CHAINS {
   GAME7 = '2187',
   GAME7_TESTNET = '13746',
   PHAROS_TESTNET = '688688',
+  PHAROS_ATLANTIC_TESTNET = '688689',
   ETHEREAL_TESTNET_0 = '13374202',
   ETHEREAL = '5064014',
   STABLE_TESTNET = '2201',
@@ -166,6 +167,7 @@ export enum SUPPORTED_CHAINS {
   ETHERLINK_GHOSTNET_TESTNET = '128123',
   EDU_TESTNET = '656476',
   EDU_MAINNET = '41923',
+  DOGEOS_CHIKYU_TESTNET = '6281971',
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -392,6 +394,7 @@ const getGatewayBaseUrl = (chain: string) => {
         ? `https://gateway.safe.game7.io`
         : `https://gateway.staging.safe.game7.io/api`
     case SUPPORTED_CHAINS.PHAROS_TESTNET:
+    case SUPPORTED_CHAINS.PHAROS_ATLANTIC_TESTNET:
       return isProdEnv
         ? `https://gateway.safe.pharosnetwork.xyz`
         : 'https://gateway.staging.safe.pharosnetwork.xyz'
@@ -512,6 +515,11 @@ const getScanAPIBaseURL = (chain: string): undefined | { link: string; apiKey?: 
         link: 'https://api.socialscan.io/pharos-testnet/v1/developer',
         apiKey: process.env.REACT_APP_PHAROS_KEY,
       }
+    case SUPPORTED_CHAINS.PHAROS_ATLANTIC_TESTNET:
+      return {
+        link: 'https://api.socialscan.io/pharos-atlantic-testnet/v1/developer',
+        apiKey: process.env.REACT_APP_PHAROS_ATLANTIC_KEY,
+      }
     case SUPPORTED_CHAINS.ETHEREAL:
     case SUPPORTED_CHAINS.ETHEREAL_TESTNET_0:
       return {
@@ -599,6 +607,8 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://edu-chain-testnet.blockscout.com'
     case SUPPORTED_CHAINS.EDU_MAINNET:
       return 'https://educhain.blockscout.com'
+    case SUPPORTED_CHAINS.DOGEOS_CHIKYU_TESTNET:
+      return 'https://blockscout.testnet.dogeos.com'
     default:
       return `https://blockscout.com/${chain}`
   }
@@ -656,6 +666,12 @@ const getBlockscoutV2BaseURL = (chain: string): string => {
       return 'https://edu-chain-testnet.blockscout.com'
     case SUPPORTED_CHAINS.EDU_MAINNET:
       return 'https://educhain.blockscout.com'
+    case SUPPORTED_CHAINS.RSK:
+      return 'https://rootstock.blockscout.com'
+    case SUPPORTED_CHAINS.RSK_TESTNET:
+      return 'https://rootstock-testnet.blockscout.com'
+    case SUPPORTED_CHAINS.DOGEOS_CHIKYU_TESTNET:
+      return 'https://blockscout.testnet.dogeos.com'
     default:
       return `https://blockscout.com/${chain}`
   }
