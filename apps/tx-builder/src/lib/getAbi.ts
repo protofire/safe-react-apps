@@ -168,6 +168,8 @@ export enum SUPPORTED_CHAINS {
   EDU_TESTNET = '656476',
   EDU_MAINNET = '41923',
   DOGEOS_CHIKYU_TESTNET = '6281971',
+  AUTONOMYS = '870',
+  AUTONOMYS_CHRONOS_TESTNET = '8700',
 }
 
 const getGatewayBaseUrl = (chain: string) => {
@@ -430,6 +432,11 @@ const getGatewayBaseUrl = (chain: string) => {
       return isProdEnv
         ? `https://gateway.safe.educhain.xyz`
         : `https://gateway.staging.safe.educhain.xyz`
+    case SUPPORTED_CHAINS.AUTONOMYS:
+    case SUPPORTED_CHAINS.AUTONOMYS_CHRONOS_TESTNET:
+      return isProdEnv
+        ? `https://gateway.safe.autonomys.xyz`
+        : `https://gateway.staging.safe.autonomys.xyz`
     default:
       throw new Error(
         `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
@@ -609,6 +616,10 @@ const getBlockscoutBaseURL = (chain: string): string => {
       return 'https://educhain.blockscout.com'
     case SUPPORTED_CHAINS.DOGEOS_CHIKYU_TESTNET:
       return 'https://blockscout.testnet.dogeos.com'
+    case SUPPORTED_CHAINS.AUTONOMYS:
+      return 'https://explorer.auto-evm.mainnet.autonomys.xyz'
+    case SUPPORTED_CHAINS.AUTONOMYS_CHRONOS_TESTNET:
+      return 'https://explorer.auto-evm.chronos.autonomys.xyz'
     default:
       return `https://blockscout.com/${chain}`
   }
@@ -672,6 +683,10 @@ const getBlockscoutV2BaseURL = (chain: string): string => {
       return 'https://rootstock-testnet.blockscout.com'
     case SUPPORTED_CHAINS.DOGEOS_CHIKYU_TESTNET:
       return 'https://blockscout.testnet.dogeos.com'
+    case SUPPORTED_CHAINS.AUTONOMYS:
+      return 'https://explorer.auto-evm.mainnet.autonomys.xyz'
+    case SUPPORTED_CHAINS.AUTONOMYS_CHRONOS_TESTNET:
+      return 'https://explorer.auto-evm.chronos.autonomys.xyz'
     default:
       return `https://blockscout.com/${chain}`
   }
