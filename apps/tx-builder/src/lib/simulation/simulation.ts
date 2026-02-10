@@ -3,7 +3,7 @@ import Web3 from 'web3'
 import { BaseTransaction } from '@safe-global/safe-apps-sdk'
 import { TenderlySimulatePayload, TenderlySimulation, StateObject } from './types'
 import { encodeMultiSendCall, getMultiSendCallOnlyAddress } from './multisend'
-import { SUPPORTED_CHAINS } from '../getAbi'
+import { getChainConfig, FEATURES } from '@safe-global/safe-gateway-typescript-sdk'
 
 type OptionalExceptFor<T, TRequired extends keyof T = keyof T> = Partial<
   Pick<T, Exclude<keyof T, TRequired>>
@@ -15,22 +15,9 @@ const TENDERLY_SIMULATE_ENDPOINT_URL = process.env.REACT_APP_TENDERLY_SIMULATE_E
 const TENDERLY_PROJECT_NAME = process.env.REACT_APP_TENDERLY_PROJECT_NAME || ''
 const TENDERLY_ORG_NAME = process.env.REACT_APP_TENDERLY_ORG_NAME || ''
 
-const TENDERLY_SUPPOERTED_CHAINS: string[] = [
-  SUPPORTED_CHAINS.MOONBEAM,
-  SUPPORTED_CHAINS.MOONRIVER,
-  SUPPORTED_CHAINS.CRONOS,
-  SUPPORTED_CHAINS.CRONOS_TESTNET,
-]
-
-const isSimulationSupported = (chainId: string) => {
-  const isSimulationEnvSet =
-    Boolean(TENDERLY_SIMULATE_ENDPOINT_URL) &&
-    Boolean(TENDERLY_ORG_NAME) &&
-    Boolean(TENDERLY_PROJECT_NAME)
-
-  const isNetworkSupported = TENDERLY_SUPPOERTED_CHAINS.includes(chainId)
-
-  return isSimulationEnvSet && isNetworkSupported
+const isSimulationSupported = async (chainId: string) => {
+  const config = await getChainConfig(chainId)
+  return config.features.includes(FEATURES.TX_SIMULATION)
 }
 
 const getSimulation = async (tx: TenderlySimulatePayload): Promise<TenderlySimulation> => {
@@ -43,13 +30,18 @@ const getSimulationLink = (simulationId: string): string => {
   return `https://dashboard.tenderly.co/public/${TENDERLY_ORG_NAME}/${TENDERLY_PROJECT_NAME}/simulator/${simulationId}`
 }
 
+const GUARD_STORAGE_POSITION = '0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8'
+
 /* We need to overwrite the threshold stored in smart contract storage to 1
  to do a proper simulation that takes transaction guards into account.
  The threshold is stored in storage slot 4 and uses full 32 bytes slot
  Safe storage layout can be found here:
- https://github.com/gnosis/safe-contracts/blob/main/contracts/libraries/GnosisSafeStorage.sol */
-const THRESHOLD_ONE_STORAGE_OVERRIDE = {
+ https://github.com/safe-global/safe-smart-account/blob/main/contracts/libraries/SafeStorage.sol */
+const STORAGE_OVERRIDE = {
+  // Threshold: 1
   [`0x${'4'.padStart(64, '0')}`]: `0x${'1'.padStart(64, '0')}`,
+  // Guard: 0x0000000000000000000000000000000000000000000000000000000000000000
+  [GUARD_STORAGE_POSITION]: `0x${'0'.padStart(64, '0')}`,
 }
 
 const getStateOverride = (
@@ -210,7 +202,7 @@ const getSimulationPayload = (tx: SimulationTxParams): TenderlySimulatePayload =
     tx.safeAddress,
     undefined,
     undefined,
-    THRESHOLD_ONE_STORAGE_OVERRIDE,
+    STORAGE_OVERRIDE,
   )
 
   return {

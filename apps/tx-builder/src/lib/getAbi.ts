@@ -717,8 +717,8 @@ const getAbiFromSourcify = async (address: string, chainId: string): Promise<any
   throw new Error('Contract found but could not found abi using Sourcify')
 }
 
-const getAbiFromGateway = async (address: string, chainId: string): Promise<any> => {
-  const { data } = await axios.get(getProviderURL(chainId, address, PROVIDER.GATEWAY), {
+const getAbiFromGateway = async (address: string, chainName: string): Promise<any> => {
+  const { data } = await axios.get(getProviderURL(chainName, address, PROVIDER.GATEWAY), {
     timeout: DEFAULT_TIMEOUT,
   })
 
