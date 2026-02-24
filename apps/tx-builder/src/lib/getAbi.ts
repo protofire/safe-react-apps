@@ -15,6 +15,13 @@ type SourcifyResponse = {
   content: string
 }
 
+type ExplorerDetectionResult = {
+  provider: PROVIDER | null
+  baseUrl: string
+}
+
+const GATEWAY_BASE_URL = 'https://gateway-registry.safe.protofire.io'
+
 const METADATA_FILE = 'metadata.json'
 const DEFAULT_TIMEOUT = 10000
 
@@ -23,7 +30,7 @@ const getProviderURL = (chain: string, address: string, urlProvider: PROVIDER): 
     case PROVIDER.SOURCIFY:
       return `https://sourcify.dev/server/files/${chain}/${address}`
     case PROVIDER.GATEWAY:
-      return `${getGatewayBaseUrl(chain)}/v1/chains/${chain}/contracts/${address}`
+      return `${GATEWAY_BASE_URL}/v1/chains/${chain}/contracts/${address}`
     case PROVIDER.BLOCKSCOUT:
       const baseApi = getBlockscoutBaseURL(chain)
       return `${baseApi}/api?module=contract&action=getabi&address=${address}`
@@ -171,284 +178,7 @@ export enum SUPPORTED_CHAINS {
   AUTONOMYS = '870',
   AUTONOMYS_CHRONOS_TESTNET = '8700',
   ADI_CHAIN_MAINNET = '36900',
-  ADI_CHAIN_AB_TESTNET = '99999'
-}
-
-const getGatewayBaseUrl = (chain: string) => {
-  const isProdEnv = process.env?.REACT_APP_IS_PRODUCTION === 'true'
-
-  switch (chain) {
-    case SUPPORTED_CHAINS.ACALA:
-    case SUPPORTED_CHAINS.KARURA:
-    case SUPPORTED_CHAINS.MANDALA:
-      return isProdEnv
-        ? `https://gateway.safe.acala.network`
-        : `https://gateway.staging.safe.acala.network`
-    case SUPPORTED_CHAINS.ASTAR:
-    case SUPPORTED_CHAINS.SHIDEN:
-    case SUPPORTED_CHAINS.SHIBUYA:
-    case SUPPORTED_CHAINS.ZKATANA_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.astar.network`
-        : `https://gateway.staging-safe.astar.network`
-    case SUPPORTED_CHAINS.FRAXTAL_TESNET:
-      return isProdEnv
-        ? `https://gateway.safe.optimism.io`
-        : `https://gateway.staging.safe.optimism.io`
-    case SUPPORTED_CHAINS.BLAST:
-    case SUPPORTED_CHAINS.BLAST_TESTNET:
-      return isProdEnv ? `https://gateway.blast-safe.io` : `https://gateway.blast-safe.io`
-    case SUPPORTED_CHAINS.BOB:
-    case SUPPORTED_CHAINS.BOB_TESTNET:
-      return isProdEnv ? `https://gateway.safe.gobob.xyz` : `https://gateway.staging.safe.gobob.xyz`
-    case SUPPORTED_CHAINS.BERACHAIN:
-      return isProdEnv
-        ? `https://gateway.safe.berachain.com`
-        : `https://gateway.staging.safe.berachain.com`
-
-    case SUPPORTED_CHAINS.BOBABEAM:
-      return isProdEnv
-        ? `https://gateway.multisig.bobabeam.boba.network`
-        : `https://gateway.staging.multisig.bobabeam.boba.network`
-    case SUPPORTED_CHAINS.CASCADIA_TESTNET:
-      return `https://gateway.safe.cascadia.foundation`
-    case SUPPORTED_CHAINS.STORY:
-    case SUPPORTED_CHAINS.STORY_AENEID:
-      return isProdEnv
-        ? `https://gateway.safe.story.foundation`
-        : `https://gateway.staging.safe.story.foundation`
-    case SUPPORTED_CHAINS.KAKAROT:
-      return `https://gateway.staging.safe.kakarot.org`
-    case SUPPORTED_CHAINS.CRONOS:
-    case SUPPORTED_CHAINS.CRONOS_TESTNET:
-      return isProdEnv
-        ? `https://gateway.cronos-safe.org`
-        : `https://gateway-cronos-safe.crolabs-int.co`
-    case SUPPORTED_CHAINS.VANA:
-    case SUPPORTED_CHAINS.VANA_MOKSHA_TESTNET:
-      return isProdEnv ? `https://gateway.safe.vana.org` : `https://gateway.staging.safe.vana.org`
-    case SUPPORTED_CHAINS.AUTONOMYS_TAURUS_NETWORK:
-      return isProdEnv
-        ? `https://gateway.safe.autonomys.xyz`
-        : `https://gateway.staging.safe.autonomys.xyz`
-    case SUPPORTED_CHAINS.EVMOS:
-    case SUPPORTED_CHAINS.EVMOS_TESTNET:
-      return isProdEnv ? `https://gateway.safe.evmos.org` : `https://gateway.safe.evmos.dev`
-    case SUPPORTED_CHAINS.HARMONY:
-    case SUPPORTED_CHAINS.HARMONY_TESTNET:
-      return isProdEnv
-        ? `https://gateway.multisig.harmony.one`
-        : `https://gateway.staging-safe.harmony.one`
-    case SUPPORTED_CHAINS.HOLESKY:
-      return isProdEnv
-        ? `https://gateway.holesky-safe.protofire.io`
-        : `https://gateway.stg.holesky-safe.protofire.io`
-    case SUPPORTED_CHAINS.IOTEX:
-    case SUPPORTED_CHAINS.IOTEX_TESTNET:
-      return isProdEnv ? `https://gateway.safe.iotex.io` : `https://gateway.staging.safe.iotex.io`
-    case SUPPORTED_CHAINS.KROMA:
-    case SUPPORTED_CHAINS.KROMA_SEPOLIA:
-      return isProdEnv
-        ? `https://gateway.safe.kroma.network`
-        : `https://gateway.staging.safe.kroma.network`
-    case SUPPORTED_CHAINS.LINEA:
-    case SUPPORTED_CHAINS.LINEA_SEPOLIA:
-      return isProdEnv
-        ? `https://gateway.safe.linea.build`
-        : `https://gateway.staging.safe.linea.build`
-    case SUPPORTED_CHAINS.MANTA_PACIFIC_MAINNET:
-      return isProdEnv
-        ? `https://gateway.safe.manta.network`
-        : `https://gateway.staging.safe.manta.network`
-    case SUPPORTED_CHAINS.MANTLE:
-    case SUPPORTED_CHAINS.MANTLE_SEPOLIA:
-      return isProdEnv
-        ? `https://gateway.multisig.mantle.xyz`
-        : `https://gateway.staging.multisig.mantle.xyz`
-    case SUPPORTED_CHAINS.HMNTY:
-    case SUPPORTED_CHAINS.HMNTYTEST:
-      return isProdEnv
-        ? `https://gateway.safe.humanity.org`
-        : `https://gateway.staging.safe.humanity.org`
-    case SUPPORTED_CHAINS.MOONBEAM:
-    case SUPPORTED_CHAINS.MOONRIVER:
-    case SUPPORTED_CHAINS.MOONBASE:
-      return isProdEnv
-        ? `https://gateway.multisig.moonbeam.network`
-        : `https://gateway.staging.multisig.moonbeam.network`
-    case SUPPORTED_CHAINS.NEON_EVM:
-    case SUPPORTED_CHAINS.NEON_EVM_DEVNET:
-    case SUPPORTED_CHAINS.NEON_EVM_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.neonevm.org`
-        : `https://gateway.staging.safe.neonevm.org`
-    case SUPPORTED_CHAINS.ABSTRACT:
-      return isProdEnv ? `https://gateway.safe.abs.xyz` : `https://gateway.staging.safe.abs.xyz`
-    case SUPPORTED_CHAINS.ABSTRACT_TESTNET:
-      return isProdEnv ? `https://gateway.safe.abs.xyz` : `https://gateway.staging.safe.abs.xyz`
-    case SUPPORTED_CHAINS.REYA:
-      return isProdEnv
-        ? `https://gateway.safe.reya.network`
-        : `https://gateway.staging.safe.reya.network`
-
-    case SUPPORTED_CHAINS.OASIS_SAPPHIRE:
-    case SUPPORTED_CHAINS.OASIS_SAPPHIRE_TESTNET:
-      return isProdEnv ? `https://gateway.safe.oasis.io` : `https://gateway.safe.stg.oasis.io`
-    case SUPPORTED_CHAINS.RSK:
-    case SUPPORTED_CHAINS.RSK_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.rootstock.io`
-        : `https://gateway.staging.safe.rootstock.io`
-    case SUPPORTED_CHAINS.SCROLL:
-    case SUPPORTED_CHAINS.SCROLL_ALPHA_TESTNET:
-    case SUPPORTED_CHAINS.SCROLL_SEPOLIA_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.scroll.xyz `
-        : `https://gateway.staging.safe.scroll.xyz`
-    case SUPPORTED_CHAINS.SEI:
-    case SUPPORTED_CHAINS.SEI_TESTNET:
-    case SUPPORTED_CHAINS.SEI_DEVNET:
-      return isProdEnv
-        ? `https://gateway.sei-safe.protofire.io`
-        : `https://gateway.staging.sei-safe.protofire.io`
-    case SUPPORTED_CHAINS.TANGIBLE_REAL:
-    case SUPPORTED_CHAINS.TANGIBLE_UNREAL:
-      return isProdEnv ? `https://gateway.safe.re.al` : `https://gateway.staging.safe.re.al`
-    case SUPPORTED_CHAINS.TELOS:
-    case SUPPORTED_CHAINS.TELOS_TESTNET:
-      return `https://gateway.safe.telos.net`
-    case SUPPORTED_CHAINS.TENET:
-    case SUPPORTED_CHAINS.TENET_TESTNET:
-      return isProdEnv ? `https://gateway.safe.tenet.org` : `https://gateway.staging.safe.tenet.org`
-    case SUPPORTED_CHAINS.THUNDER_CORE:
-    case SUPPORTED_CHAINS.THUNDER_CORE_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.thundercore.com`
-        : `https://gateway.staging.safe.thundercore.com`
-    case SUPPORTED_CHAINS.VELAS:
-    case SUPPORTED_CHAINS.VELAS_TESTNET:
-      return isProdEnv ? `https://gateway.velasafe.com` : `https://gateway.staging.velasafe.com`
-    case SUPPORTED_CHAINS.ZETACHAIN:
-    case SUPPORTED_CHAINS.ZETACHAIN_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.zetachain.com`
-        : `https://gateway.staging.safe.zetachain.com`
-    case SUPPORTED_CHAINS.ZILLIQA_EVM:
-    case SUPPORTED_CHAINS.ZILLIQA_EVM_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.zilliqa.com`
-        : `https://gateway.staging.safe.zilliqa.com`
-    case SUPPORTED_CHAINS.ZKSYNC_ERA:
-    case SUPPORTED_CHAINS.ZKSYNC_ERA_TESTNET:
-      return isProdEnv
-        ? `https://gateway.zksafe.protofire.io`
-        : `https://gateway.staging-zksafe.protofire.io`
-    case SUPPORTED_CHAINS.CROSS_FI_TESTNET:
-      return isProdEnv
-        ? 'https://gateway.safe.crossfi.org'
-        : 'https://gateway.staging.safe.crossfi.org'
-    case SUPPORTED_CHAINS.CROSSFI:
-      return isProdEnv
-        ? 'https://gateway.staging.safe.crossfi.org'
-        : 'https://gateway.safe.crossfi.org'
-    case SUPPORTED_CHAINS.WEMIX:
-    case SUPPORTED_CHAINS.WEMIX_TESTNET:
-      return isProdEnv ? 'https://gateway.safe.wemix.com' : 'https://gateway.staging.safe.wemix.com'
-    case SUPPORTED_CHAINS.XAI:
-    case SUPPORTED_CHAINS.XAI_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe-xai.protofire.io`
-        : `https://gateway.staging-safe-xai.protofire.io`
-    case SUPPORTED_CHAINS.MORPH:
-    case SUPPORTED_CHAINS.MORPH_HOODI:
-      return isProdEnv ? `https://gateway.safe.morphl2.io` : `https://gateway.stg.safe.morphl2.io`
-    case SUPPORTED_CHAINS.TAIKO:
-    case SUPPORTED_CHAINS.TAIKO_HOODI:
-      return isProdEnv ? 'https://gateway.safe.taiko.xyz' : 'https://gateway.staging.safe.taiko.xyz'
-    case SUPPORTED_CHAINS.SOPHON:
-    case SUPPORTED_CHAINS.SOPHON_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.sophon.xyz`
-        : `https://gateway.staging.safe.sophon.xyz`
-    case SUPPORTED_CHAINS.ALEPH_ZERO:
-    case SUPPORTED_CHAINS.ALEPH_ZERO_TESTNET:
-      return isProdEnv
-        ? `https://gateway.alephzero-safe.protofire.io`
-        : `https://gateway.staging.alephzero-safe.protofire.io`
-    case SUPPORTED_CHAINS.EXPCHAIN_TESTNET:
-      return isProdEnv
-        ? `https://gateway.polyhedra-safe.protofire.io`
-        : `https://gateway.staging.polyhedra-safe.protofire.io`
-    case SUPPORTED_CHAINS.ZIRCUIT:
-    case SUPPORTED_CHAINS.ZIRCUIT_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.zircuit.com`
-        : `https://gateway.staging.safe.zircuit.com`
-    case SUPPORTED_CHAINS.KAVA:
-    case SUPPORTED_CHAINS.KAVA_TESTNET:
-      return isProdEnv ? `https://gateway.safe.kava.io` : `https://gateway.staging.safe.kava.io`
-    case SUPPORTED_CHAINS.SHAPE:
-    case SUPPORTED_CHAINS.SHAPE_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.shape.network`
-        : `https://gateway.staging.safe.shape.network`
-    case SUPPORTED_CHAINS.GAME7:
-    case SUPPORTED_CHAINS.GAME7_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.game7.io`
-        : `https://gateway.staging.safe.game7.io/api`
-    case SUPPORTED_CHAINS.PHAROS_TESTNET:
-    case SUPPORTED_CHAINS.PHAROS_ATLANTIC_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.pharosnetwork.xyz`
-        : 'https://gateway.staging.safe.pharosnetwork.xyz'
-    case SUPPORTED_CHAINS.ETHEREAL:
-    case SUPPORTED_CHAINS.ETHEREAL_TESTNET_0:
-      return isProdEnv
-        ? 'https://gateway.safe.ethereal.trade'
-        : 'https://gateway.safe.etherealtest.net'
-    case SUPPORTED_CHAINS.STABLE_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.stable.xyz`
-        : `https://gateway.staging.safe.stable.xyz`
-    case SUPPORTED_CHAINS.TAC_MAINNET:
-    case SUPPORTED_CHAINS.TAC_SAINT_PETERSBUG_TESTNET:
-      return isProdEnv ? `https://gateway.safe.tac.build` : `https://gateway.staging.safe.tac.build`
-    case SUPPORTED_CHAINS.CITREA_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.citrea.xyz`
-        : `https://gateway.staging.safe.citrea.xyz`
-    case SUPPORTED_CHAINS.ETHERLINK:
-    case SUPPORTED_CHAINS.ETHERLINK_SHADOWNET_TESTNET:
-    case SUPPORTED_CHAINS.ETHERLINK_GHOSTNET_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.etherlink.com`
-        : `https://gateway.staging.safe.etherlink.com`
-    case SUPPORTED_CHAINS.BOBA:
-    case SUPPORTED_CHAINS.BOBA_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.boba.network`
-        : `https://gateway.staging.safe.boba.network`
-    case SUPPORTED_CHAINS.EDU_TESTNET:
-    case SUPPORTED_CHAINS.EDU_MAINNET:
-      return isProdEnv
-        ? `https://gateway.safe.educhain.xyz`
-        : `https://gateway.staging.safe.educhain.xyz`
-    case SUPPORTED_CHAINS.AUTONOMYS:
-    case SUPPORTED_CHAINS.AUTONOMYS_CHRONOS_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.autonomys.xyz`
-        : `https://gateway.staging.safe.autonomys.xyz`
-    case SUPPORTED_CHAINS.ADI_CHAIN_MAINNET:
-    case SUPPORTED_CHAINS.ADI_CHAIN_AB_TESTNET:
-      return isProdEnv
-        ? `https://gateway.safe.adifoundation.ai`
-        : `https://gateway.staging.safe.adifoundation.ai`
-    default:
-      throw new Error(
-        `[getGatewayBaseUrl]: There is no gateway for ${chain}, therefore we cannot get the contract abi from it.`,
-      )
-  }
+  ADI_CHAIN_AB_TESTNET = '99999',
 }
 
 // TODO: split this function into multiple functions for each explorer api,
@@ -772,10 +502,139 @@ const getABIFromScanAPI = async (address: string, chainId: string): Promise<any>
   throw new Error('Contract found but ABI is missing when using API service')
 }
 
+const detectExplorerType = async (baseUrl: string): Promise<ExplorerDetectionResult> => {
+  try {
+    // This endpoint is specific to Blockscout V2 and returns backend version
+    const response = await axios.get(`${baseUrl}/api/v2/config/backend-version`, {
+      timeout: DEFAULT_TIMEOUT,
+      validateStatus: status => status < 500,
+    })
+
+    if (response.status === 200 && response.data && 'backend_version' in response.data) {
+      return {
+        provider: PROVIDER.BLOCKSCOUT_V2,
+        baseUrl: baseUrl,
+      }
+    }
+  } catch (error) {
+    throw new Error(`Provided explorer API doesn't support Blockscout V2 endpoints`)
+  }
+
+  try {
+    // Both Blockscout V1 and Etherscan support this endpoint
+    const response = await axios.get(`${baseUrl}/api?module=stats&action=ethsupply`, {
+      timeout: DEFAULT_TIMEOUT,
+      validateStatus: status => status < 500,
+    })
+
+    if (response.status === 200 && response.data) {
+      if (baseUrl.includes('blockscout')) {
+        return {
+          provider: PROVIDER.BLOCKSCOUT,
+          baseUrl: baseUrl,
+        }
+      } else {
+        return {
+          provider: PROVIDER.SCANAPI,
+          baseUrl: baseUrl,
+        }
+      }
+    }
+
+    throw new Error(
+      `Stats endpoint responded with unexpected format: ${JSON.stringify(response.data)}`,
+    )
+  } catch (error) {
+    throw new Error(`Failed to detect explorer type for ${baseUrl}. Error: ${error}`)
+  }
+}
+
+const getAbiDynamic = async (address: string, chainId: string): Promise<any> => {
+  // Fetch chain info from Safe Gateway API
+  let chainInfo: ChainInfo
+  try {
+    const { data } = await axios.get(`${GATEWAY_BASE_URL}/v1/chains/${chainId}`, {
+      timeout: DEFAULT_TIMEOUT,
+    })
+    chainInfo = data
+  } catch (error) {
+    throw new Error(`Failed to fetch chain info from Gateway API for chainId ${chainId}: ${error}`)
+  }
+
+  // Extract explorer API URL from chain info
+  const explorerApiUrl = chainInfo?.blockExplorerUriTemplate?.api
+  if (!explorerApiUrl) {
+    throw new Error(`No explorer API URL found in Gateway response for chainId ${chainId}`)
+  }
+
+  // Get API key from environment if available (for Etherscan detection)
+  const apiKey = process.env.REACT_APP_ETHERSCAN_API_KEY
+
+  // Detect the explorer type
+  let detection: ExplorerDetectionResult
+  try {
+    detection = await detectExplorerType(explorerApiUrl)
+  } catch (error) {
+    throw new Error(`Failed to detect explorer type: ${error}`)
+  }
+
+  // Use appropriate method based on detected provider
+  switch (detection.provider) {
+    case PROVIDER.BLOCKSCOUT_V2:
+      try {
+        const { data } = await axios.get(`${detection.baseUrl}/api/v2/smart-contracts/${address}`, {
+          timeout: DEFAULT_TIMEOUT,
+        })
+        if (data && data.abi) {
+          return data.abi
+        }
+        throw new Error('Contract found but ABI is missing')
+      } catch (error) {
+        throw new Error(`Failed to fetch ABI from Blockscout V2: ${error}`)
+      }
+
+    case PROVIDER.BLOCKSCOUT:
+      try {
+        const { data } = await axios.get(
+          `${detection.baseUrl}/api?module=contract&action=getabi&address=${address}`,
+          {
+            timeout: DEFAULT_TIMEOUT,
+          },
+        )
+        if (data && data.message === 'OK' && data.result) {
+          return JSON.parse(data.result)
+        }
+        throw new Error('Contract found but ABI is missing')
+      } catch (error) {
+        throw new Error(`Failed to fetch ABI from Blockscout V1: ${error}`)
+      }
+
+    case PROVIDER.SCANAPI:
+      try {
+        const { data } = await axios.get(
+          `${detection.baseUrl}/api?chainid=${chainId}&module=contract&action=getabi&address=${address}&apikey=${apiKey}`,
+          {
+            timeout: DEFAULT_TIMEOUT,
+          },
+        )
+        if (data && data.message === 'OK' && data.result) {
+          return JSON.parse(data.result)
+        }
+        throw new Error('Contract found but ABI is missing')
+      } catch (error) {
+        throw new Error(`Failed to fetch ABI from Etherscan-compatible API: ${error}`)
+      }
+
+    default:
+      throw new Error(`Could not detect explorer type for ${explorerApiUrl}.`)
+  }
+}
+
 const getAbi = async (address: string, chainInfo: ChainInfo): Promise<any> => {
   let abi
   try {
     abi = await Promise.any([
+      getAbiDynamic(address, chainInfo.chainId),
       getAbiFromSourcify(address, chainInfo.chainId),
       getAbiFromGateway(address, chainInfo.chainId),
       getAbiFromBlockscout(address, chainInfo.chainId),
