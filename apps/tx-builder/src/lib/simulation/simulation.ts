@@ -3,7 +3,7 @@ import Web3 from 'web3'
 import { BaseTransaction } from '@safe-global/safe-apps-sdk'
 import { TenderlySimulatePayload, TenderlySimulation, StateObject } from './types'
 import { encodeMultiSendCall, getMultiSendCallOnlyAddress } from './multisend'
-import { getChainConfig, FEATURES } from '@safe-global/safe-gateway-typescript-sdk'
+// import { getChainConfig, FEATURES } from '@safe-global/safe-gateway-typescript-sdk'
 
 type OptionalExceptFor<T, TRequired extends keyof T = keyof T> = Partial<
   Pick<T, Exclude<keyof T, TRequired>>
@@ -16,8 +16,9 @@ const TENDERLY_PROJECT_NAME = process.env.REACT_APP_TENDERLY_PROJECT_NAME || ''
 const TENDERLY_ORG_NAME = process.env.REACT_APP_TENDERLY_ORG_NAME || ''
 
 const isSimulationSupported = async (chainId: string) => {
-  const config = await getChainConfig(chainId)
-  return config.features.includes(FEATURES.TX_SIMULATION)
+  // const config = await getChainConfig(chainId)
+  // return config.features.includes(FEATURES.TX_SIMULATION)
+  return false
 }
 
 const getSimulation = async (tx: TenderlySimulatePayload): Promise<TenderlySimulation> => {
