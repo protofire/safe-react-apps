@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 
@@ -8,17 +8,17 @@ import useModal from '../hooks/useModal/useModal'
 import { HOME_PATH } from '../routes/routes'
 import SuccessBatchCreationModal from '../components/modals/SuccessBatchCreationModal'
 import { useTransactionLibrary, useTransactions } from '../store'
-// import { useSimulation } from '../hooks/useSimulation'
-// import { FETCH_STATUS } from '../utils'
+import { useSimulation } from '../hooks/useSimulation'
+import { FETCH_STATUS } from '../utils'
 import Button from '../components/Button'
 import FixedIcon from '../components/FixedIcon'
-// import Text from '../components/Text'
-// import Link from '../components/Link'
-// import ButtonLink from '../components/buttons/ButtonLink'
+import Text from '../components/Text'
+import Link from '../components/Link'
+import ButtonLink from '../components/buttons/ButtonLink'
 import { Typography } from '@material-ui/core'
-// import Loader from '../components/Loader'
-// import IconText from '../components/IconText'
-// import Card from '../components/Card'
+import Loader from '../components/Loader'
+import IconText from '../components/IconText'
+import Card from '../components/Card'
 import Wrapper from '../components/Wrapper'
 
 const ReviewAndConfirm = () => {
@@ -41,22 +41,22 @@ const ReviewAndConfirm = () => {
     reorderTransactions,
   } = useTransactions()
   const { downloadBatch, saveBatch } = useTransactionLibrary()
-  // const [showSimulation, setShowSimulation] = useState<boolean>(false)
-  // const {
-  //   simulation,
-  //   simulateTransaction,
-  //   simulationRequestStatus,
-  //   simulationLink,
-  //   simulationSupported,
-  // } = useSimulation()
+  const [showSimulation, setShowSimulation] = useState<boolean>(false)
+  const {
+    simulation,
+    simulateTransaction,
+    simulationRequestStatus,
+    simulationLink,
+    simulationSupported,
+  } = useSimulation()
   const navigate = useNavigate()
 
-  // const clickSimulate = () => {
-  //   simulateTransaction()
-  //   setShowSimulation(true)
-  // }
-  //
-  // const closeSimulation = () => setShowSimulation(false)
+  const clickSimulate = () => {
+    simulateTransaction()
+    setShowSimulation(true)
+  }
+
+  const closeSimulation = () => setShowSimulation(false)
 
   const createBatch = async () => {
     try {
@@ -115,14 +115,14 @@ const ReviewAndConfirm = () => {
             Cancel
           </Button>
 
-          {/* {simulationSupported && (
+          {simulationSupported && (
             <Button type="button" variant="bordered" color="primary" onClick={clickSimulate}>
               Simulate
             </Button>
-          )} */}
+          )}
         </ButtonsWrapper>
 
-        {/* {showSimulation && (
+        {showSimulation && (
           <SimulationContainer>
             <StyledButton
               iconType="cross"
@@ -185,7 +185,7 @@ const ReviewAndConfirm = () => {
               </>
             )}
           </SimulationContainer>
-        )} */}
+        )}
       </Wrapper>
 
       {/* Delete batch modal */}
@@ -217,31 +217,31 @@ const ReviewAndConfirm = () => {
 
 export default ReviewAndConfirm
 
-// const StyledButton = styled(ButtonLink)`
-//   && {
-//     position: absolute;
-//     right: 26px;
-//     padding: 5px;
-//     width: 26px;
-//     height: 26px;
-//
-//     :hover {
-//       background: ${({ theme }) => theme.palette.divider};
-//       border-radius: 16px;
-//     }
-//   }
-// `
-//
-// const SimulationContainer = styled(Card)`
-//   box-shadow: none;
-//   margin: 24px 0 0 34px;
-//   background: ${({ theme }) => theme.palette.background.paper};
-//
-//   // last child is the status result
-//   & > :last-child {
-//     margin-top: 11px;
-//   }
-// `
+const StyledButton = styled(ButtonLink)`
+  && {
+    position: absolute;
+    right: 26px;
+    padding: 5px;
+    width: 26px;
+    height: 26px;
+
+    :hover {
+      background: ${({ theme }) => theme.palette.divider};
+      border-radius: 16px;
+    }
+  }
+`
+
+const SimulationContainer = styled(Card)`
+  box-shadow: none;
+  margin: 24px 0 0 34px;
+  background: ${({ theme }) => theme.palette.background.paper};
+
+  // last child is the status result
+  & > :last-child {
+    margin-top: 11px;
+  }
+`
 
 const StyledTitle = styled(Typography)`
   && {
