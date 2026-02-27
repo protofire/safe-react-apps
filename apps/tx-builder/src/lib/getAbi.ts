@@ -4,12 +4,6 @@ import { ChainInfo } from '@safe-global/safe-apps-sdk'
 enum PROVIDER {
   SOURCIFY = 1,
   GATEWAY = 2,
-  BLOCKSCOUT_V2 = 3,
-  SCANAPI = 4,
-  ZKSYNC = 5,
-  MODERATO = 6,
-  SUBSCAN = 7,
-  XFISCAN = 8,
 }
 
 type SourcifyResponse = {
@@ -23,30 +17,12 @@ const GATEWAY_BASE_URL = process.env.REACT_APP_GATEWAY_BASE_URL
 const METADATA_FILE = 'metadata.json'
 const DEFAULT_TIMEOUT = 10000
 
-const getProviderURL = (
-  chain: string,
-  address: string,
-  urlProvider: PROVIDER,
-  scanAPI?: { link: string; apiKey?: string },
-): string => {
+const getProviderURL = (chain: string, address: string, urlProvider: PROVIDER): string => {
   switch (urlProvider) {
     case PROVIDER.SOURCIFY:
       return `https://sourcify.dev/server/files/${chain}/${address}`
     case PROVIDER.GATEWAY:
       return `${GATEWAY_BASE_URL}/v1/chains/${chain}/contracts/${address}`
-    case PROVIDER.XFISCAN:
-      return `${scanAPI?.link}/api/1.0/verify-contract?chainid=${chain}&module=contract&action=getabi&address=${address}`
-    case PROVIDER.MODERATO:
-      return `${scanAPI?.link}/v2/contract/${chain}/${address}`
-    case PROVIDER.SUBSCAN:
-      return `${scanAPI?.link}/api/scan/contracts/info`
-    case PROVIDER.ZKSYNC:
-      return `${scanAPI?.link}/api?module=contract&action=getabi&address=${address}`
-    case PROVIDER.BLOCKSCOUT_V2:
-      return `${scanAPI?.link}/api/v2/smart-contracts/${address}`
-    case PROVIDER.SCANAPI:
-      /** @notice adding chainid for compatibility with Etherscan V2 API */
-      return `${scanAPI?.link}/api?chainid=${chain}&module=contract&action=getabi&address=${address}&apikey=${scanAPI?.apiKey}`
     default:
       throw new Error('The Provider is not supported')
   }
@@ -83,6 +59,12 @@ const getAbiFromGateway = async (address: string, chainName: string): Promise<an
   throw new Error('Contract found but could not found ABI using the Gateway')
 }
 
+const replaceTemplate = (uri: string, data: Record<string, string>): string => {
+  const TEMPLATE_REGEX = /\{\{([^}]+)\}\}/g
+
+  return uri.replace(TEMPLATE_REGEX, (_, key: string) => data[key])
+}
+
 const getABIFromScanAPI = async (address: string, chainId: string): Promise<any> => {
   // Fetch chain info from Safe Gateway API
   let chainInfo: ChainInfo
@@ -95,101 +77,63 @@ const getABIFromScanAPI = async (address: string, chainId: string): Promise<any>
     throw new Error(`Failed to fetch chain info from Gateway API for chainId ${chainId}: ${error}`)
   }
 
-  // Extract explorer API URL from chain info
-  const explorerApiUrl = chainInfo?.blockExplorerUriTemplate?.api
-  if (!explorerApiUrl) {
+  // Extract explorer API URL template from chain info
+  const explorerApiUrlTemplate = chainInfo?.blockExplorerUriTemplate?.api
+  if (!explorerApiUrlTemplate) {
     throw new Error(`No explorer API URL found in Gateway response for chainId ${chainId}`)
   }
 
-  // Get API key from environment if available (for Etherscan detection)
+  // Get API key from environment (for Etherscan API)
   const apiKey = process.env.REACT_APP_ETHERSCAN_API_KEY
 
-  const abi = await Promise.any([
-    // Blockscout V2 API
+  const promises = []
+
+  // Subscan API
+  if (explorerApiUrlTemplate.includes('subscan')) {
+    promises.push(
+      (async () => {
+        const { data } = await axios.post(
+          explorerApiUrlTemplate,
+          { contract: address },
+          { timeout: DEFAULT_TIMEOUT },
+        )
+        if (data && data.message === 'Success' && data.abi) {
+          return data.abi
+        }
+        throw new Error('Subscan: Contract found but ABI is missing')
+      })(),
+    )
+  }
+
+  // Standard GET request using template replacement
+  const scanApiUrl = replaceTemplate(explorerApiUrlTemplate, {
+    module: 'contract',
+    action: 'getabi',
+    address: address,
+    apiKey: apiKey!,
+    chainId: chainId,
+  })
+
+  promises.push(
     (async () => {
-      const { data } = await axios.get(
-        getProviderURL(chainId, address, PROVIDER.BLOCKSCOUT_V2, { link: explorerApiUrl }),
-        {
-          timeout: DEFAULT_TIMEOUT,
-        },
-      )
+      const { data } = await axios.get(scanApiUrl, {
+        timeout: DEFAULT_TIMEOUT,
+      })
+
       if (data && data.abi) {
+        // Blockscout V2 format
         return data.abi
       }
-      throw new Error('Blockscout V2: Contract found but ABI is missing')
-    })(),
-
-    // Etherscan API
-    (async () => {
-      const { data } = await axios.get(
-        getProviderURL(chainId, address, PROVIDER.SCANAPI, { link: explorerApiUrl, apiKey }),
-        {
-          timeout: DEFAULT_TIMEOUT,
-        },
-      )
       if (data && data.message === 'OK' && data.result) {
+        // Etherscan/ZkSync/XFIScan format
         return JSON.parse(data.result)
       }
-      throw new Error('Etherscan: Contract found but ABI is missing')
-    })(),
 
-    // ZkSync API
-    (async () => {
-      const { data } = await axios.get(
-        getProviderURL(chainId, address, PROVIDER.ZKSYNC, { link: explorerApiUrl }),
-        {
-          timeout: DEFAULT_TIMEOUT,
-        },
-      )
-      if (data && data.message === 'OK' && data.result) {
-        return JSON.parse(data.result)
-      }
-      throw new Error('ZKSync: Contract found but ABI is missing')
+      throw new Error('Contract found but ABI is missing')
     })(),
+  )
 
-    // Subscan API
-    (async () => {
-      const { data } = await axios.post(
-        getProviderURL(chainId, address, PROVIDER.SUBSCAN, { link: explorerApiUrl }),
-        { contract: address },
-        { timeout: DEFAULT_TIMEOUT },
-      )
-      if (data && data.message === 'Success' && data.abi) {
-        return data.abi
-      }
-      throw new Error('Subscan: Contract found but ABI is missing')
-    })(),
-
-    // XFIScan API
-    (async () => {
-      const { data } = await axios.get(
-        getProviderURL(chainId, address, PROVIDER.XFISCAN, { link: explorerApiUrl }),
-        {
-          timeout: DEFAULT_TIMEOUT,
-        },
-      )
-      if (data && data.message === 'OK' && data.result) {
-        return JSON.parse(data.result)
-      }
-      throw new Error('XFIScan: Contract found but ABI is missing')
-    })(),
-
-    // Moderato API
-    (async () => {
-      const { data } = await axios.get(
-        getProviderURL(chainId, address, PROVIDER.MODERATO, { link: explorerApiUrl }),
-        {
-          timeout: DEFAULT_TIMEOUT,
-        },
-      )
-      if (data && data.abi) {
-        return data.abi
-      }
-      throw new Error('Moderato: Contract found but ABI is missing')
-    })(),
-  ])
-
-  return abi
+  return await Promise.any(promises)
 }
 
 const getAbi = async (address: string, chainInfo: ChainInfo): Promise<any> => {
