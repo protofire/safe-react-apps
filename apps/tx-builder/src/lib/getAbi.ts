@@ -112,6 +112,7 @@ const getABIFromScanAPI = async (address: string, chainId: string): Promise<any>
     address: address,
     apiKey: apiKey!,
     chainId: chainId,
+    chainid: chainId, // for compatibility with Etherscan V2 API
   })
 
   promises.push(
