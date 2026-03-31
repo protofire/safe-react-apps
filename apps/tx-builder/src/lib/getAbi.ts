@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { ChainInfo } from '@safe-global/safe-apps-sdk'
+import { ChainInfo as GatewayChainInfo } from '@safe-global/safe-gateway-typescript-sdk'
+import { hasFeature, FEATURES } from '../utils'
 
 enum PROVIDER {
   SOURCIFY = 1,
@@ -67,7 +69,7 @@ const replaceTemplate = (uri: string, data: Record<string, string>): string => {
 
 const getABIFromScanAPI = async (address: string, chainId: string): Promise<any> => {
   // Fetch chain info from Safe Gateway API
-  let chainInfo: ChainInfo
+  let chainInfo: GatewayChainInfo
   try {
     const { data } = await axios.get(`${GATEWAY_BASE_URL}/v1/chains/${chainId}`, {
       timeout: DEFAULT_TIMEOUT,
@@ -83,19 +85,32 @@ const getABIFromScanAPI = async (address: string, chainId: string): Promise<any>
     throw new Error(`No explorer API URL found in Gateway response for chainId ${chainId}`)
   }
 
-  // Get API key from environment (for Etherscan API)
-  const apiKey = process.env.REACT_APP_ETHERSCAN_API_KEY
+  // Determine which API key to use based on chain feature flags
+  const apiKey = hasFeature(chainInfo, FEATURES.SOCIAL_SCAN)
+    ? process.env.REACT_APP_SOCIALSCAN_API_KEY
+    : hasFeature(chainInfo, FEATURES.CRONOS_ZK_EVM)
+    ? process.env.REACT_APP_CRONOS_ZK_EVM_API_KEY
+    : hasFeature(chainInfo, FEATURES.CRONOS)
+    ? process.env.REACT_APP_CRONOS_API_KEY
+    : hasFeature(chainInfo, FEATURES.CRONOS_TESTNET)
+    ? process.env.REACT_APP_CRONOS_TESTNET_API_KEY
+    : hasFeature(chainInfo, FEATURES.SUBSCAN)
+    ? process.env.REACT_APP_SUBSCAN_API_KEY
+    : process.env.REACT_APP_ETHERSCAN_API_KEY
 
   const promises = []
 
-  // Subscan API
-  if (explorerApiUrlTemplate.includes('subscan')) {
+  // Subscan API custom processing
+  if (hasFeature(chainInfo, FEATURES.SUBSCAN)) {
     promises.push(
       (async () => {
         const { data } = await axios.post(
           explorerApiUrlTemplate,
           { contract: address },
-          { timeout: DEFAULT_TIMEOUT },
+          {
+            timeout: DEFAULT_TIMEOUT,
+            headers: { 'x-api-key': apiKey },
+          },
         )
         if (data && data.message === 'Success' && data.abi) {
           return data.abi
