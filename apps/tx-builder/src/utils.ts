@@ -1,4 +1,5 @@
 import { AbiItem, toBN, fromWei, toChecksumAddress } from 'web3-utils'
+import { ChainInfo } from '@safe-global/safe-gateway-typescript-sdk'
 import abiCoder, { AbiCoder } from 'web3-eth-abi'
 import { ContractInput, ContractMethod, ProposedTransaction } from './typings/models'
 import {
@@ -14,6 +15,14 @@ import {
   isTupleFieldType,
 } from './components/forms/fields/fields'
 
+export enum FEATURES {
+  SOCIAL_SCAN = 'SOCIAL_SCAN',
+  CRONOS_ZK_EVM = 'CRONOS_ZK_EVM',
+  CRONOS = 'CRONOS',
+  CRONOS_TESTNET = 'CRONOS_TESTNET',
+  SUBSCAN = 'SUBSCAN',
+}
+
 export const enum FETCH_STATUS {
   NOT_ASKED = 'NOT_ASKED',
   LOADING = 'LOADING',
@@ -21,6 +30,10 @@ export const enum FETCH_STATUS {
   ERROR = 'ERROR',
 }
 export class SoliditySyntaxError extends Error {}
+
+export const hasFeature = (chain: Pick<ChainInfo, 'features'>, feature: FEATURES): boolean => {
+  return (chain.features as string[]).includes(feature)
+}
 
 export const parseBooleanValue = (value: any): boolean => {
   const isStringValue = typeof value === 'string'
