@@ -108,10 +108,57 @@ serve it at `/tx-builder` (as the existing deployment does), or override:
 PUBLIC_URL=/some/other/path yarn workspace tx-builder build:tron
 ```
 
+---
+
+## 2a. Running it locally
+
+```bash
+nvm use 18                                    # CI's pinned version
+yarn install --frozen-lockfile
+yarn workspace tx-builder start:tron          # reads .env.tron.shasta
+```
+
+Serves on **`http://localhost:3000/tx-builder`** — note the path. `homepage`
+is `/tx-builder`, so the dev server mounts `public/` there too: the manifest is
+at `/tx-builder/manifest.json`, and plain `http://localhost:3000/` returns the
+history-fallback HTML for every asset path. Verifying the wrong URL produces a
+confusing "manifest is not valid JSON: Unexpected token '<'".
+
+**Use `start:tron`, not `start`.** `start` is `dotenv -e .env -- …` and `.env`
+is gitignored and absent from a fresh clone. `dotenv-cli` does **not** error on
+a missing file — it silently leaves every variable unset, so the app boots and
+looks healthy while `getAbi.ts` builds `undefined/v1/chains/…` request URLs.
+That is the same failure mode as the misbuilt deployment in §1, just locally.
+Confirm with:
+
+```bash
+node scripts/verify_safe_app_deployment.mjs http://localhost:3000/tx-builder \
+  --allow-http --expect-gateway https://gateway-tron.stage.safe.protofire.io
+```
+
+The dev server already sends `Access-Control-Allow-Origin: *`
+(`config-overrides.js`, the `devServer` hook), so all seven checks pass locally.
+
+### Loading it into the real Safe UI
+
+The app is only meaningful inside the Safe iframe — standalone it has no SDK
+peer, so it will sit waiting for a handshake that never arrives. Safe{Wallet} is
+HTTPS and a browser will not frame `http://localhost`, so tunnel it:
+
+```bash
+cloudflared tunnel --url http://localhost:3000     # or: ngrok http 3000
+```
+
+Then add `https://<tunnel-host>/tx-builder` as a custom Safe App via
+**Apps → My custom apps** and follow the §6 walkthrough. Re-run the verifier
+against the tunnel URL first (without `--allow-http`) — tunnels sometimes inject
+their own headers.
+
 ### Unit tests
 
 ```bash
 yarn workspace tx-builder test --watchAll=false     # run on Node 18 (see below)
+yarn test:deploy-verifier                           # the verifier's own 57 tests
 ```
 
 **Use Node 18** — the version CI pins (`.github/workflows/lint.yml:12`). On Node
@@ -191,11 +238,24 @@ node scripts/verify_safe_app_deployment.mjs http://127.0.0.1:8765 \
   --expect-gateway https://gateway-tron.stage.safe.protofire.io --allow-http
 ```
 
-The verifier's own suite (54 tests, zero new dependencies, no network):
+The verifier's own suite (57 tests, zero new dependencies, no network):
 
 ```bash
 yarn test:deploy-verifier      # node --test scripts/verify_safe_app_deployment.test.mjs
 ```
+
+The `gateway` check works against both a production build (minified, bare key)
+and the dev server (unminified, quoted key), so it is usable at every stage.
+
+### Cypress e2e
+
+`cypress/e2e/tx-builder/tx-builder.spec.cy.js` exists but is **not usable as-is
+here**: it drives a full Safe{Wallet} web app (`CYPRESS_WEB_BASE_URL`,
+`CYPRESS_TESTING_SAFE_ADDRESS`, `CYPRESS_CHAIN_ID`, …) rather than the app alone,
+and it selects the lookup field by `/enter address or ens name/i` — a label this
+fork changed to `"Enter Address"` (`Dashboard.tsx:136`). Another stale test
+against a deliberate fork change. Adapting it for Tron is out of scope; the §6
+manual walkthrough is the acceptance test.
 
 ---
 

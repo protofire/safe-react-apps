@@ -213,9 +213,16 @@ export function resolveIconUrl(manifest, appUrl) {
  * `DEFAULT_BASE_URL="https://safe-client.safe.global"` constant that
  * @safe-global/safe-gateway-typescript-sdk ships is never mistaken for the
  * app's configured gateway.
+ *
+ * The key may or may not be quoted: the minified production bundle writes it
+ * bare (`REACT_APP_GATEWAY_BASE_URL:"…"`), the unminified dev-server bundle
+ * quotes it (`"REACT_APP_GATEWAY_BASE_URL":"…"`). The leading boundary stops a
+ * longer variable that merely ends with this name from matching.
  */
 export function extractBakedGatewayUrl(source) {
-  const match = source.match(/REACT_APP_GATEWAY_BASE_URL\s*:\s*(['"])(.*?)\1/)
+  const match = source.match(
+    /(?<![A-Za-z0-9_])["']?REACT_APP_GATEWAY_BASE_URL["']?\s*:\s*(['"])(.*?)\1/,
+  )
   return match ? match[2] : null
 }
 

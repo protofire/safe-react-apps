@@ -246,8 +246,28 @@ describe('extractBakedGatewayUrl', () => {
     assert.equal(extractBakedGatewayUrl(js), 'https://gw.example.com')
   })
 
+  test('handles the quoted-key form the CRA dev server emits', () => {
+    // The production minified bundle writes the key bare; the unminified dev
+    // bundle quotes it. Both must be recognised, so `--expect-gateway` works
+    // against `yarn start:tron` as well as a built artifact.
+    const js =
+      '{"REACT_APP_TENDERLY_ORG_NAME":"","REACT_APP_GATEWAY_BASE_URL":"https://gateway-tron.stage.safe.protofire.io","REACT_APP_SUBSCAN_API_KEY":""}'
+    assert.equal(extractBakedGatewayUrl(js), 'https://gateway-tron.stage.safe.protofire.io')
+  })
+
+  test("does not confuse a neighbouring variable's value for the gateway", () => {
+    const js =
+      '{"REACT_APP_OTHER_URL":"https://wrong.example.com","REACT_APP_GATEWAY_BASE_URL":"https://right.example.com"}'
+    assert.equal(extractBakedGatewayUrl(js), 'https://right.example.com')
+  })
+
   test('handles the direct process.env member-expression form', () => {
     const js = 'var x=process.env.REACT_APP_GATEWAY_BASE_URL'
+    assert.equal(extractBakedGatewayUrl(js), null)
+  })
+
+  test('does not match a variable that merely ends with the same suffix', () => {
+    const js = '{"MY_REACT_APP_GATEWAY_BASE_URL_OVERRIDE":"https://wrong.example.com"}'
     assert.equal(extractBakedGatewayUrl(js), null)
   })
 
