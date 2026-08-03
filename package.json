@@ -4,6 +4,8 @@
   "scripts": {
     "build": "yarn workspaces run build",
     "test": "yarn workspaces run test --watchAll=false",
+    "test:deploy-verifier": "node --test scripts/verify_safe_app_deployment.test.mjs",
+    "verify:safe-app": "node scripts/verify_safe_app_deployment.mjs",
     "test:coverage": "yarn workspaces run test --coverage --watchAll=false",
     "deploy:pr": "yarn workspaces run deploy:pr",
     "deploy:s3": "yarn workspaces run deploy:s3",
