@@ -160,7 +160,12 @@ export const parseInputValue = (fieldType: string, value: string): any => {
   const trimmedValue = typeof value === 'string' ? value.trim() : value
 
   if (isAddressFieldType(fieldType)) {
-    return toChecksumAddress(trimmedValue)
+    // Normalising the casing lets any correctly-shaped address encode, but
+    // `toChecksumAddress` throws on a malformed one. Pass those through
+    // untouched so the caller reports the problem (the ABI encoder's "invalid
+    // address", or the field validator's message) instead of surfacing
+    // web3-utils' exception.
+    return isValidAddress(trimmedValue) ? toChecksumAddress(trimmedValue) : trimmedValue
   }
 
   if (isBooleanFieldType(fieldType)) {

@@ -7,6 +7,7 @@ import {
   isBooleanFieldType,
   BASIC_UINT_FIELD_TYPE,
 } from '../fields/fields'
+import { isValidAddress } from '../../../utils'
 import basicSolidityValidation from './basicSolidityValidation'
 import validateAddressField from './validateAddressField'
 import validateAmountField from './validateAmountField'
@@ -19,6 +20,15 @@ export type ValidationFunction = (value: string, fieldType: string) => ValidateR
 const uintBasicValidation = (value: string): ValidateResult =>
   basicSolidityValidation(toWei(value), BASIC_UINT_FIELD_TYPE)
 
+// Address values are checksum-normalised before validation so that a
+// correctly-shaped address passes whatever its casing. `toChecksumAddress`
+// throws on anything that is not a 40-hex-char address, though, so guard it:
+// otherwise an invalid entry (a Tron base58 `T…` address, a half-typed one, an
+// empty field) aborts validation with an uncaught exception instead of
+// returning "Invalid address".
+const normalizeAddressValue = (value: string): string =>
+  isValidAddress(value) ? toChecksumAddress(value) : value
+
 const validateField = (
   fieldType: string,
   extraValidations: ValidationFunction[] = [],
@@ -30,7 +40,13 @@ const validateField = (
       ...extraValidations, // extra validations
     ].reduce<ValidateResult>(
       (error, validation) => {
-        return error || validation(isAddressFieldType(fieldType) ? toChecksumAddress(value) : value, fieldType)
+        return (
+          error ||
+          validation(
+            isAddressFieldType(fieldType) ? normalizeAddressValue(value) : value,
+            fieldType,
+          )
+        )
       },
       undefined, // initially no error is present
     )
