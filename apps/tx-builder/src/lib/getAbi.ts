@@ -2,6 +2,8 @@ import axios from 'axios'
 import { ChainInfo } from '@safe-global/safe-apps-sdk'
 import { ChainInfo as GatewayChainInfo } from '@safe-global/safe-gateway-typescript-sdk'
 import { hasFeature, FEATURES } from '../utils'
+import { hexToTronRawHex } from '../utils/tronAddress'
+import { tronAbiEntrysToAbi } from './tronAbi'
 
 enum PROVIDER {
   SOURCIFY = 1,
@@ -67,17 +69,63 @@ const replaceTemplate = (uri: string, data: Record<string, string>): string => {
   return uri.replace(TEMPLATE_REGEX, (_, key: string) => data[key])
 }
 
-const getABIFromScanAPI = async (address: string, chainId: string): Promise<any> => {
-  // Fetch chain info from Safe Gateway API
-  let chainInfo: GatewayChainInfo
+const getChainInfoFromGateway = async (chainId: string): Promise<GatewayChainInfo> => {
   try {
     const { data } = await axios.get(`${GATEWAY_BASE_URL}/v1/chains/${chainId}`, {
       timeout: DEFAULT_TIMEOUT,
     })
-    chainInfo = data
+    return data
   } catch (error) {
     throw new Error(`Failed to fetch chain info from Gateway API for chainId ${chainId}: ${error}`)
   }
+}
+
+// Tron keeps a contract's ABI on chain, so the node is an ABI source in its own
+// right -- it answers for unverified contracts too, which is what makes ABI
+// auto-lookup work on Tron at all: Sourcify has no Tron index, the gateway's
+// `/contracts` endpoint returns 503, and Tronscan's API matches none of the
+// explorer response shapes `getABIFromScanAPI` understands.
+//
+// `wallet/getcontract` lives on the node's REST API, which sits alongside the
+// JSON-RPC endpoint the chain config advertises.
+const getAbiFromTronNode = async (address: string, chainId: string): Promise<any> => {
+  const chainInfo = await getChainInfoFromGateway(chainId)
+
+  const isTronChain =
+    chainInfo?.nativeCurrency?.symbol === 'TRX' || !!chainInfo?.shortName?.startsWith('trx')
+  if (!isTronChain) {
+    throw new Error(`Chain ${chainId} is not a Tron chain`)
+  }
+
+  const jsonRpcUrl = chainInfo.safeAppsRpcUri?.value || chainInfo.rpcUri?.value
+  if (!jsonRpcUrl) {
+    throw new Error(`No RPC URI found in Gateway response for chainId ${chainId}`)
+  }
+
+  const rawHexAddress = hexToTronRawHex(address)
+  if (!rawHexAddress) {
+    throw new Error(`Not a Tron address: ${address}`)
+  }
+
+  const nodeUrl = jsonRpcUrl.replace(/\/jsonrpc\/?$/, '')
+  const { data } = await axios.post(
+    `${nodeUrl}/wallet/getcontract`,
+    { value: rawHexAddress },
+    { timeout: DEFAULT_TIMEOUT },
+  )
+
+  const entrys = data?.abi?.entrys
+  if (!entrys?.length) {
+    // Either the address is not a contract, or it was deployed without its ABI.
+    throw new Error('Contract found but it exposes no ABI on chain')
+  }
+
+  return tronAbiEntrysToAbi(entrys)
+}
+
+const getABIFromScanAPI = async (address: string, chainId: string): Promise<any> => {
+  // Fetch chain info from Safe Gateway API
+  const chainInfo = await getChainInfoFromGateway(chainId)
 
   // Extract explorer API URL template from chain info
   const explorerApiUrlTemplate = chainInfo?.blockExplorerUriTemplate?.api
@@ -159,6 +207,7 @@ const getAbi = async (address: string, chainInfo: ChainInfo): Promise<any> => {
       getAbiFromSourcify(address, chainInfo.chainId),
       getAbiFromGateway(address, chainInfo.chainId),
       getABIFromScanAPI(address, chainInfo.chainId),
+      getAbiFromTronNode(address, chainInfo.chainId),
     ])
   } catch {
     abi = null
