@@ -8,6 +8,7 @@ import detectProxyTarget from 'evm-proxy-detection'
 import { toChecksumAddress } from 'web3-utils'
 
 import { evalTemplate, FETCH_STATUS, isValidAddress } from '../utils'
+import { normalizeTronAddress, toDisplayAddress } from '../utils/tronAddress'
 import AddNewTransactionForm from '../components/forms/AddNewTransactionForm'
 import JsonField from '../components/forms/fields/JsonField'
 import { ContractInterface } from '../typings/models'
@@ -66,7 +67,12 @@ const Dashboard = (): ReactElement => {
   //    implementation address, otherwise we keep the original address.
   const handleAbiAddressInput = useCallback(
     async (_input: string) => {
-      const input = toChecksumAddress(_input)
+      // A Tron base58 (`T…`) address is converted to its hex form; anything that
+      // is not address-shaped hex is passed through as typed, because
+      // `toChecksumAddress` throws on it and this handler runs on every
+      // keystroke (see `isAbiAddressInputFieldValid` for the error it surfaces).
+      const hexInput = normalizeTronAddress(_input)
+      const input = isValidAddress(hexInput) ? toChecksumAddress(hexInput) : hexInput
       // For some reason the onchange handler is fired many times
       // Even if the value hasn't changed, we have to check if we already tried to fetch the ABI
       const alreadyExecuted = input.toLowerCase() === abiAddress.toLowerCase()
@@ -188,7 +194,12 @@ const Dashboard = (): ReactElement => {
         <ImplementationABIDialog
           networkPrefix={networkPrefix}
           blockExplorerLink={evalTemplate(chainInfo.blockExplorerUriTemplate.address, {
-            address: implementationABIDialog.implementationAddress,
+            // Tronscan resolves base58 only: it rejects both `0x…` and `41…`
+            // (verified 2026-08-04 against shastapi.tronscan.org/api/account).
+            address: toDisplayAddress(
+              implementationABIDialog.implementationAddress,
+              chainInfo.shortName,
+            ),
           })}
           implementationAddress={implementationABIDialog.implementationAddress}
           onCancel={() => {

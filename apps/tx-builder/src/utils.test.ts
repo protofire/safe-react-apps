@@ -175,6 +175,30 @@ describe('util functions', () => {
 
         expect(parsedValue).toBe('INVALID_ADDRESS')
       })
+
+      it('converts a Tron base58 address to its hex form', () => {
+        const parsedValue = parseInputValue('address', 'TSqF5pn9FxP77jfQCy46NoFa5HXdQaYiwZ')
+
+        expect(parsedValue).toBe('0xB8F88C79d2d655A0acAf5982A13028dDf7628EBe')
+      })
+
+      it('converts Tron base58 addresses inside an address array', () => {
+        const parsedValue = parseInputValue(
+          'address[]',
+          '[TSqF5pn9FxP77jfQCy46NoFa5HXdQaYiwZ,0x680cde08860141F9D223cE4E620B10Cd6741037E]',
+        )
+
+        expect(parsedValue).toEqual([
+          '0xB8F88C79d2d655A0acAf5982A13028dDf7628EBe',
+          '0x680cde08860141F9D223cE4E620B10Cd6741037E',
+        ])
+      })
+
+      it('leaves a mistyped Tron base58 address untouched', () => {
+        const parsedValue = parseInputValue('address', 'TSqF5pn9FxP77jfQCy46NoFa5HXdQaYiwY')
+
+        expect(parsedValue).toBe('TSqF5pn9FxP77jfQCy46NoFa5HXdQaYiwY')
+      })
     })
 
     describe('bytes values', () => {

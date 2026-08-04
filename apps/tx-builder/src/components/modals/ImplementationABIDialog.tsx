@@ -5,6 +5,7 @@ import Text from '../Text'
 import Button from '../Button'
 import EthHashInfo from '../ETHHashInfo'
 import GenericModal from '../GenericModal'
+import { isTronNetworkPrefix, toDisplayAddress } from '../../utils/tronAddress'
 
 type Props = {
   networkPrefix: string
@@ -31,10 +32,11 @@ const ImplementationABIDialog: React.FC<Props> = ({
 
           <StyledEthHashInfo
             shortName={networkPrefix || ''}
-            hash={implementationAddress}
+            hash={toDisplayAddress(implementationAddress, networkPrefix)}
+            avatarSeed={implementationAddress}
             explorerUrl={() => ({ url: blockExplorerLink, alt: blockExplorerLink })}
             showCopyBtn
-            shouldShowShortName
+            shouldShowShortName={!isTronNetworkPrefix(networkPrefix)}
             textSize="xl"
           />
           <StyledModalButtonsWrapper

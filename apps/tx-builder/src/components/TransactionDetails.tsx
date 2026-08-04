@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import useElementHeight from '../hooks/useElementHeight/useElementHeight'
 import { ProposedTransaction } from '../typings/models'
 import { weiToEther } from '../utils'
+import { isTronNetworkPrefix, toDisplayAddress, toDisplayAddressList } from '../utils/tronAddress'
 import EthHashInfo from './ETHHashInfo'
 import Text from './Text'
 import { Typography } from '@material-ui/core'
@@ -30,6 +31,11 @@ const TransactionDetails = ({ transaction }: TransactionDetailsProp) => {
 
   const isTokenTransferTx = !isCustomHexDataTx && !isContractInteractionTx
 
+  // Addresses are stored and submitted as hex, but shown in Tron's base58 form on
+  // Tron chains. Base58 addresses carry no EIP-3770 prefix, so drop it there.
+  const isTron = isTronNetworkPrefix(networkPrefix)
+  const displayedTo = toDisplayAddress(to, networkPrefix)
+
   return (
     <Wrapper>
       <StyledTxTitle>
@@ -40,10 +46,11 @@ const TransactionDetails = ({ transaction }: TransactionDetailsProp) => {
 
       <StyledEthHashInfo
         shortName={networkPrefix || ''}
-        hash={to}
+        hash={displayedTo}
+        avatarSeed={to}
         showAvatar
         showCopyBtn
-        shouldShowShortName
+        shouldShowShortName={!isTron}
       />
 
       <TxSummaryContainer>
@@ -51,10 +58,10 @@ const TransactionDetails = ({ transaction }: TransactionDetailsProp) => {
         <StyledText color="grey">to (address)</StyledText>
         <StyledEthHashInfo
           shortName={networkPrefix || ''}
-          hash={to}
+          hash={displayedTo}
           shortenHash={4}
           showCopyBtn
-          shouldShowShortName
+          shouldShowShortName={!isTron}
         />
 
         {/* value */}
@@ -76,6 +83,12 @@ const TransactionDetails = ({ transaction }: TransactionDetailsProp) => {
               const inputName = name || index
               const inputLabel = `${inputName} (${type})`
               const inputValue = contractFieldsValues?.[inputName]
+              // Covers `address`, `address[]`, `address[][]` and `address[N]`,
+              // whose values arrive here as the text the user typed.
+              const displayedInputValue =
+                type.startsWith('address') && inputValue
+                  ? toDisplayAddressList(inputValue, networkPrefix)
+                  : inputValue
               return (
                 <React.Fragment key={`${inputLabel}-${index}`}>
                   {/* input name */}
@@ -83,7 +96,7 @@ const TransactionDetails = ({ transaction }: TransactionDetailsProp) => {
                     {inputLabel}
                   </StyledMethodNameLabel>
                   {/* input value */}
-                  <TxValueLabel>{inputValue}</TxValueLabel>
+                  <TxValueLabel>{displayedInputValue}</TxValueLabel>
                 </React.Fragment>
               )
             })}

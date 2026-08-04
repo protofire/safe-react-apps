@@ -11,6 +11,7 @@ import {
   isValidAddress,
   isValidEnsName,
 } from '../../../utils/address'
+import { normalizeTronAddress } from '../../../utils/tronAddress'
 import TextFieldInput, { TextFieldInputProps } from './TextFieldInput'
 import useThrottle from '../../../hooks/useThrottle'
 
@@ -178,11 +179,16 @@ function LoaderSpinnerAdornment() {
 
 // we only checksum valid addresses
 function checksumValidAddress(address: string) {
-  if (isValidAddress(address) && !isChecksumAddress(address)) {
-    return checksumAddress(address)
+  // A pasted Tron base58 (`T…`) address is converted to its hex form here, at
+  // the field boundary: the rest of the app (encoder, transaction service,
+  // bridge) is hex-only, and the field then shows the address it will submit.
+  const hexAddress = normalizeTronAddress(address)
+
+  if (isValidAddress(hexAddress) && !isChecksumAddress(hexAddress)) {
+    return checksumAddress(hexAddress)
   }
 
-  return address
+  return hexAddress
 }
 
 // we try to add the network prefix if its not present

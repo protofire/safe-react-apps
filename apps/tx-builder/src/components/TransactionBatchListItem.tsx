@@ -6,6 +6,7 @@ import DragIndicatorIcon from '@material-ui/icons/DragIndicator'
 import { ProposedTransaction } from '../typings/models'
 import TransactionDetails from './TransactionDetails'
 import { getTransactionText } from '../utils'
+import { isTronNetworkPrefix, toDisplayAddress } from '../utils/tronAddress'
 import Text from './Text'
 import { Accordion, AccordionSummary } from './Accordion'
 import { Tooltip } from './Tooltip'
@@ -112,9 +113,9 @@ const TransactionBatchListItem = memo(
               {/* Destination Address label */}
               <StyledEthHashInfo
                 shortName={networkPrefix || ''}
-                hash={to}
+                hash={toDisplayAddress(to, networkPrefix)}
                 shortenHash={4}
-                shouldShowShortName
+                shouldShowShortName={!isTronNetworkPrefix(networkPrefix)}
               />
 
               {/* Transaction Description label */}

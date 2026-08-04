@@ -43,7 +43,14 @@ const StyledImg = styled.img<{ size: keyof typeof identiconSizes }>`
 
 type Props = {
   className?: string
+  /** What is shown and copied. On Tron this is the base58 form of `avatarSeed`. */
   hash: string
+  /**
+   * Identicon seed, when it must differ from `hash`. Addresses are displayed in
+   * base58 on Tron but stored as hex, and seeding the blockie with the hex form
+   * keeps one address looking the same here and in the rest of Safe{Wallet}.
+   */
+  avatarSeed?: string
   showHash?: boolean
   shortenHash?: number
   name?: string
@@ -80,6 +87,7 @@ type EthHashInfoProps = Props & ShortNameProps
 
 const EthHashInfo = ({
   hash,
+  avatarSeed,
   showHash = true,
   name,
   className,
@@ -117,7 +125,7 @@ const EthHashInfo = ({
               onError={setAppImageFallback}
             />
           ) : (
-            <Identicon address={hash} size={avatarSize} />
+            <Identicon address={avatarSeed || hash} size={avatarSize} />
           )}
         </AvatarContainer>
       )}

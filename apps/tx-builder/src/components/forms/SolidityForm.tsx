@@ -11,6 +11,7 @@ import {
 } from './fields/fields'
 import Field from './fields/Field'
 import { encodeToHexData, getInputTypeHelper } from '../../utils'
+import { normalizeTronAddress } from '../../utils/tronAddress'
 import { ContractInterface, ProposedTransaction } from '../../typings/models'
 
 export const TO_ADDRESS_FIELD_NAME = 'toAddress'
@@ -61,7 +62,9 @@ export const parseFormToProposedTransaction = (
   const contractMethod = contract?.methods[Number(contractMethodIndex)]
 
   const data = customTransactionData || encodeToHexData(contractMethod, methodValues) || '0x'
-  const to = toChecksumAddress(toAddress)
+  // `toAddress` is already hex when it comes from the address field, but a batch
+  // imported from a file may carry a Tron base58 address.
+  const to = toChecksumAddress(normalizeTronAddress(toAddress))
   const value = toWei(tokenValue || '0')
 
   return {

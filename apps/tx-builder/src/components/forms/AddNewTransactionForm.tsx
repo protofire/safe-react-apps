@@ -3,6 +3,7 @@ import { toChecksumAddress } from 'web3-utils'
 
 import { ContractInterface } from '../../typings/models'
 import { isValidAddress } from '../../utils'
+import { normalizeTronAddress } from '../../utils/tronAddress'
 import SolidityForm, {
   CONTRACT_METHOD_INDEX_FIELD_NAME,
   SolidityFormValuesTypes,
@@ -25,8 +26,9 @@ const AddNewTransactionForm = ({
   to,
   showHexEncodedData,
 }: AddNewTransactionFormProps) => {
+  const hexTo = normalizeTronAddress(to)
   const initialFormValues = {
-    [TO_ADDRESS_FIELD_NAME]: isValidAddress(to) ? toChecksumAddress(to) : '',
+    [TO_ADDRESS_FIELD_NAME]: isValidAddress(hexTo) ? toChecksumAddress(hexTo) : '',
     [CONTRACT_METHOD_INDEX_FIELD_NAME]: '0',
   }
 
