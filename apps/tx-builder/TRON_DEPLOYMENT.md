@@ -512,6 +512,14 @@ source are unaffected. Applied to:
 - `AddressInput.tsx` — **every address field**, via `toInputValue`: the field
   renders the base58 form of the hex it holds. See below; this is the one place
   where display and state genuinely diverge.
+- `AddressContractField.tsx` — **and it is not enough to fix `AddressInput`.**
+  This wrapper (used for "To Address" and for `address` method arguments, via
+  `Field.tsx`) passes `inputProps={{ value }}`, which makes that input
+  *controlled*: React re-asserts the raw form state on every render and overrides
+  the base58 value `AddressInput` writes into its ref. That is why "To Address"
+  kept showing `0x958ACEc5…` while the uncontrolled lookup box above it already
+  showed `TPbuyAoBUEzGQbn…` — the same address, rendered two ways. The wrapper now
+  converts the controlled value too, and still adds no network prefix.
 - `TransactionDetails.tsx` — the "Interact with:" heading, the `to (address)` row
   and **address-typed method arguments** (`address`, `address[]`, `address[][]`,
   `address[N]` — the list variant rewrites each address inside the value).
