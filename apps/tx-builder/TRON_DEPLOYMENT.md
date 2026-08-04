@@ -27,7 +27,7 @@ research rounds and this one.
 |---|---|
 | `GET /v1/chains` | `count: 1` — Tron Shasta Testnet only. Mainnet still absent. |
 | `GET /v1/chains/2494104990/safe-apps` | **1 app registered** (was `[]` in Rounds 1–2) |
-| `GET /v1/chains/2494104990/contracts/0x00…00` | **503** — unchanged; ABI auto-lookup via the gateway is still blocked (Gap 5) |
+| `GET /v1/chains/2494104990/contracts/0x00…00` | **503** — unchanged; the *gateway's* ABI lookup is still blocked (Gap 5). No longer blocks the feature: ABI auto-lookup now goes through the Tron node (§7c) |
 | `GET gateway-registry.safe.protofire.io/v1/chains/2494104990` | **404** — that gateway serves 136 chains, none of them Tron |
 
 ### A Transaction Builder is already registered — and it is misbuilt
@@ -53,16 +53,18 @@ The served bundle (`/tx-builder/static/js/main.8030a8ce.js`, `last-modified:
 `REACT_APP_GATEWAY_BASE_URL:"https://gateway-registry.safe.protofire.io"`.
 That host **404s for chain `2494104990`**, so in that deployment:
 
-- `getAbiFromGateway` (`src/lib/getAbi.ts:49`) → 404, always;
-- `getABIFromScanAPI` (`:70`) → its chain-info fetch (`:74`) 404s before it can
-  even read `blockExplorerUriTemplate`, always;
-- `getAbiFromSourcify` (`:33`) → no Tron index, always.
+- `getAbiFromGateway` → 404, always;
+- `getABIFromScanAPI` → its chain-info fetch 404s before it can even read
+  `blockExplorerUriTemplate`, always;
+- `getAbiFromSourcify` → no Tron index, always;
+- `getAbiFromTronNode` (§7c) → absent from that bundle, and would 404 on the same
+  chain-info fetch anyway.
 
-**Consequence:** ABI auto-lookup in the currently-registered app cannot work,
-and **fixing Gap 5 will not fix it** — the requests never reach the Tron
-gateway. That app needs a rebuild against the correct gateway; §2–§5 produce it.
-Batch composition and submission in that app are unaffected (they never touch
-the gateway), so it is degraded, not broken.
+**Consequence:** ABI auto-lookup in the currently-registered app cannot work, and
+neither fixing Gap 5 nor the Tron-node path fixes it — the requests never reach
+the Tron gateway. That app needs a rebuild against the correct gateway; §2–§5
+produce it. Batch composition and submission in that app are unaffected (they
+never touch the gateway), so it is degraded, not broken.
 
 > Note the `manifest-cors` result above is a genuine PASS. The bucket serves
 > `Access-Control-Allow-Origin: *` but only to requests that carry an `Origin`
@@ -292,20 +294,26 @@ owner, TronLink on Shasta with TRX, and a deployed contract plus its ABI —
 for this and covers the whole matrix (`increment()`, `setValue(uint256)`,
 `setValueAndLabel(uint256,string)`, `deposit()` payable).
 
-### Read this before you start: "To Address" needs the hex address, pasted directly
+### Read this before you start: base58 in, hex on the wire, base58 back on screen
 
-The top **"Enter Address"** box is a *contract-lookup* field for ABI search. It
-is **decoupled** from the transaction's **"To Address"** field. Typing a Tron
-base58 (`T…`) address into the lookup box does **not** populate or convert
-"To Address" — that field simply stays empty and marked *"Required"*, with **no
-toast and no inline error text**.
+Every address field accepts a Tron base58 (`T…`) address and **rewrites it to the
+equivalent `0x…` hex form in place** — see §7b. The bridge, the transaction
+service, the gateway and the ABI encoder are all hex-only, so the conversion
+happens at the field boundary and the field then shows exactly the address that
+will be submitted. Seeing your `T…` paste turn into `0x…` in an *input* is the
+feature working.
 
-That is the hex-only design of this deployment's bridge working as intended, not
-a broken field. Confirmed hands-on 2026-08-03; it cost real diagnosis time.
+Everywhere an address is **displayed** rather than edited — batch list,
+transaction details, method arguments, explorer links — it is shown back in
+base58, without an EIP-3770 prefix (§7b-2).
 
-**Always paste the contract's `0x…` hex address directly into "To Address",**
-independent of whatever is in the lookup box above it. Convert base58 → hex with
-`'0x' + TronWeb.address.toHex(base58).slice(2)` (drop the `41` prefix).
+An incomplete or mistyped base58 address (base58check catches single-character
+typos) is left as typed and reported as *"Invalid address"*.
+
+The top **"Enter Address"** box is still a *contract-lookup* field for ABI
+search, **decoupled** from the transaction's **"To Address"** field: filling it
+does not populate "To Address" (which stays empty and marked *"Required"*). That
+is upstream behaviour, not a Tron issue — fill both.
 
 ### Steps
 
@@ -316,20 +324,27 @@ independent of whatever is in the lookup box above it. Convert base58 → hex wi
 2. **Handshake.** Open the app. It should render the dashboard and show the
    Safe's address/network — that confirms `getSafeInfo` + `getChainInfo` over the
    bridge.
-3. **Base58 rejection, lookup box (user story 9).** Paste a `T…` address into
-   **"Enter Address"**. **Pass condition:** the app does not crash, and "To
-   Address" stays empty and marked *"Required"* with no explicit error text.
-   This is expected behavior — do not file it as a bug.
-3b. **Base58 rejection, argument field (user story 9, the other half).** Select
-   a method with an `address` parameter — `withdraw(address,uint256)` on the
+3. **Base58 input, lookup box (user story 9).** Paste the contract's `T…`
+   address into **"Enter Address"**. **Pass condition:** the field rewrites it to
+   the checksummed `0x…` form, and its ABI is fetched automatically (see step 10)
+   — no manual paste needed.
+3b. **Base58 input, argument field (user story 9, the other half).** Select a
+   method with an `address` parameter — `withdraw(address,uint256)` on the
    testbed contract — and type a `T…` address into that parameter field.
-   **Pass condition:** an **"Invalid address"** message appears under the field
-   and the form stays usable. Before the fix in §7a this threw an uncaught
-   exception; if you see a blank or frozen form here, the deployed bundle
-   predates that fix.
-4. **Single call.** Paste the contract's **hex** address into "To Address",
-   paste the ABI into the manual-ABI field, select `increment()`, review the
-   encoded calldata, add to batch.
+   **Pass condition:** it converts to `0x…` and the encoded calldata carries
+   those 20 bytes. Then change its last character: **"Invalid address"** appears
+   and the form stays usable. Before the fixes in §7a/§7b this field threw an
+   uncaught exception; a blank or frozen form here means the deployed bundle
+   predates them.
+4. **Single call.** Put the contract's address (base58 or hex) into "To Address",
+   select `increment()`, review the encoded calldata, add to batch. The ABI
+   should already be populated from step 3; if you are testing the manual path,
+   clear it and paste the ABI JSON instead.
+4b. **Base58 display (§7b-2).** Expand the batch entry you just added.
+   **Pass condition:** the destination and any `address` argument are shown in
+   base58 with no `trx-shasta:` prefix, `data:` is still raw hex, and the copy
+   button yields a `T…` address. On a proxy contract, the implementation dialog's
+   explorer button must open a Tronscan page that actually resolves.
 5. **Batch (≥ 2 calls).** Add `setValue(uint256)` with some value. Reorder the
    two entries, delete one, re-add it — confirms user story 6.
 6. **Payable call.** Add `deposit()` with a TRX value. `value` is decimal SUN,
@@ -342,9 +357,12 @@ independent of whatever is in the lookup box above it. Convert base58 → hex wi
    change on Tronscan.
 9. **Batch library.** Save the batch, reload the app, re-load the saved batch
    (user story 10).
-10. **ABI auto-lookup.** Enter a contract address with *no* manual ABI. Expected
-    today: no ABI is found (gateway `/contracts` → 503) and the manual-paste
-    field remains usable. Re-test after Gap 5 is fixed.
+10. **ABI auto-lookup.** Enter a contract address with *no* manual ABI.
+    **Pass condition:** the ABI appears in the "Enter ABI" field within a couple
+    of seconds and the method selector fills up — it comes from the Tron node's
+    on-chain ABI (§7), not from the gateway or an explorer, so it works for
+    unverified contracts too. A contract deployed without an on-chain ABI shows
+    *"No ABI found for this address"* and the manual-paste field stays usable.
 
 Record the outcome of each step with the date and the app URL tested. This
 walkthrough doubles as the reference proof that the deployment's whole Safe Apps
@@ -354,18 +372,18 @@ stack works end to end.
 
 ## 7. ABI resolution: what works, what lights up later
 
-`getAbi()` (`src/lib/getAbi.ts:155-167`) races three providers via
-`Promise.any`. On this deployment:
+`getAbi()` races its providers via `Promise.any`. On this deployment:
 
 | Provider | Status | Notes |
 |---|---|---|
-| Sourcify (`:33`) | **Never works** | `https://sourcify.dev/server/files/{chain}/{address}` — no Tron index. Harmless no-op failure. |
-| Gateway `/contracts` (`:49`) | **Blocked, fixes itself** | The strategic path. Returns 503 today (Gap 5, a separate backend issue). Once fixed, it works with **no code change** — provided the bundle was built against the Tron gateway (§1). |
-| Explorer scan API (`:70`) | **Deferred** | Expects an Etherscan-V2-, Blockscout- or Subscan-shaped response. Tronscan's contract API matches none of them, so this needs a new adapter branch. Out of scope. |
+| **Tron node `wallet/getcontract`** | **Works — this is the Tron path** | Added on this branch (§7c). Tron stores each contract's ABI *on chain*, so the node answers for **unverified** contracts too. Endpoint derived from the chain config's own `safeAppsRpcUri` (`https://api.shasta.trongrid.io/jsonrpc` → `…/wallet/getcontract`), CORS `*`, ~1.5 s round trip including the chain-info fetch. |
+| Sourcify | **Never works** | `https://sourcify.dev/server/files/{chain}/{address}` — no Tron index. Harmless no-op failure. |
+| Gateway `/contracts` | **Blocked (Gap 5)** | Returns 503 today; `422` for a base58 address, i.e. it wants hex. No longer on the critical path — if it starts working it just wins the race sometimes. |
+| Explorer scan API | **Cannot work on Tron** | Expects an Etherscan-V2-, Blockscout- or Subscan-shaped response; Tronscan's contract API matches none of them. Worse, the API host the chain config advertises (`https://shasta.tronscan.org/api`) is Cloudflare-gated — the reachable host is `https://shastapi.tronscan.org/api`. Its only advantage over the node path is verified *source*, which this app does not use. Out of scope. |
 
-**Manual ABI paste is the supported operator flow at launch** and works today:
-`useAbi` exposes `setAbi` straight to the form, and `abiStatus` resolves to
-`SUCCESS` even when lookup returns nothing, so the paste field stays usable.
+**Manual ABI paste still works and remains the fallback:** `useAbi` exposes
+`setAbi` straight to the form, and `abiStatus` resolves to `SUCCESS` even when
+lookup returns nothing, so the paste field stays usable.
 
 **No simulation.** `isSimulationSupported()`
 (`src/lib/simulation/simulation.ts:18-21`) is hardcoded `return false` — the real
@@ -378,7 +396,7 @@ do not attempt a Tron substitute.
 
 ## 7a. Source fix: address fields must not throw on a base58 address
 
-This is the **only application-logic change** on this branch, and it was not
+The first of three application-logic changes on this branch, none of them
 anticipated by the PRD. Two sites called `web3-utils`' `toChecksumAddress`
 unconditionally on address input:
 
@@ -413,11 +431,137 @@ specified and which 16 tests were failing on:
 Checksum leniency — the reason the fork added the call — is preserved: lowercase,
 mixed-case and correctly-checksummed addresses all still validate and encode.
 
-Covered by `src/components/forms/validations/validateField.test.ts` (11 tests),
-including the base58 cases for `address`, `address[]` and `address[][]`.
+Covered by `src/components/forms/validations/validateField.test.ts`, including the
+base58 cases for `address`, `address[]` and `address[][]`.
 
-**This is not base58 support** and does not move that into scope. A `T…` address
-is still rejected; it is now rejected with a message instead of an exception.
+This fix only stopped the crash — a `T…` address was still *rejected*. §7b makes
+it work.
+
+---
+
+## 7b. Source change: Tron base58 addresses are accepted and converted
+
+Rejecting `T…` addresses was never going to hold: base58 is the only address form
+Tronscan, TronLink and every Tron doc shows, so operators paste it, and telling
+them to hand-convert with TronWeb was the wrong bar for a Safe App.
+
+A base58 address is the *same address* as its hex form. base58check decodes to 21
+bytes — a `0x41` network prefix plus the 20 bytes the hex form shows — and the
+trailing 4 bytes are a double-SHA-256 checksum, which is what makes a
+single-character typo detectable.
+
+**Implementation** — one conversion, applied at every boundary where a
+user-supplied address enters the app:
+
+- `src/utils/tronAddress.ts` — base58check codec.
+  `normalizeTronAddress(value)` converts a complete, checksum-valid `T…` address
+  to `0x…` and returns anything else untouched, so each call site keeps reporting
+  its own errors for junk and half-typed input. Also exports `hexToTronBase58`
+  (display, Tron-native APIs) and `hexToTronRawHex` (the `41…` form).
+- `src/utils/sha256.ts` — SHA-256 (FIPS 180-4). No runtime dependency of this app
+  provides it (`web3-utils` is keccak-only), and the checksum needs it; 100 lines
+  beat a new bundle dependency. Verified against the NIST vectors.
+
+Call sites: the address field itself
+(`AddressInput.tsx` → `checksumValidAddress`, which covers **all** address inputs
+including "To Address" and method arguments), `parseInputValue`
+(`utils.ts`, covers `address`, `address[]`, `address[][]`), `validateField.ts`,
+`SolidityForm.tsx` (`parseFormToProposedTransaction`, for batches imported from a
+file), `AddNewTransactionForm.tsx` and `Dashboard.tsx`'s lookup box — which was
+the *last* unguarded `toChecksumAddress` call, and therefore still crashed on a
+pasted `T…` address after §7a.
+
+**Conversion happens on input, not on submit.** The field rewrites `T…` to `0x…`
+as you paste, so what you see is what gets submitted, and one representation
+flows through encoding, review, the batch file and the transaction service.
+No `T…` string reaches anything downstream.
+
+Covered by `src/utils/tronAddress.test.ts`, `src/utils/sha256.test.ts` and the
+base58 cases in `validateField.test.ts` / `utils.test.ts` — including the typo
+case (last character changed → `"Invalid address"`, *not* a silently wrong
+address).
+
+---
+
+## 7b-2. Presentation: hex is canonical, base58 is what a human sees
+
+The gateway settles the question of which form is canonical — it is hex, all the
+way down. `GET /v1/chains/2494104990/safes/0xD72c8d27d0F45173d3178E35B2d496F56a407fF7`
+returns hex for the Safe, every owner, the implementation and the fallback
+handler. So the app **stores, encodes and submits hex**, and treats base58 purely
+as a rendering.
+
+Tronscan, however, resolves base58 **only** — verified 2026-08-04 against
+`shastapi.tronscan.org/api/account`:
+
+| Address form | Result |
+|---|---|
+| `TSqF5pn9FxP77jfQCy46NoFa5HXdQaYiwZ` | 200, account data |
+| `41b8f88c79…` (raw Tron hex) | `some parameters are invalid or out of range` |
+| `0xb8f88c79…` | `some parameters are invalid or out of range` |
+
+That made every explorer link built from `blockExplorerUriTemplate.address` a
+dead link on Tron.
+
+**What changed** — `toDisplayAddress(address, networkPrefix)` /
+`toDisplayAddressList` in `src/utils/tronAddress.ts` convert hex to base58 when
+the chain's short name is Tron's (`isTronNetworkPrefix`: `trx`, `trx-*`), and
+return the address untouched on every other chain, so non-Tron builds of this
+source are unaffected. Applied to:
+
+- `TransactionDetails.tsx` — the "Interact with:" heading, the `to (address)` row
+  and **address-typed method arguments** (`address`, `address[]`, `address[][]`,
+  `address[N]` — the list variant rewrites each address inside the value).
+  The `data:` row stays raw calldata hex.
+- `TransactionBatchListItem.tsx` — the destination label in the batch list.
+- `ImplementationABIDialog.tsx` and the Tronscan link `Dashboard.tsx` builds
+  for it.
+
+Two details worth knowing:
+
+- **No EIP-3770 prefix on Tron.** A base58 address is not a `shortName:0x…`
+  address, so `shouldShowShortName` is off on Tron chains — you see
+  `TSqF5pn9…`, not `trx-shasta:TSqF5pn9…`. The copy button copies the base58
+  form, which is what Tronscan and TronLink accept.
+- **Identicons stay seeded by hex.** `EthHashInfo` gained an `avatarSeed` prop:
+  the blockie is generated from the canonical hex address so one address looks
+  the same here as everywhere else in Safe{Wallet}.
+
+**Input fields are deliberately not part of this.** They keep converting a pasted
+`T…` address to hex on input (§7b) so that what the field shows is what gets
+submitted. The display layer is one-way: hex in state, base58 on screen.
+
+Covered by `src/components/TransactionDetails.test.tsx` (base58 rendering, no
+prefix, hex calldata untouched, and the non-Tron chain left alone) plus the
+helper tests in `src/utils/tronAddress.test.ts`.
+
+---
+
+## 7c. Source change: ABI auto-lookup via the Tron node
+
+Tron stores a contract's ABI on chain, so the node itself is an ABI source and
+verification is irrelevant. `POST {node}/wallet/getcontract` with
+`{"value": "41<40 hex>"}` returns `abi.entrys` for any contract deployed with its
+ABI — including unverified ones, which is the whole ballgame on a testnet.
+
+- `src/lib/getAbi.ts` — `getAbiFromTronNode` joins the `Promise.any` race. It
+  reads the chain config from the gateway (the same fetch the scan-API path
+  already did, now shared as `getChainInfoFromGateway`), bails unless the chain is
+  Tron (`nativeCurrency.symbol === 'TRX'` or `shortName` starts with `trx`), and
+  derives the REST host by stripping `/jsonrpc` from the advertised
+  `safeAppsRpcUri`. No new environment variable: the gateway already publishes
+  the endpoint.
+- `src/lib/tronAbi.ts` — `tronAbiEntrysToAbi` converts Tron's ABI shape to
+  standard ABI JSON. Three differences matter: `type`/`stateMutability` are
+  capitalised (`"Function"`, `"Nonpayable"`) and `interfaceRepository.getMethods`
+  compares them lowercase — without this, **`view` methods would be listed as
+  writable**; empty `inputs`/`outputs` are omitted where array values are
+  expected; and the legacy `payable`/`constant` flags are absent.
+
+Verified end to end against Shasta on 2026-08-03: `getAbi()` resolved the testbed
+contract `TSqF5pn9FxP77jfQCy46NoFa5HXdQaYiwZ` in ~1.5 s, and
+`tronAbi.test.ts` asserts the app's own `getMethods` reads the converted ABI back
+as the expected writable methods (`deposit` payable, `increment`, `withdraw`).
 
 ---
 
