@@ -11,7 +11,11 @@ import {
   isValidAddress,
   isValidEnsName,
 } from '../../../utils/address'
-import { normalizeTronAddress } from '../../../utils/tronAddress'
+import {
+  isTronNetworkPrefix,
+  normalizeTronAddress,
+  toDisplayAddress,
+} from '../../../utils/tronAddress'
 import TextFieldInput, { TextFieldInputProps } from './TextFieldInput'
 import useThrottle from '../../../hooks/useThrottle'
 
@@ -44,16 +48,15 @@ function AddressInput({
   ...rest
 }: AddressInputProps): ReactElement {
   const [isLoadingENSResolution, setIsLoadingENSResolution] = useState(false)
-  const defaultInputValue = addPrefix(address, networkPrefix, showNetworkPrefix)
+  const isTron = isTronNetworkPrefix(networkPrefix)
+  const defaultInputValue = toInputValue(address, networkPrefix, showNetworkPrefix)
   const inputRef = useRef({ value: defaultInputValue })
   const throttle = useThrottle()
 
-  // we checksum & include the network prefix in the input if showNetworkPrefix is set to true
   const updateInputValue = useCallback(
     (value = '') => {
       if (inputRef.current) {
-        const checksumAddress = checksumValidAddress(value)
-        inputRef.current.value = addPrefix(checksumAddress, networkPrefix, showNetworkPrefix)
+        inputRef.current.value = toInputValue(value, networkPrefix, showNetworkPrefix)
       }
     },
     [networkPrefix, showNetworkPrefix],
@@ -92,15 +95,22 @@ function AddressInput({
     const inputPrefix = getNetworkPrefix(inputValue)
     const addressPrefix = getNetworkPrefix(address)
 
-    const isNewAddressLoaded = inputWithoutPrefix !== addressWithoutPrefix
-    const isNewPrefixLoaded = addressPrefix && inputPrefix !== addressPrefix
+    // On Tron the field shows base58 while the state holds hex, so the two are
+    // *expected* to differ. Compare the field against what it should be showing
+    // for the current state instead, otherwise every render looks like a new
+    // address and rewrites the field mid-typing.
+    const isNewAddressLoaded = isTron
+      ? inputValue !== toInputValue(address, networkPrefix, showNetworkPrefix)
+      : inputWithoutPrefix !== addressWithoutPrefix
+    // Base58 addresses carry no EIP-3770 prefix, so there is none to reconcile.
+    const isNewPrefixLoaded = !isTron && addressPrefix && inputPrefix !== addressPrefix
 
     // we check if we load a new address (both prefixed and unprefixed cases)
     if (isNewAddressLoaded || isNewPrefixLoaded) {
       // we update the input value
       updateInputValue(address)
     }
-  }, [address, updateInputValue])
+  }, [address, isTron, networkPrefix, showNetworkPrefix, updateInputValue])
 
   // we trim, checksum & remove valid network prefix when a valid address is typed by the user
   const updateAddressState = useCallback(
@@ -124,10 +134,18 @@ function AddressInput({
     // Because the `address` is going to change after we call `updateAddressState`
     // To avoid calling `updateAddressState` twice, we check the value and the current address
     const inputValue = inputRef.current?.value
-    if (inputValue !== address) {
+
+    // A Tron field showing base58 for the address already in state is not a
+    // change: resolving it would push the same hex back and mark the field dirty.
+    const isShowingCurrentAddress =
+      isTron &&
+      normalizeTronAddress(getAddressWithoutNetworkPrefix(inputValue)).toLowerCase() ===
+        getAddressWithoutNetworkPrefix(address).toLowerCase()
+
+    if (inputValue !== address && !isShowingCurrentAddress) {
       updateAddressState(inputRef.current?.value)
     }
-  }, [networkPrefix, address, updateAddressState])
+  }, [networkPrefix, address, isTron, updateAddressState])
 
   // when user types we update the address state
   function onChange(e: ChangeEvent<HTMLInputElement>) {
@@ -179,9 +197,9 @@ function LoaderSpinnerAdornment() {
 
 // we only checksum valid addresses
 function checksumValidAddress(address: string) {
-  // A pasted Tron base58 (`T…`) address is converted to its hex form here, at
-  // the field boundary: the rest of the app (encoder, transaction service,
-  // bridge) is hex-only, and the field then shows the address it will submit.
+  // A pasted Tron base58 (`T…`) address becomes hex here, at the field boundary:
+  // the rest of the app (encoder, transaction service, gateway, bridge) is
+  // hex-only, so hex is what the form state and every consumer see.
   const hexAddress = normalizeTronAddress(address)
 
   if (isValidAddress(hexAddress) && !isChecksumAddress(hexAddress)) {
@@ -189,6 +207,22 @@ function checksumValidAddress(address: string) {
   }
 
   return hexAddress
+}
+
+// What the field shows for a given address state. On Tron that is the base58
+// form -- the only one Tronscan and TronLink use -- and base58 addresses carry
+// no EIP-3770 prefix, so none is added. Every other chain is untouched:
+// checksummed hex, optionally prefixed.
+function toInputValue(
+  address: string,
+  networkPrefix: string | undefined,
+  showNetworkPrefix: boolean,
+): string {
+  const normalizedAddress = checksumValidAddress(address)
+
+  return isTronNetworkPrefix(networkPrefix)
+    ? toDisplayAddress(normalizedAddress, networkPrefix)
+    : addPrefix(normalizedAddress, networkPrefix, showNetworkPrefix)
 }
 
 // we try to add the network prefix if its not present

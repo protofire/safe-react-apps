@@ -294,18 +294,17 @@ owner, TronLink on Shasta with TRX, and a deployed contract plus its ABI —
 for this and covers the whole matrix (`increment()`, `setValue(uint256)`,
 `setValueAndLabel(uint256,string)`, `deposit()` payable).
 
-### Read this before you start: base58 in, hex on the wire, base58 back on screen
+### Read this before you start: base58 on screen, hex on the wire
 
-Every address field accepts a Tron base58 (`T…`) address and **rewrites it to the
-equivalent `0x…` hex form in place** — see §7b. The bridge, the transaction
-service, the gateway and the ABI encoder are all hex-only, so the conversion
-happens at the field boundary and the field then shows exactly the address that
-will be submitted. Seeing your `T…` paste turn into `0x…` in an *input* is the
-feature working.
+On Tron the app shows addresses in base58 (`T…`) **everywhere a human sees one** —
+the "Enter Address" and "To Address" fields, `address` method arguments, the batch
+list, transaction details and explorer links — with no `trx-shasta:` prefix,
+because a base58 address is not an EIP-3770 address.
 
-Everywhere an address is **displayed** rather than edited — batch list,
-transaction details, method arguments, explorer links — it is shown back in
-base58, without an EIP-3770 prefix (§7b-2).
+Underneath, every address is stored and submitted as `0x…` hex, because the
+bridge, the transaction service, the gateway and the ABI encoder are hex-only
+(§7b, §7b-2). Paste either form into any field: hex is converted to base58 for
+display, base58 is converted to hex for use.
 
 An incomplete or mistyped base58 address (base58check catches single-character
 typos) is left as typed and reported as *"Invalid address"*.
@@ -325,15 +324,16 @@ is upstream behaviour, not a Tron issue — fill both.
    Safe's address/network — that confirms `getSafeInfo` + `getChainInfo` over the
    bridge.
 3. **Base58 input, lookup box (user story 9).** Paste the contract's `T…`
-   address into **"Enter Address"**. **Pass condition:** the field rewrites it to
-   the checksummed `0x…` form, and its ABI is fetched automatically (see step 10)
-   — no manual paste needed.
+   address into **"Enter Address"**. **Pass condition:** the field keeps showing
+   the `T…` address, with no `trx-shasta:` prefix and no flip to `0x…`, and its
+   ABI is fetched automatically (see step 10) — no manual paste needed. Paste the
+   `0x…` form instead and the field should display the `T…` equivalent.
 3b. **Base58 input, argument field (user story 9, the other half).** Select a
    method with an `address` parameter — `withdraw(address,uint256)` on the
    testbed contract — and type a `T…` address into that parameter field.
-   **Pass condition:** it converts to `0x…` and the encoded calldata carries
-   those 20 bytes. Then change its last character: **"Invalid address"** appears
-   and the form stays usable. Before the fixes in §7a/§7b this field threw an
+   **Pass condition:** it stays as typed and the encoded calldata carries those
+   20 bytes. Then change its last character: **"Invalid address"** appears and
+   the form stays usable. Before the fixes in §7a/§7b this field threw an
    uncaught exception; a blank or frozen form here means the deployed bundle
    predates them.
 4. **Single call.** Put the contract's address (base58 or hex) into "To Address",
@@ -509,6 +509,9 @@ the chain's short name is Tron's (`isTronNetworkPrefix`: `trx`, `trx-*`), and
 return the address untouched on every other chain, so non-Tron builds of this
 source are unaffected. Applied to:
 
+- `AddressInput.tsx` — **every address field**, via `toInputValue`: the field
+  renders the base58 form of the hex it holds. See below; this is the one place
+  where display and state genuinely diverge.
 - `TransactionDetails.tsx` — the "Interact with:" heading, the `to (address)` row
   and **address-typed method arguments** (`address`, `address[]`, `address[][]`,
   `address[N]` — the list variant rewrites each address inside the value).
@@ -527,13 +530,40 @@ Two details worth knowing:
   the blockie is generated from the canonical hex address so one address looks
   the same here as everywhere else in Safe{Wallet}.
 
-**Input fields are deliberately not part of this.** They keep converting a pasted
-`T…` address to hex on input (§7b) so that what the field shows is what gets
-submitted. The display layer is one-way: hex in state, base58 on screen.
+### Input fields: hex in state, base58 in the box
 
-Covered by `src/components/TransactionDetails.test.tsx` (base58 rendering, no
-prefix, hex calldata untouched, and the non-Tron chain left alone) plus the
-helper tests in `src/utils/tronAddress.test.ts`.
+Input fields were initially left showing hex, on the reasoning that a field should
+show what it submits. In practice that reads as the app rejecting Tron's address
+format — you paste `T…`, it turns into `trx-shasta:0x…` — so the fields now show
+base58 too, while the form state stays hex.
+
+`AddressInput` is an uncontrolled input synced to `address` through a ref, and two
+of its effects reconcile the two. Both compared the field's text against the state
+string directly, which on Tron differ *by design*, so both needed a Tron branch:
+
+- The "address changed from outside" effect (QR scan, proxy-ABI dialog) compares
+  the field against `toInputValue(address, …)` — what it *should* be showing —
+  rather than against the raw state. Comparing raw would treat every render as a
+  new address and rewrite the field mid-typing.
+- The network-switch effect skips pushing state when the field is already showing
+  the address in state; otherwise it would re-push the same hex on every render
+  and mark a pristine field dirty.
+
+Both branches are gated on `isTron`, so behaviour on every other chain is
+byte-identical — including the checksum-on-type and EIP-3770 prefix handling.
+
+Conversion into hex still happens the moment a complete base58 address is
+recognised (`checksumValidAddress` → `normalizeTronAddress`), so `onChangeAddress`
+never emits base58 and no consumer of form state sees a `T…` string. Incomplete or
+mistyped input is left exactly as typed and reported as *"Invalid address"*.
+
+Covered by `src/components/forms/fields/AddressInput.test.tsx` — base58 in and
+out, hex paste displayed as base58, half-typed input untouched, and the non-Tron
+chain still prefixing and checksumming hex. Its harness holds the address state
+the way the real parents do; with a stub `onChangeAddress` the sync effects never
+run and the test proves nothing. Display elsewhere is covered by
+`src/components/TransactionDetails.test.tsx` plus the helper tests in
+`src/utils/tronAddress.test.ts`.
 
 ---
 
