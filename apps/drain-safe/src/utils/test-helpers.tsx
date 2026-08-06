@@ -147,6 +147,57 @@ export const mockInitialBalances = [
   },
 ]
 
+// A chain with no price feed, copied from a live Tron Shasta (2494104990) balances
+// response: the gateway reports fiatBalance "0" and fiatConversion "0" for every asset,
+// and both assets use 6 decimals. Every other fixture here is 18-decimal with a live
+// price, so nothing else exercises this shape.
+export const mockZeroFiatBalances = [
+  {
+    tokenInfo: {
+      type: 'NATIVE_TOKEN',
+      address: '0x0000000000000000000000000000000000000000',
+      decimals: 6,
+      symbol: 'TRX',
+      name: 'TRON',
+      logoUri: 'https://assets.stage.safe.protofire.io/chains/2494104990/currency_logo.png',
+    },
+    balance: '47000000',
+    fiatBalance: '0',
+    fiatConversion: '0',
+  },
+  {
+    tokenInfo: {
+      type: 'ERC20',
+      address: '0x42a1e39aefA49290F2B3F9ed688D7cecf86CD6E0',
+      decimals: 6,
+      symbol: 'USDT',
+      name: 'TetherToken',
+      logoUri:
+        'https://assets.stage.safe.protofire.io/0x42a1e39aefA49290F2B3F9ed688D7cecf86CD6E0.png',
+    },
+    balance: '85000000',
+    fiatBalance: '0',
+    fiatConversion: '0',
+  },
+]
+
+// The sweep the fixture above must produce: the whole native balance in raw base units
+// (no decimals handling needed) plus one erc20 transfer.
+export const mockZeroFiatTxsRequest = {
+  txs: [
+    {
+      data: '0x',
+      to: '0x301812eb4c89766875eFe61460f7a8bBC0CadB96',
+      value: '47000000',
+    },
+    {
+      data: '0xa9059cbb000000000000000000000000301812eb4c89766875efe61460f7a8bbc0cadb96000000000000000000000000000000000000000000000000000000000510ff40',
+      to: '0x42a1e39aefA49290F2B3F9ed688D7cecf86CD6E0',
+      value: '0',
+    },
+  ],
+}
+
 export function renderWithProviders(ui: JSX.Element) {
   return {
     ...render(<ThemeProvider theme={mockTheme}>{ui}</ThemeProvider>),

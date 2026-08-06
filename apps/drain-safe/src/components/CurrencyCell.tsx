@@ -3,8 +3,7 @@ import { Icon, Tooltip } from '@gnosis.pm/safe-react-components'
 import BigNumber from 'bignumber.js'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import web3Utils from 'web3-utils'
-import { formatCurrencyValue } from '../utils/formatters'
+import { formatCurrencyValue, formatTokenValue } from '../utils/formatters'
 import { tokenToTx } from '../utils/sdk-helpers'
 import Flex from './Flex'
 import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk'
@@ -14,11 +13,13 @@ function CurrencyCell({
   currency,
   gasPrice,
   ethFiatPrice,
+  nativeCurrencyDecimals,
 }: {
   item: TokenBalance
   currency: string
   gasPrice: BigNumber
   ethFiatPrice: number
+  nativeCurrencyDecimals: number
 }) {
   const label = formatCurrencyValue(item.fiatBalance, currency)
   const [transferCostInFiat, setTransferCostInFiat] = useState(new BigNumber(0))
@@ -40,10 +41,14 @@ function CurrencyCell({
           from: safe.safeAddress,
         })
 
-        const gasCostInWei = gasPrice.multipliedBy(estimatedTransferGas)
-        const gasCostInEther = new BigNumber(web3Utils.fromWei(gasCostInWei.toString(), 'ether'))
+        const gasCostInSmallestUnit = gasPrice.multipliedBy(estimatedTransferGas)
+        // Not every chain's native currency has 18 decimals -- TRX has 6, and dividing by
+        // 1e18 there understates the cost by a factor of a trillion.
+        const gasCostInNativeCurrency = new BigNumber(
+          formatTokenValue(gasCostInSmallestUnit.toString(), nativeCurrencyDecimals),
+        )
 
-        const transferCostInFiat = gasCostInEther.multipliedBy(ethFiatPrice)
+        const transferCostInFiat = gasCostInNativeCurrency.multipliedBy(ethFiatPrice)
 
         setTransferCostInFiat(transferCostInFiat)
       } catch (e) {
@@ -51,7 +56,7 @@ function CurrencyCell({
       }
     }
     estimateTransferCost()
-  }, [gasPrice, ethFiatPrice, item, sdk, safe])
+  }, [gasPrice, ethFiatPrice, item, sdk, safe, nativeCurrencyDecimals])
 
   // if transfer cost is higher than token market value, we show a warning icon & tooltip in the cell
   const showWarningIcon =

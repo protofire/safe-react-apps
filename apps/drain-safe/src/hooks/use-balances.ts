@@ -13,7 +13,10 @@ export type BalancesType = {
 
 const transferableTokens = (item: TokenBalance) =>
   item.tokenInfo.type !== NATIVE_TOKEN ||
-  (item.tokenInfo.type === NATIVE_TOKEN && Number(item.fiatBalance) !== 0)
+  // Drainability is a function of BALANCE, not of fiat value: a chain without a price feed
+  // reports fiatBalance "0" for every asset, which silently hid the entire native balance
+  // from a "transfer everything" sweep.
+  (item.tokenInfo.type === NATIVE_TOKEN && Number(item.balance) !== 0)
 
 function useBalances(safeAddress: string, chainId: number): BalancesType {
   const { sdk } = useSafeAppsSDK()

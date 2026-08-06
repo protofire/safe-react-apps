@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import { DataTable } from '@gnosis.pm/safe-react-components'
 import { GridColDef, GridRowsProp, GridSelectionModel, GridDensityTypes } from '@mui/x-data-grid'
-import { TokenBalance, TokenInfo, TokenType } from '@safe-global/safe-apps-sdk'
+import { TokenBalance } from '@safe-global/safe-apps-sdk'
 import BigNumber from 'bignumber.js'
 
 import { formatTokenValue } from '../utils/formatters'
@@ -10,25 +10,18 @@ import CurrencyCell from './CurrencyCell'
 
 const CURRENCY = 'USD'
 
-const ethToken: TokenInfo = {
-  logoUri: './eth.svg',
-  symbol: 'ETH',
-  name: 'Ether',
-  decimals: 18,
-  type: TokenType['NATIVE_TOKEN'],
-  address: '',
-}
-
 function Balances({
   assets,
   onSelectionChange,
   gasPrice,
   ethFiatPrice,
+  nativeCurrencyDecimals,
 }: {
   assets: TokenBalance[]
   ethFiatPrice: number
   onSelectionChange: (addresses: string[]) => void
   gasPrice: BigNumber
+  nativeCurrencyDecimals: number
 }): JSX.Element {
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([])
 
@@ -36,7 +29,7 @@ function Balances({
     setSelectionModel(assets.map(item => item.tokenInfo.address))
   }, [assets])
 
-  const dataGridColumns: GridColDef[] = [
+  const allColumns: GridColDef[] = [
     {
       field: 'asset',
       headerName: 'Asset',
@@ -81,6 +74,7 @@ function Balances({
       renderCell: (params: any) => (
         <CurrencyCell
           ethFiatPrice={ethFiatPrice}
+          nativeCurrencyDecimals={nativeCurrencyDecimals}
           gasPrice={gasPrice}
           item={params.value}
           currency={CURRENCY}
@@ -89,10 +83,14 @@ function Balances({
     },
   ]
 
+  // Without a price feed every fiatBalance is "0", so a Value column would render $0.00
+  // beside a real balance. Drop it rather than mislead; it returns if a feed appears.
+  const dataGridColumns = allColumns.filter(column => column.field !== 'value' || ethFiatPrice > 0)
+
   const dataGridRows: GridRowsProp = useMemo(
     () =>
       assets.slice().map((item: TokenBalance) => {
-        const token = item.tokenInfo || ethToken
+        const token = item.tokenInfo
 
         return {
           id: token.address,
