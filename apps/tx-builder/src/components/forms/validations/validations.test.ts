@@ -20,6 +20,26 @@ describe('form validations', () => {
 
         expect(validationResult).toBe(NO_ERROR_IS_PRESENT)
       })
+
+      it('validates a valid base58 address on a Tron chain', () => {
+        const validationResult = validateAddressField(
+          'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb',
+          undefined,
+          '728126428',
+        )
+
+        expect(validationResult).toBe(NO_ERROR_IS_PRESENT)
+      })
+
+      it('rejects a base58 address on a non-Tron chain', () => {
+        const validationResult = validateAddressField(
+          'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb',
+          undefined,
+          '1',
+        )
+
+        expect(validationResult).toBe('Invalid address')
+      })
     })
 
     describe('validateAmountField', () => {
@@ -49,6 +69,48 @@ describe('form validations', () => {
 
       it('validates invalid decimal amounts', () => {
         const validationResult = validateAmountField('0.000000000000000000000000000000001')
+
+        expect(validationResult).toBe('Invalid amount value')
+      })
+
+      it('validates too many decimal places for a chain with fewer decimals (Tron)', () => {
+        const validationResult = validateAmountField('0.0000001', undefined, '728126428', 6)
+
+        expect(validationResult).toBe('Too many decimal places (max 6)')
+      })
+
+      it('rejects trailing-zero decimals beyond the allowed count on a Tron chain', () => {
+        const validationResult = validateAmountField('1.0000000', undefined, '728126428', 6)
+
+        expect(validationResult).toBe('Too many decimal places (max 6)')
+      })
+
+      it('falls back to the invalid-amount error for scientific notation on a Tron chain (not a decimal-places error)', () => {
+        const validationResult = validateAmountField('1e-7', undefined, '728126428', 18)
+
+        expect(validationResult).toBe('Invalid amount value')
+      })
+
+      it('non-Tron chains never return the too-many-decimals message', () => {
+        const validationResult = validateAmountField('0.0000001', undefined, '1', 6)
+
+        expect(validationResult).toBe('Invalid amount value')
+      })
+
+      it('rejects empty string on EVM chains', () => {
+        const validationResult = validateAmountField('')
+
+        expect(validationResult).toBe('Invalid amount value')
+      })
+
+      it('rejects empty string on Tron chains', () => {
+        const validationResult = validateAmountField('', undefined, '728126428', 6)
+
+        expect(validationResult).toBe('Invalid amount value')
+      })
+
+      it('rejects too many fractional digits on EVM even when the excess digits are zero', () => {
+        const validationResult = validateAmountField('1.0000000000000000000')
 
         expect(validationResult).toBe('Invalid amount value')
       })
@@ -105,6 +167,68 @@ describe('form validations', () => {
         const validationResult = addressValidation('')
 
         expect(validationResult).toBe('Invalid address')
+      })
+
+      it('normalises and validates a valid base58 address on a Tron chain', () => {
+        const addressValidation = validateField('address', '728126428')
+
+        const validationResult = addressValidation('T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')
+
+        expect(validationResult).toBe(NO_ERROR_IS_PRESENT)
+      })
+
+      it('returns "Invalid address" (not a throw) for a bad-checksum base58 address', () => {
+        const addressValidation = validateField('address', '728126428')
+
+        const validationResult = addressValidation('T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwc')
+
+        expect(validationResult).toBe('Invalid address')
+      })
+
+      it('rejects a base58 address on a non-Tron chain, unchanged behavior', () => {
+        const addressValidation = validateField('address', '1')
+
+        const validationResult = addressValidation('T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')
+
+        expect(validationResult).toBe('Invalid address')
+      })
+
+      it('accepts an uppercase 0X-prefixed address (isChecksumable gate, not isValidAddress)', () => {
+        const addressValidation = validateField('address')
+
+        const validationResult = addressValidation('0X57CB13cbef735FbDD65f5f2866638c546464E45F')
+
+        expect(validationResult).toBe(NO_ERROR_IS_PRESENT)
+      })
+    })
+
+    describe('address[] field type', () => {
+      it('normalises and validates a valid base58 address array on a Tron chain', () => {
+        const addressArrayValidation = validateField('address[]', '728126428')
+
+        const validationResult = addressArrayValidation('["T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb"]')
+
+        expect(validationResult).toBe(NO_ERROR_IS_PRESENT)
+      })
+    })
+
+    describe('tuple field type with components', () => {
+      it('accepts a base58 address inside a tuple(address,uint256) when components are passed through', () => {
+        const components = [
+          { internalType: 'address', name: 'addr', type: 'address' },
+          { internalType: 'uint256', name: 'amount', type: 'uint256' },
+        ]
+        const tupleValidation = validateField(
+          'tuple(address,uint256)',
+          '728126428',
+          6,
+          [],
+          components,
+        )
+
+        const validationResult = tupleValidation('["T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb","1"]')
+
+        expect(validationResult).toBe(NO_ERROR_IS_PRESENT)
       })
     })
 

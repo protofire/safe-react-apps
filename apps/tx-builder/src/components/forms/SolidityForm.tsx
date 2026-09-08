@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
-import { toChecksumAddress, toWei } from 'web3-utils'
+import { toChecksumAddress } from 'web3-utils'
 
 import {
   ADDRESS_FIELD_TYPE,
@@ -10,8 +10,10 @@ import {
   NATIVE_AMOUNT_FIELD_TYPE,
 } from './fields/fields'
 import Field from './fields/Field'
-import { encodeToHexData, getInputTypeHelper } from '../../utils'
+import { encodeToHexData, getInputTypeHelper, toNativeUnits } from '../../utils'
+import { normalizeAddressInput } from '../../lib/tronAddress'
 import { ContractInterface, ProposedTransaction } from '../../typings/models'
+import { useNetwork } from '../../store'
 
 export const TO_ADDRESS_FIELD_NAME = 'toAddress'
 export const NATIVE_VALUE_FIELD_NAME = 'nativeAmount'
@@ -50,6 +52,8 @@ export const parseFormToProposedTransaction = (
   contract: ContractInterface | null,
   nativeCurrencySymbol: string | undefined,
   networkPrefix: string | undefined,
+  chainId: string | undefined,
+  nativeCurrencyDecimals: number,
 ): ProposedTransaction => {
   const contractMethodIndex = values[CONTRACT_METHOD_INDEX_FIELD_NAME]
   const toAddress = values[TO_ADDRESS_FIELD_NAME]
@@ -60,9 +64,10 @@ export const parseFormToProposedTransaction = (
 
   const contractMethod = contract?.methods[Number(contractMethodIndex)]
 
-  const data = customTransactionData || encodeToHexData(contractMethod, methodValues) || '0x'
-  const to = toChecksumAddress(toAddress)
-  const value = toWei(tokenValue || '0')
+  const data =
+    customTransactionData || encodeToHexData(contractMethod, methodValues, chainId) || '0x'
+  const to = toChecksumAddress(normalizeAddressInput(toAddress, chainId))
+  const value = toNativeUnits(tokenValue, nativeCurrencyDecimals)
 
   return {
     id: new Date().getTime(),
@@ -94,6 +99,7 @@ const SolidityForm = ({
   children,
   showHexEncodedData,
 }: SolidityFormPropsTypes) => {
+  const { chainId, nativeCurrencyDecimals } = useNetwork()
   const {
     handleSubmit,
     control,
@@ -124,10 +130,10 @@ const SolidityForm = ({
     const methodValues = contractFieldsValues?.[`method-${contractMethodIndex}`]
 
     if (showHexEncodedData && contractMethod) {
-      const encodeData = encodeToHexData(contractMethod, methodValues)
+      const encodeData = encodeToHexData(contractMethod, methodValues, chainId)
       setValue(CUSTOM_TRANSACTION_DATA_FIELD_TYPE, encodeData || '')
     }
-  }, [contractMethod, getValues, setValue, showHexEncodedData, contractMethodIndex])
+  }, [contractMethod, getValues, setValue, showHexEncodedData, contractMethodIndex, chainId])
 
   // Resets form to initial values if the user edited contract method and then switched to custom data and edited it
   useEffect(() => {
@@ -174,6 +180,7 @@ const SolidityForm = ({
           fieldType={ADDRESS_FIELD_TYPE}
           control={control}
           showErrorsInTheLabel={false}
+          chainId={chainId}
         />
 
         {/* Native Token Amount Input */}
@@ -187,6 +194,8 @@ const SolidityForm = ({
             required
             control={control}
             showErrorsInTheLabel={false}
+            nativeCurrencyDecimals={nativeCurrencyDecimals}
+            chainId={chainId}
           />
         )}
 
@@ -231,6 +240,8 @@ const SolidityForm = ({
                 showErrorsInTheLabel={false}
                 getAddressFromDomain={getAddressFromDomain}
                 networkPrefix={networkPrefix}
+                chainId={chainId}
+                components={contractField.components}
               />
             )
           )

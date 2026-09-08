@@ -3,9 +3,10 @@ import { useTransactions } from './transactionsContext'
 import StorageManager from '../lib/storage'
 import { Batch, BatchFile, BatchTransaction, ProposedTransaction } from '../typings/models'
 import { ChainInfo, SafeInfo } from '@safe-global/safe-apps-sdk'
-import { encodeToHexData } from '../utils'
+import { encodeToHexData, isChecksumable } from '../utils'
 import { toChecksumAddress } from 'web3-utils'
 import { addChecksum, validateChecksum } from '../lib/checksum'
+import { isTronChainId, normalizeAddressInput } from '../lib/tronAddress'
 import { useNetwork } from './networkContext'
 
 const packageJson = require('../../package.json')
@@ -304,11 +305,23 @@ const convertToBatchTransactions = (transactions: ProposedTransaction[]): BatchT
   )
 }
 
-const convertToProposedTransactions = (
+export const convertToProposedTransactions = (
   batchFile: BatchFile,
   chainInfo: ChainInfo,
 ): ProposedTransaction[] => {
   return batchFile.transactions.map((transaction, index) => {
+    // On EVM chains `raw.to` must stay byte-identical to base: no throwing on a malformed/empty
+    // `to`, no checksumming in the custom-data branch. On Tron chains, normalise base58 -> hex
+    // and checksum the result — matching base's own toChecksumAddress(rawTo), which throws on a
+    // garbage/empty `to` rather than silently passing it through to sdk.txs.send.
+    const tronTo = (rawTo: string) => {
+      const normalized = normalizeAddressInput(rawTo, chainInfo.chainId)
+      if (!isChecksumable(normalized)) {
+        throw new Error(`Invalid Tron address: ${rawTo}`)
+      }
+      return toChecksumAddress(normalized)
+    }
+
     if (transaction.data) {
       return {
         id: index,
@@ -321,7 +334,7 @@ const convertToProposedTransactions = (
           networkPrefix: chainInfo.shortName,
         },
         raw: {
-          to: transaction.to,
+          to: isTronChainId(chainInfo.chainId) ? tronTo(transaction.to) : transaction.to,
           value: transaction.value,
           data: transaction.data || '',
         },
@@ -343,11 +356,17 @@ const convertToProposedTransactions = (
         networkPrefix: chainInfo.shortName,
       },
       raw: {
-        to: toChecksumAddress(transaction.to),
+        to: isTronChainId(chainInfo.chainId)
+          ? tronTo(transaction.to)
+          : toChecksumAddress(transaction.to),
         value: transaction.value,
         data:
           transaction.data ||
-          encodeToHexData(transaction.contractMethod, transaction.contractInputsValues) ||
+          encodeToHexData(
+            transaction.contractMethod,
+            transaction.contractInputsValues,
+            chainInfo.chainId,
+          ) ||
           '0x',
       },
     }

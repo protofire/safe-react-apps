@@ -3,11 +3,13 @@ import styled from 'styled-components'
 
 import useElementHeight from '../hooks/useElementHeight/useElementHeight'
 import { ProposedTransaction } from '../typings/models'
-import { weiToEther } from '../utils'
+import { fromNativeUnits } from '../utils'
+import { useNetwork } from '../store'
 import EthHashInfo from './ETHHashInfo'
 import Text from './Text'
 import { Typography } from '@material-ui/core'
 import ButtonLink from './buttons/ButtonLink'
+import Loader from './Loader'
 
 type TransactionDetailsProp = {
   transaction: ProposedTransaction
@@ -30,11 +32,21 @@ const TransactionDetails = ({ transaction }: TransactionDetailsProp) => {
 
   const isTokenTransferTx = !isCustomHexDataTx && !isContractInteractionTx
 
+  const { nativeCurrencyDecimals } = useNetwork()
+
+  if (nativeCurrencyDecimals === undefined) {
+    return (
+      <Wrapper>
+        <Loader size="md" />
+      </Wrapper>
+    )
+  }
+
   return (
     <Wrapper>
       <StyledTxTitle>
         {isTokenTransferTx
-          ? `Transfer ${weiToEther(value)} ${nativeCurrencySymbol} to:`
+          ? `Transfer ${fromNativeUnits(value, nativeCurrencyDecimals)} ${nativeCurrencySymbol} to:`
           : 'Interact with:'}
       </StyledTxTitle>
 
@@ -59,7 +71,10 @@ const TransactionDetails = ({ transaction }: TransactionDetailsProp) => {
 
         {/* value */}
         <StyledText color="grey">value:</StyledText>
-        <TxValueLabel>{`${weiToEther(value)} ${nativeCurrencySymbol}`}</TxValueLabel>
+        <TxValueLabel>{`${fromNativeUnits(
+          value,
+          nativeCurrencyDecimals,
+        )} ${nativeCurrencySymbol}`}</TxValueLabel>
 
         {/* data */}
         <StyledText color="grey">data:</StyledText>

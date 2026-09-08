@@ -4,13 +4,20 @@ import abiCoder, { AbiCoder } from 'web3-eth-abi'
 import { parseInputValue } from '../../../utils'
 import { NON_SOLIDITY_TYPES } from '../fields/fields'
 import { isEthersError } from '../../../typings/errors'
+import { ContractInput } from '../../../typings/models'
 
-const basicSolidityValidation = (value: string, fieldType: string): ValidateResult => {
+const basicSolidityValidation = (
+  value: string,
+  fieldType: string,
+  chainId?: string,
+  _nativeCurrencyDecimals?: number,
+  components?: ContractInput[],
+): ValidateResult => {
   const isSolidityFieldType = !NON_SOLIDITY_TYPES.includes(fieldType)
   // NOTE: skip validation from web3-eth-abi library, since it has issues with encoding `tuple(...)[]`
   if (isSolidityFieldType && !(fieldType.startsWith('tuple(') && fieldType.endsWith(')[]'))) {
     try {
-      const cleanValue = parseInputValue(fieldType, value)
+      const cleanValue = parseInputValue(fieldType, value, chainId, components)
       const abi = abiCoder as unknown // a bug in the web3-eth-abi types
       ;(abi as AbiCoder).encodeParameter(fieldType, cleanValue)
     } catch (error: unknown) {
