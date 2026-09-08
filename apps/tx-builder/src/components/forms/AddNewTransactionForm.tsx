@@ -3,6 +3,7 @@ import { toChecksumAddress } from 'web3-utils'
 
 import { ContractInterface } from '../../typings/models'
 import { isValidAddress } from '../../utils'
+import { normalizeAddressInput } from '../../lib/tronAddress'
 import SolidityForm, {
   CONTRACT_METHOD_INDEX_FIELD_NAME,
   SolidityFormValuesTypes,
@@ -13,6 +14,7 @@ import { useTransactions, useNetwork } from '../../store'
 import { Typography } from '@material-ui/core'
 import Button from '../Button'
 import FixedIcon from '../FixedIcon'
+import Loader from '../Loader'
 
 type AddNewTransactionFormProps = {
   contract: ContractInterface | null
@@ -25,13 +27,28 @@ const AddNewTransactionForm = ({
   to,
   showHexEncodedData,
 }: AddNewTransactionFormProps) => {
+  const { addTransaction } = useTransactions()
+  const {
+    networkPrefix,
+    getAddressFromDomain,
+    nativeCurrencySymbol,
+    chainId,
+    nativeCurrencyDecimals,
+  } = useNetwork()
+
+  const normalizedTo = normalizeAddressInput(to, chainId)
   const initialFormValues = {
-    [TO_ADDRESS_FIELD_NAME]: isValidAddress(to) ? toChecksumAddress(to) : '',
+    [TO_ADDRESS_FIELD_NAME]: isValidAddress(normalizedTo) ? toChecksumAddress(normalizedTo) : '',
     [CONTRACT_METHOD_INDEX_FIELD_NAME]: '0',
   }
 
-  const { addTransaction } = useTransactions()
-  const { networkPrefix, getAddressFromDomain, nativeCurrencySymbol } = useNetwork()
+  if (nativeCurrencyDecimals === undefined) {
+    return (
+      <LoaderContainer>
+        <Loader size="md" />
+      </LoaderContainer>
+    )
+  }
 
   const onSubmit = (values: SolidityFormValuesTypes) => {
     const proposedTransaction = parseFormToProposedTransaction(
@@ -39,6 +56,8 @@ const AddNewTransactionForm = ({
       contract,
       nativeCurrencySymbol,
       networkPrefix,
+      chainId,
+      nativeCurrencyDecimals,
     )
 
     addTransaction(proposedTransaction)
@@ -76,6 +95,11 @@ export default AddNewTransactionForm
 
 const StyledButtonLabel = styled.span`
   margin-left: 8px;
+`
+const LoaderContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 24px;
 `
 const ButtonContainer = styled.div`
   display: flex;

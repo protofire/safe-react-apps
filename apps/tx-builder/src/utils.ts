@@ -1,7 +1,9 @@
-import { AbiItem, toBN, fromWei, toChecksumAddress } from 'web3-utils'
+import { AbiItem, toBN, toChecksumAddress } from 'web3-utils'
+import { ethers } from 'ethers'
 import { ChainInfo } from '@safe-global/safe-gateway-typescript-sdk'
 import abiCoder, { AbiCoder } from 'web3-eth-abi'
 import { ContractInput, ContractMethod, ProposedTransaction } from './typings/models'
+import { isTronChainId, normalizeAddressInput, tronBase58ToHex } from './lib/tronAddress'
 import {
   isAddressFieldType,
   isArrayFieldType,
@@ -139,28 +141,75 @@ export const isArray = (values: string): boolean => {
   return isArray
 }
 
-const parseArrayOfValues = (values: string, fieldType: string): any => {
+const parseArrayOfValues = (
+  values: string,
+  fieldType: string,
+  chainId?: string,
+  components?: ContractInput[],
+): any => {
   if (!isArray(values)) {
     throw new SoliditySyntaxError('Invalid Array value')
   }
 
   return parseStringToArray(values).map(itemValue =>
     isArray(itemValue)
-      ? parseArrayOfValues(itemValue, fieldType) // recursive call because Matrix and MultiDimensional Arrays field types
+      ? parseArrayOfValues(itemValue, fieldType, chainId, components) // recursive call because Matrix and MultiDimensional Arrays field types
       : parseInputValue(
           // recursive call to parseInputValue
           getBaseFieldType(fieldType), // based on the base field type
           itemValue.replace(/"/g, '').replace(/'/g, ''), // removing " and ' chars from the value
+          chainId,
+          components,
         ),
   )
 }
 
+const TRON_BASE58_LEAF_REGEX = /^T[1-9A-HJ-NP-Za-km-z]{33}$/
+
+// Single type-directed walker over an already-JSON.parsed tuple/array value, normalising Tron
+// base58 addresses at `address` leaves. Never touches non-address leaves (strings, numbers) and
+// never throws on shape mismatches — those are left for the encoder to reject exactly as EVM does.
+export const normalizeTronAddressLeaves = (
+  type: string,
+  components: ContractInput[] | undefined,
+  value: unknown,
+): unknown => {
+  const trailingArrayMatch = type.match(/^(.*)(\[[1-9]*[0-9]*\])$/)
+  if (trailingArrayMatch) {
+    if (!Array.isArray(value)) {
+      return value
+    }
+    const elementType = trailingArrayMatch[1]
+    return value.map(item => normalizeTronAddressLeaves(elementType, components, item))
+  }
+
+  if (type.startsWith('tuple')) {
+    if (!Array.isArray(value) || !components || value.length !== components.length) {
+      return value
+    }
+    return value.map((item, index) =>
+      normalizeTronAddressLeaves(components[index].type, components[index].components, item),
+    )
+  }
+
+  if (type === 'address' && typeof value === 'string' && TRON_BASE58_LEAF_REGEX.test(value)) {
+    return tronBase58ToHex(value) ?? value
+  }
+
+  return value
+}
+
 // This function is used to parse the user input values
-export const parseInputValue = (fieldType: string, value: string): any => {
+export const parseInputValue = (
+  fieldType: string,
+  value: string,
+  chainId?: string,
+  components?: ContractInput[],
+): any => {
   const trimmedValue = typeof value === 'string' ? value.trim() : value
 
   if (isAddressFieldType(fieldType)) {
-    return toChecksumAddress(trimmedValue)
+    return toChecksumAddress(normalizeAddressInput(trimmedValue, chainId))
   }
 
   if (isBooleanFieldType(fieldType)) {
@@ -173,7 +222,13 @@ export const parseInputValue = (fieldType: string, value: string): any => {
 
   // FIX: fix the issue with long numbers in the tuples
   if (isTupleFieldType(fieldType)) {
-    return JSON.parse(trimmedValue)
+    const parsed = JSON.parse(trimmedValue)
+
+    if (isTronChainId(chainId)) {
+      return normalizeTronAddressLeaves(fieldType, components, parsed)
+    }
+
+    return parsed
   }
 
   // for Arrays, Matrix and MultiDimensional Arrays of strings JSON.parse is required
@@ -190,7 +245,7 @@ export const parseInputValue = (fieldType: string, value: string): any => {
     isMatrixFieldType(fieldType) ||
     isMultiDimensionalArrayFieldType(fieldType)
   ) {
-    return parseArrayOfValues(trimmedValue, fieldType)
+    return parseArrayOfValues(trimmedValue, fieldType, chainId, components)
   }
 
   return value
@@ -222,11 +277,24 @@ export const isValidAddress = (address: string | null) => {
   return /^(0x)?[0-9a-fA-F]{40}$/.test(address)
 }
 
+// Unlike isValidAddress (strict lowercase 0x), toChecksumAddress (web3-utils) also accepts an
+// uppercase 0X prefix. Use this to gate any new toChecksumAddress call added for Tron support so
+// a 0X-prefixed address isn't rejected before it ever reaches toChecksumAddress.
+export const isChecksumable = (value: string): boolean => {
+  try {
+    toChecksumAddress(value)
+    return true
+  } catch {
+    return false
+  }
+}
+
 const NON_VALID_CONTRACT_METHODS = ['receive', 'fallback']
 
 export const encodeToHexData = (
   contractMethod: ContractMethod | undefined,
   contractFieldsValues: any,
+  chainId?: string,
 ) => {
   const contractMethodName = contractMethod?.name
   const contractFields = contractMethod?.inputs || []
@@ -240,7 +308,7 @@ export const encodeToHexData = (
         const contractFieldName = contractField.name || index
         const cleanValue = contractFieldsValues[contractFieldName] || ''
 
-        return parseInputValue(contractField.type, cleanValue)
+        return parseInputValue(contractField.type, cleanValue, chainId, contractField.components)
       })
       const abi = abiCoder as unknown // a bug in the web3-eth-abi types
       const hexEncondedData = (abi as AbiCoder).encodeFunctionCall(
@@ -255,8 +323,35 @@ export const encodeToHexData = (
   }
 }
 
-export const weiToEther = (wei: string) => {
-  return fromWei(wei, 'ether')
+export const toNativeUnits = (value: string, decimals: number): string => {
+  const trimmedValue = value || '0'
+  const fractionalDigits = trimmedValue.split('.')[1]?.length || 0
+
+  if (fractionalDigits > decimals) {
+    throw new Error('too many decimal places')
+  }
+
+  return ethers.utils.parseUnits(trimmedValue, decimals).toString()
+}
+
+export const fromNativeUnits = (rawValue: string, decimals: number): string => {
+  // base weiToEther('') returned '0' (web3-utils fromWei('') -> '0'); ethers.formatUnits('')
+  // throws, so guard empty/whitespace input before it ever reaches ethers
+  const trimmedValue = rawValue?.trim()
+  if (!trimmedValue) {
+    return '0'
+  }
+
+  try {
+    const formatted = ethers.utils.formatUnits(trimmedValue, decimals)
+    // formatUnits always keeps a decimal point (e.g. '1.0'); strip trailing zeros
+    // and a trailing bare '.' so display stays byte-identical to the previous fromWei
+    return formatted.replace(/0+$/, '').replace(/\.$/, '')
+  } catch {
+    // base fromWei coerced junk input to some number rather than throwing; '0' is an accepted
+    // deviation for genuinely unparseable input (e.g. 'abc', scientific notation '1e18')
+    return '0'
+  }
 }
 
 export const getTransactionText = (description: ProposedTransaction['description']) => {

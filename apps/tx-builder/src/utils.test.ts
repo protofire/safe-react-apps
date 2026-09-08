@@ -1,16 +1,19 @@
-import { toBN } from 'web3-utils'
+import { toBN, toChecksumAddress } from 'web3-utils'
 
 import {
   encodeToHexData,
+  fromNativeUnits,
   getBaseFieldType,
   getInputTypeHelper,
   getNumberOfBits,
   isArray,
+  isChecksumable,
   parseBooleanValue,
   parseInputValue,
   parseIntValue,
   parseStringToArray,
   SoliditySyntaxError,
+  toNativeUnits,
 } from './utils'
 
 describe('util functions', () => {
@@ -1526,6 +1529,164 @@ describe('util functions', () => {
           '0xcff4aff20000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001',
         )
       })
+    })
+  })
+
+  describe('toNativeUnits', () => {
+    it('converts a decimal value to the smallest unit for the given decimals', () => {
+      expect(toNativeUnits('0.000001', 6)).toBe('1')
+      expect(toNativeUnits('1', 18)).toBe('1000000000000000000')
+    })
+
+    it('defaults an empty value to 0', () => {
+      expect(toNativeUnits('', 18)).toBe('0')
+    })
+
+    it('throws when the value has more decimal places than the chain supports', () => {
+      expect(() => toNativeUnits('0.0000001', 6)).toThrow()
+    })
+  })
+
+  describe('fromNativeUnits', () => {
+    it('formats a raw value using the given decimals', () => {
+      expect(fromNativeUnits('1', 6)).toBe('0.000001')
+    })
+
+    it('strips a trailing .0 to match the previous fromWei behavior', () => {
+      expect(fromNativeUnits('1000000000000000000', 18)).toBe('1')
+    })
+
+    it('strips trailing zeros but keeps significant decimals', () => {
+      expect(fromNativeUnits('1500000000000000000', 18)).toBe('1.5')
+      expect(fromNativeUnits('1230000', 6)).toBe('1.23')
+    })
+
+    it('returns 0 for empty or whitespace input', () => {
+      expect(fromNativeUnits('', 18)).toBe('0')
+      expect(fromNativeUnits('   ', 18)).toBe('0')
+    })
+
+    it('returns 0 for garbage input instead of throwing', () => {
+      expect(fromNativeUnits('abc', 18)).toBe('0')
+    })
+
+    it('returns 0 for scientific notation formatUnits cannot parse as raw wei', () => {
+      expect(fromNativeUnits('1e18', 18)).toBe('0')
+    })
+
+    it('trims whitespace-padded numeric input and parses it correctly', () => {
+      expect(fromNativeUnits(' 1000000 ', 6)).toBe('1')
+    })
+  })
+
+  describe('normalizeTronAddressLeaves (Tron tuple/array address normalisation)', () => {
+    const TRON_CHAIN_ID = '728126428'
+    const BASE58_ADDRESS = 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb'
+
+    it('does not split a string leaf containing a comma inside tuple(string[],address)', () => {
+      const fieldType = getInputTypeHelper({
+        components: [
+          { internalType: 'string[]', name: 'names', type: 'string[]' },
+          { internalType: 'address', name: 'addr', type: 'address' },
+        ],
+        internalType: 'tuple',
+        name: 'params',
+        type: 'tuple',
+      })
+
+      const parsedValue = parseInputValue(
+        fieldType,
+        JSON.stringify([['hello,world'], '0x680cde08860141F9D223cE4E620B10Cd6741037E']),
+        TRON_CHAIN_ID,
+        [
+          { internalType: 'string[]', name: 'names', type: 'string[]' },
+          { internalType: 'address', name: 'addr', type: 'address' },
+        ],
+      )
+
+      expect(parsedValue[0]).toEqual(['hello,world'])
+      expect(parsedValue[1]).toEqual('0x680cde08860141F9D223cE4E620B10Cd6741037E')
+    })
+
+    it('rejects an over-long tuple value the same way EVM would (no truncation, unchanged for encoder to reject)', () => {
+      const components = [
+        { internalType: 'address', name: 'addr', type: 'address' },
+        { internalType: 'uint256', name: 'amount', type: 'uint256' },
+      ]
+      const fieldType = getInputTypeHelper({
+        components,
+        internalType: 'tuple',
+        name: 'params',
+        type: 'tuple',
+      })
+
+      const overLongValue = ['0x680cde08860141F9D223cE4E620B10Cd6741037E', '1', 'extra']
+      const parsedValue = parseInputValue(
+        fieldType,
+        JSON.stringify(overLongValue),
+        TRON_CHAIN_ID,
+        components,
+      )
+
+      // length mismatch -> returned unchanged, left for the encoder to reject
+      expect(parsedValue).toEqual(overLongValue)
+    })
+
+    it('normalises addresses inside a fixed-size tuple[2] array', () => {
+      const components = [{ internalType: 'address', name: 'addr', type: 'address' }]
+      const fieldType = 'tuple[2]'
+
+      const parsedValue = parseInputValue(
+        fieldType,
+        JSON.stringify([[BASE58_ADDRESS], [BASE58_ADDRESS]]),
+        TRON_CHAIN_ID,
+        components,
+      )
+
+      expect(parsedValue).toEqual([
+        ['0x0000000000000000000000000000000000000000'],
+        ['0x0000000000000000000000000000000000000000'],
+      ])
+    })
+
+    it('normalises addresses inside a nested address[][] tuple component', () => {
+      const components = [{ internalType: 'address[][]', name: 'addrs', type: 'address[][]' }]
+      const fieldType = getInputTypeHelper({
+        components,
+        internalType: 'tuple',
+        name: 'params',
+        type: 'tuple',
+      })
+
+      const parsedValue = parseInputValue(
+        fieldType,
+        JSON.stringify([[[BASE58_ADDRESS, BASE58_ADDRESS], [BASE58_ADDRESS]]]),
+        TRON_CHAIN_ID,
+        components,
+      )
+
+      expect(parsedValue).toEqual([
+        [
+          [
+            '0x0000000000000000000000000000000000000000',
+            '0x0000000000000000000000000000000000000000',
+          ],
+          ['0x0000000000000000000000000000000000000000'],
+        ],
+      ])
+    })
+  })
+
+  describe('isChecksumable', () => {
+    it('accepts an uppercase 0X-prefixed address, matching toChecksumAddress', () => {
+      const address = '0X0000000000000000000000000000000000000000'
+
+      expect(isChecksumable(address)).toBe(true)
+      expect(toChecksumAddress(address)).toBe('0x0000000000000000000000000000000000000000')
+    })
+
+    it('rejects a garbage value', () => {
+      expect(isChecksumable('GARBAGE')).toBe(false)
     })
   })
 })

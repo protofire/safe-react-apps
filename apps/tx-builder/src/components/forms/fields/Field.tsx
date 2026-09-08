@@ -14,6 +14,7 @@ import SelectContractField from './SelectContractField'
 import TextareaContractField from './TextareaContractField'
 import TextContractField from './TextContractField'
 import validateField, { ValidationFunction } from '../validations/validateField'
+import { ContractInput } from '../../../typings/models'
 
 const CUSTOM_DEFAULT_VALUES: CustomDefaultValueTypes = {
   [BOOLEAN_FIELD_TYPE]: 'true',
@@ -51,6 +52,9 @@ type FieldProps = {
   showErrorsInTheLabel?: boolean
   shouldUnregister?: boolean
   options?: SelectItem[]
+  chainId?: string
+  nativeCurrencyDecimals?: number
+  components?: ContractInput[]
 }
 
 const Field = ({
@@ -61,6 +65,9 @@ const Field = ({
   options,
   required = true,
   validations, // you can define extra validations as a prop
+  chainId,
+  nativeCurrencyDecimals,
+  components,
   ...props
 }: FieldProps) => {
   // Component based on the field type
@@ -78,7 +85,13 @@ const Field = ({
           value: required,
           message: 'Required',
         },
-        validate: validateField(fieldType, validations),
+        validate: validateField(
+          fieldType,
+          chainId,
+          nativeCurrencyDecimals,
+          validations,
+          components,
+        ),
       }}
       render={({ field, fieldState }) => (
         <FieldComponent

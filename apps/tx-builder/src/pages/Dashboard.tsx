@@ -7,7 +7,8 @@ import CheckCircle from '@material-ui/icons/CheckCircle'
 import detectProxyTarget from 'evm-proxy-detection'
 import { toChecksumAddress } from 'web3-utils'
 
-import { evalTemplate, FETCH_STATUS, isValidAddress } from '../utils'
+import { evalTemplate, FETCH_STATUS, isChecksumable, isValidAddress } from '../utils'
+import { normalizeAddressInput } from '../lib/tronAddress'
 import AddNewTransactionForm from '../components/forms/AddNewTransactionForm'
 import JsonField from '../components/forms/fields/JsonField'
 import { ContractInterface } from '../typings/models'
@@ -33,7 +34,8 @@ const Dashboard = (): ReactElement => {
     proxyAddress: '',
   })
 
-  const { interfaceRepo, networkPrefix, getAddressFromDomain, web3, chainInfo } = useNetwork()
+  const { interfaceRepo, networkPrefix, getAddressFromDomain, web3, chainInfo, chainId } =
+    useNetwork()
 
   useEffect(() => {
     if (!abi || !interfaceRepo) {
@@ -66,7 +68,10 @@ const Dashboard = (): ReactElement => {
   //    implementation address, otherwise we keep the original address.
   const handleAbiAddressInput = useCallback(
     async (_input: string) => {
-      const input = toChecksumAddress(_input)
+      const normalizedInput = normalizeAddressInput(_input, chainId)
+      const input = isChecksumable(normalizedInput)
+        ? toChecksumAddress(normalizedInput)
+        : normalizedInput
       // For some reason the onchange handler is fired many times
       // Even if the value hasn't changed, we have to check if we already tried to fetch the ABI
       const alreadyExecuted = input.toLowerCase() === abiAddress.toLowerCase()
@@ -99,7 +104,7 @@ const Dashboard = (): ReactElement => {
       setAbiAddress(input)
       setTransactionRecipientAddress(input)
     },
-    [abiAddress, interfaceRepo, web3],
+    [abiAddress, interfaceRepo, web3, chainId],
   )
 
   if (!chainInfo) {

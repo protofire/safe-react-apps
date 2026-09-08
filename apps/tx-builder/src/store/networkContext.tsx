@@ -13,6 +13,8 @@ type NetworkContextProps = {
   interfaceRepo: InterfaceRepo | undefined
   networkPrefix: string
   nativeCurrencySymbol: string | undefined
+  chainId: string | undefined
+  nativeCurrencyDecimals: number | undefined
   getAddressFromDomain: (name: string) => Promise<string>
 }
 
@@ -54,6 +56,8 @@ const NetworkProvider: React.FC = ({ children }) => {
   const networkPrefix = chainInfo?.shortName || ''
 
   const nativeCurrencySymbol = chainInfo?.nativeCurrency.symbol
+  const chainId = chainInfo?.chainId
+  const nativeCurrencyDecimals = chainInfo?.nativeCurrency.decimals
 
   const getAddressFromDomain = (name: string): Promise<string> => {
     return web3?.eth.ens.getAddress(name) || new Promise(resolve => resolve(name))
@@ -69,6 +73,8 @@ const NetworkProvider: React.FC = ({ children }) => {
         interfaceRepo,
         networkPrefix,
         nativeCurrencySymbol,
+        chainId,
+        nativeCurrencyDecimals,
         getAddressFromDomain,
       }}
     >

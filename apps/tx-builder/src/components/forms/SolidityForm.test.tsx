@@ -6,6 +6,7 @@ import SolidityForm, {
   CONTRACT_METHOD_INDEX_FIELD_NAME,
   TO_ADDRESS_FIELD_NAME,
 } from './SolidityForm'
+import { NetworkContext } from '../../store/networkContext'
 
 // Axios is bundled as ESM module which is not directly compatible with Jest
 // https://jestjs.io/docs/ecmascript-modules
@@ -91,6 +92,47 @@ describe('<SolidityForm>', () => {
     // now testBooleanMethod is selected by default
     await waitFor(() => {
       // expect(input).toHaveValue('testBooleanValue')
+    })
+  })
+
+  it('rejects too many decimal places for the native amount field through the real form validation path (Tron, 6 decimals)', async () => {
+    render(
+      <NetworkContext.Provider
+        value={{
+          sdk: {} as any,
+          safe: {} as any,
+          chainInfo: undefined,
+          web3: undefined,
+          interfaceRepo: undefined,
+          networkPrefix: 'tron:',
+          nativeCurrencySymbol: 'TRX',
+          chainId: '728126428',
+          nativeCurrencyDecimals: 6,
+          getAddressFromDomain: jest.fn(),
+        }}
+      >
+        <SolidityForm
+          id={'test-form'}
+          onSubmit={jest.fn()}
+          getAddressFromDomain={jest.fn()}
+          initialValues={initialValues}
+          contract={null}
+          nativeCurrencySymbol={'TRX'}
+          networkPrefix={'tron:'}
+          showHexEncodedData={false}
+        >
+          <button type="submit">submit</button>
+        </SolidityForm>
+      </NetworkContext.Provider>,
+    )
+
+    const amountInput = await screen.findByTestId('token-value-input')
+
+    fireEvent.change(amountInput, { target: { value: '1.0000000' } })
+    fireEvent.blur(amountInput)
+
+    await waitFor(() => {
+      expect(screen.getByText('Too many decimal places (max 6)')).toBeInTheDocument()
     })
   })
 

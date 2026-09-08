@@ -9,9 +9,11 @@ import SolidityForm, {
   SolidityFormValuesTypes,
   TO_ADDRESS_FIELD_NAME,
 } from '../forms/SolidityForm'
-import { weiToEther } from '../../utils'
+import { fromNativeUnits } from '../../utils'
+import { useNetwork } from '../../store'
 import GenericModal from '../GenericModal'
 import Button from '../Button'
+import Loader from '../Loader'
 
 type EditTransactionModalProps = {
   txIndex: number
@@ -40,9 +42,25 @@ const EditTransactionModal = ({
 
   const isCustomHexDataTx = !!customTransactionData
 
+  const { chainId, nativeCurrencyDecimals } = useNetwork()
+
+  if (nativeCurrencyDecimals === undefined) {
+    return (
+      <GenericModal
+        title={`Transaction ${txIndex + 1}`}
+        body={
+          <LoaderContainer>
+            <Loader size="md" />
+          </LoaderContainer>
+        }
+        onClose={onClose}
+      />
+    )
+  }
+
   const initialFormValues: Partial<SolidityFormValuesTypes> = {
     [TO_ADDRESS_FIELD_NAME]: transaction.raw.to,
-    [NATIVE_VALUE_FIELD_NAME]: weiToEther(transaction.raw.value),
+    [NATIVE_VALUE_FIELD_NAME]: fromNativeUnits(transaction.raw.value, nativeCurrencyDecimals),
     [CUSTOM_TRANSACTION_DATA_FIELD_NAME]: customTransactionData,
     [CONTRACT_METHOD_INDEX_FIELD_NAME]: contractMethodIndex,
     [CONTRACT_VALUES_FIELD_NAME]: {
@@ -56,6 +74,8 @@ const EditTransactionModal = ({
       contractInterface,
       nativeCurrencySymbol,
       networkPrefix,
+      chainId,
+      nativeCurrencyDecimals,
     )
 
     // keep the id of the transaction
@@ -95,6 +115,12 @@ const EditTransactionModal = ({
     />
   )
 }
+
+const LoaderContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+`
 
 const ButtonContainer = styled.div`
   display: flex;
